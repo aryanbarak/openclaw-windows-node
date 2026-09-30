@@ -323,7 +323,7 @@ Use the named shadows in `x-colophon.tokens.shadows` when elevation is needed. K
 
 ## Shapes
 
-Use the `rounded` tokens for corner radii: `sm` for buttons and inputs, `md` for cards and flyouts, `lg` for grouped panels, `bubble` (12px) for chat message and code surfaces, `composer` (20px) for the chat writing surface, and `pill` for status badges and toggles.
+Use the `rounded` tokens for corner radii: `sm` for buttons and inputs, `md` for cards and flyouts, `lg` for grouped panels, `bubble` (12px) for the user chat bubble and code surfaces (assistant prose is bubbleless), `composer` (20px) for the chat writing surface, and `pill` for status badges and toggles.
 
 ## Chat surface
 
@@ -331,7 +331,7 @@ The chat transcript and composer ship via Reactor and follow the native chat vis
 
 - **Semantic brushes.** Chat binds the chat-local resources in `Themes/ChatResources.xaml` (Default/Light/HighContrast), not raw palette hex: `ChatCanvasBrush` (transparent; system window in HC), `ChatComposerBrush` and `ChatCardBrush` (`CardBackgroundFillColorDefault`), `ChatStrokeBrush` (`ControlStrokeColorDefault`), `ChatTextBrush` (`TextFillColorPrimary`), `ChatSecondaryTextBrush` (`TextFillColorSecondary`, used for code text), `ChatUserBrush` (accent at low opacity for the user bubble), `ChatUserTextBrush` (`TextFillColorPrimary`), `ChatPickerAccentBrush` (accent variants for picker triggers), and `ChatCopySuccessBrush` (`SystemFillColorSuccess`).
 - **Surface layering.** The Hub title bar and expanded navigation pane reveal Mica; `NavigationViewContentBackground` supplies one content layer (`LayerFillColorDefaultBrush`; system window in HC). The chat canvas is transparent so it neither hides nor doubles that layer, and the composer and code cards use the card fill above it. The standalone chat window uses the same Mica plus one content layer.
-- **Geometry.** The reading column is capped at 768px with a 16px prose inset; outer gutters are 12px below 640px and 40px above. The avatar is omitted below 960px. The writing surface uses the `composer` (20px) radius, a 16px editor inset, and a 112px minimum height; message and code surfaces use the `bubble` (12px) radius. All spacing stays on the 4px grid.
+- **Geometry.** The reading column is capped at 768px with a 16px prose inset; outer gutters are 12px below 640px and 40px above. The avatar is omitted below 960px. The writing surface uses the `composer` (20px) radius, a 16px editor inset, and a 112px minimum height. Assistant turns are bubbleless: their prose flows in the reading column with no card or fill, so the transcript reads like a document. Only the user's own message and code blocks sit on a surface with the `bubble` (12px) radius. All spacing stays on the 4px grid.
 - **Footer controls.** One bottom row keeps Attach, session, model, effort, voice, and the primary Send/Stop. The model picker is a native flyout with an AutoSuggestBox over a grouped single-selection list. Effort uses a native discrete slider with a compact gauge trigger (a WinUI-path rendering, not a font glyph) at narrow widths. Copy actions confirm with a `ChatCopySuccessBrush` checkmark and announce Copied.
 
 ## Components

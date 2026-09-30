@@ -279,7 +279,7 @@
     },
     {
       "name": "ChatBubble",
-      "note": "Assistant chat bubble: a 36×36 avatar (subtle `surface` fill, hairline `controlLine` border, `pill` radius) to the LEFT of a bubble on a `subtleHover` fill with a `controlLine` border. The `bubble` radius (12px) matches the refreshed native message and code surfaces (#1459); padding tokens 4/3 mirror the app's 16/12. In-app the bubble binds `ChatCardBrush`/`ChatTextBrush`, code text uses `ChatSecondaryTextBrush`, and the Copy action confirms with a `ChatCopySuccessBrush` checkmark that announces Copied and resets after two seconds. Footer reads timestamp · usage · Copy · Read aloud — Copy and Read aloud are hover-gated 20×20 subtle icon buttons in-app, and usage is the used/context (pct%) string ChatUsageFormatter produces. Mirrors ReactorChatTimeline's assistant row; ships via Reactor. Bubble max-width min(80%, 720px) and the run-start avatar gating are Reactor port notes (no token equivalent). (User messages ride the softer `accentSubtle` on the right in-app; this previews the assistant variant.)",
+      "note": "Assistant chat turn: a 36×36 avatar (subtle `surface` fill, hairline `controlLine` border, `pill` radius) to the LEFT of plain prose that flows in the reading column with NO bubble, card, border, or fill (#1459). The refreshed assistant turn is bubbleless: only the user's own message rides a soft bubble (see ChatThread), so the transcript reads like a document rather than facing chat cards. Prose binds `ChatTextBrush` (`ink`) at body type (14/21 in-app); top-level blocks use one uniform 16px gap (token 3). Inline code and fenced code still get their own `ChatCardBrush` surfaces with `ChatSecondaryTextBrush` code text and a `bubble` (12px) radius, and the Copy action confirms with a `ChatCopySuccessBrush` checkmark that announces Copied and resets after two seconds. Footer reads timestamp · usage · Copy · Read aloud — Copy and Read aloud are hover-gated 20×20 subtle icon buttons in-app, and usage is the used/context (pct%) string ChatUsageFormatter produces. Mirrors ReactorChatTimeline's assistant row; ships via Reactor. Reading column max-width 768px, 16px prose inset, and the avatar hiding below 960px are Reactor port notes (no token equivalent). (This previews the assistant variant; the user variant rides the softer `ChatUserBrush` bubble on the right.)",
       "props": {
         "time": "2:14 PM",
         "usage": "12.5K/200K (6%)",
@@ -350,18 +350,12 @@
                 "el": "div",
                 "layout": {
                   "mode": "vertical",
-                  "padding": {
-                    "x": "4",
-                    "y": "3"
-                  }
+                  "gap": "3"
                 },
                 "appearance": {
                   "fontFamily": "body",
                   "textStyle": "body",
-                  "background": "subtleHover",
-                  "color": "ink",
-                  "borderColor": "controlLine",
-                  "radius": "bubble"
+                  "color": "ink"
                 },
                 "children": [
                   "{children}"
@@ -937,7 +931,7 @@
     },
     {
       "name": "ChatThread",
-      "note": "A short thread: the \"does chat hang together\" check — a user turn (softer `accentSubtle` bubble on the right, with a hover Copy) and an assistant turn (avatar + Copy / Read aloud / context-usage readout), then the composer. In-app the user bubble binds `ChatUserBrush` (accent at low opacity) with `ChatUserTextBrush`, and the footer follows the refreshed model and reasoning-effort pickers (#1459). Thread/bubble max-width 720px is a Reactor port note.",
+      "note": "A short thread: the \"does chat hang together\" check — a user turn (softer `accentSubtle` bubble on the right, with a hover Copy) and a bubbleless assistant turn (avatar + plain prose + Copy / Read aloud / context-usage readout), then the composer. Only the user's own message rides a bubble; the assistant turn flows as plain prose in the reading column (#1459). In-app the user bubble binds `ChatUserBrush` (accent at low opacity) with `ChatUserTextBrush`, and the footer follows the refreshed model and reasoning-effort pickers. Thread max-width 768px and the user bubble cap 720px are Reactor port notes.",
       "root": {
         "id": "chat-thread-root",
         "el": "div",
