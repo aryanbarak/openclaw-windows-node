@@ -1085,41 +1085,69 @@
     },
     {
       "name": "AgentIdentityBadge",
-      "note": "Agent identity row from Controls/AgentIdentityBadge.xaml (#1541): a 32x32 PersonPicture avatar (circular, so `pill` radius) to the LEFT of a two-line stack — agent display name in body type over the agent id in caption `muted` (TextFillColorSecondary). Column spacing 12px maps to token 3; MinHeight 40 and the PersonPicture initials/photo fallback are port notes. Used in the assistant selector dropdown and anywhere an agent is named. In-app the avatar is a real PersonPicture (initials or gateway avatar), previewed here with a person glyph.",
+      "note": "Agent identity row from Controls/AgentIdentityBadge.xaml (#1541): a 32x32 PersonPicture avatar (circular, so `pill` radius) to the LEFT of a two-line stack — agent display name in body type over the agent id in caption `muted` (TextFillColorSecondary). A presence status dot rides the avatar's bottom-right corner (PersonPicture Badge slot): a 10px `pill` dot with a `paper` ring, previewed `positive` (connected). Its fill follows connection state like the ConnectionStatusFlyout dots — `positive` connected, `warning` attention, `critical` error, `muted` unknown — never color alone. Because it ships as the assistant-selector trigger and the Owner footer button, the whole row is a subtle transparent WinUI Button (SubtleFillColorTransparent rest via `control.chrome:none`, `subtleHover`/`subtlePressed` through `states`, and a `control.focus` accent focus rectangle); it spends no accent at rest. Column spacing 12px maps to token 3; MinHeight 40 and the PersonPicture initials/photo fallback are port notes. In-app the avatar is a real PersonPicture (initials or gateway avatar), previewed here with a person glyph.",
       "props": {
         "name": "Aurora",
         "handle": "agent-aurora"
       },
       "root": {
         "id": "agent-badge-root",
-        "el": "div",
+        "el": "button",
+        "attrs": {
+          "type": "button",
+          "aria-label": "{name}"
+        },
         "layout": {
           "mode": "horizontal",
           "gap": "3",
           "align": "center",
+          "padding": "1",
           "width": "fill"
+        },
+        "appearance": {
+          "background": "$none",
+          "radius": "sm"
+        },
+        "control": {
+          "chrome": "none",
+          "focus": { "kind": "outline", "color": "accent" }
+        },
+        "states": {
+          "hover": { "background": "subtleHover" },
+          "pressed": { "background": "subtlePressed" },
+          "hoverPressed": { "background": "subtlePressed" }
         },
         "children": [
           {
-            "id": "agent-badge-avatar",
+            "id": "agent-badge-avatar-wrap",
             "el": "div",
             "attrs": {
               "aria-hidden": "true"
             },
             "layout": {
-              "mode": "horizontal",
-              "align": "center",
-              "justify": "center",
+              "mode": "freeform",
               "width": 32,
               "height": 32
             },
-            "appearance": {
-              "background": "surface",
-              "borderColor": "controlLine",
-              "color": "muted",
-              "radius": "pill"
-            },
             "children": [
+              {
+                "id": "agent-badge-avatar",
+                "el": "div",
+                "position": { "mode": "absolute", "x": 0, "y": 0 },
+                "layout": {
+                  "mode": "horizontal",
+                  "align": "center",
+                  "justify": "center",
+                  "width": 32,
+                  "height": 32
+                },
+                "appearance": {
+                  "background": "surface",
+                  "borderColor": "controlLine",
+                  "color": "muted",
+                  "radius": "pill"
+                },
+                "children": [
               {
                 "id": "agent-badge-avatar-glyph",
                 "el": "svg",
@@ -1152,6 +1180,23 @@
                     }
                   }
                 ]
+              }
+            ]
+              },
+              {
+                "id": "agent-badge-status",
+                "el": "span",
+                "position": { "mode": "absolute", "x": 22, "y": 22 },
+                "layout": {
+                  "mode": "horizontal",
+                  "width": 10,
+                  "height": 10
+                },
+                "appearance": {
+                  "background": "positive",
+                  "borderColor": "paper",
+                  "radius": "pill"
+                }
               }
             ]
           },
@@ -1429,15 +1474,34 @@
               },
               {
                 "id": "conn-status-node-action",
-                "el": "a",
+                "el": "button",
                 "attrs": {
-                  "href": "#",
-                  "role": "button"
+                  "type": "button"
+                },
+                "layout": {
+                  "mode": "horizontal",
+                  "align": "center",
+                  "padding": {
+                    "x": "2",
+                    "y": "1"
+                  },
+                  "width": "hug"
                 },
                 "appearance": {
                   "fontFamily": "body",
                   "textStyle": "caption",
-                  "color": "accent"
+                  "color": "accent",
+                  "background": "$none",
+                  "radius": "sm"
+                },
+                "control": {
+                  "chrome": "none",
+                  "focus": { "kind": "outline", "color": "accent" }
+                },
+                "states": {
+                  "hover": { "background": "subtleHover" },
+                  "pressed": { "background": "subtlePressed" },
+                  "hoverPressed": { "background": "subtlePressed" }
                 },
                 "children": [
                   "Approve…"
@@ -1459,10 +1523,18 @@
           },
           {
             "id": "conn-status-open",
-            "el": "a",
+            "el": "button",
             "attrs": {
-              "href": "#",
-              "role": "button"
+              "type": "button"
+            },
+            "layout": {
+              "mode": "horizontal",
+              "align": "center",
+              "padding": {
+                "x": "2",
+                "y": "1"
+              },
+              "width": "hug"
             },
             "margin": {
               "top": "2"
@@ -1470,7 +1542,18 @@
             "appearance": {
               "fontFamily": "body",
               "textStyle": "body",
-              "color": "accent"
+              "color": "accent",
+              "background": "$none",
+              "radius": "sm"
+            },
+            "control": {
+              "chrome": "none",
+              "focus": { "kind": "outline", "color": "accent" }
+            },
+            "states": {
+              "hover": { "background": "subtleHover" },
+              "pressed": { "background": "subtlePressed" },
+              "hoverPressed": { "background": "subtlePressed" }
             },
             "children": [
               "Open Connection"
@@ -1508,15 +1591,34 @@
             "children": [
               {
                 "id": "notif-clear",
-                "el": "a",
+                "el": "button",
                 "attrs": {
-                  "href": "#",
-                  "role": "button"
+                  "type": "button"
+                },
+                "layout": {
+                  "mode": "horizontal",
+                  "align": "center",
+                  "padding": {
+                    "x": "2",
+                    "y": "1"
+                  },
+                  "width": "hug"
                 },
                 "appearance": {
                   "fontFamily": "body",
                   "textStyle": "body",
-                  "color": "accent"
+                  "color": "accent",
+                  "background": "$none",
+                  "radius": "sm"
+                },
+                "control": {
+                  "chrome": "none",
+                  "focus": { "kind": "outline", "color": "accent" }
+                },
+                "states": {
+                  "hover": { "background": "subtleHover" },
+                  "pressed": { "background": "subtlePressed" },
+                  "hoverPressed": { "background": "subtlePressed" }
                 },
                 "children": [
                   "Clear all"
@@ -1709,15 +1811,34 @@
             "children": [
               {
                 "id": "notif-footer-open",
-                "el": "a",
+                "el": "button",
                 "attrs": {
-                  "href": "#",
-                  "role": "button"
+                  "type": "button"
+                },
+                "layout": {
+                  "mode": "horizontal",
+                  "align": "center",
+                  "padding": {
+                    "x": "2",
+                    "y": "1"
+                  },
+                  "width": "hug"
                 },
                 "appearance": {
                   "fontFamily": "body",
                   "textStyle": "body",
-                  "color": "accent"
+                  "color": "accent",
+                  "background": "$none",
+                  "radius": "sm"
+                },
+                "control": {
+                  "chrome": "none",
+                  "focus": { "kind": "outline", "color": "accent" }
+                },
+                "states": {
+                  "hover": { "background": "subtleHover" },
+                  "pressed": { "background": "subtlePressed" },
+                  "hoverPressed": { "background": "subtlePressed" }
                 },
                 "children": [
                   "Open notifications"
