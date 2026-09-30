@@ -1179,6 +1179,7 @@
             "el": "div",
             "layout": {
               "mode": "vertical",
+              "align": "start",
               "grow": true
             },
             "children": [
@@ -1188,7 +1189,8 @@
                 "appearance": {
                   "fontFamily": "body",
                   "textStyle": "body",
-                  "color": "ink"
+                  "color": "ink",
+                  "textAlign": "left"
                 },
                 "children": [
                   "{name}"
@@ -1200,7 +1202,8 @@
                 "appearance": {
                   "fontFamily": "body",
                   "textStyle": "caption",
-                  "color": "muted"
+                  "color": "muted",
+                  "textAlign": "left"
                 },
                 "children": [
                   "{handle}"
@@ -1232,6 +1235,173 @@
                 "attrs": {
                   "d": "M6 9l6 6 6-6"
                 }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserIdentityBadge",
+      "note": "Owner / account identity from the Workspace PaneFooter (Windows/WorkspaceWindow.xaml #1541), and the sibling of AgentIdentityBadge: a 24px PersonPicture avatar to the LEFT of a two-line stack, the display name in body type over a connection-status line. Unlike AgentIdentityBadge, the status line pairs a small connection status dot with the caption `muted` label, dot on the LEFT of the status text. Reads the authenticated users.self profile (display name plus a live connection-status subtitle) with an honest Owner / Disconnected fallback; it never encodes authorization state. The dot follows connection state like the ConnectionStatusFlyout dots (`positive` connected, `warning` attention, `critical` error, `muted` unknown), never color alone. Ships as a subtle transparent WinUI Button that opens the Owner MenuFlyout: SubtleFillColorTransparent rest via `control.chrome:none`, `subtleHover`/`subtlePressed` through `states`, and a `control.focus` accent focus rectangle. In-app the avatar is a real PersonPicture (initials or account photo), previewed here with a person glyph.",
+      "props": {
+        "name": "Ada Lovelace",
+        "status": "Connected"
+      },
+      "root": {
+        "id": "user-badge-root",
+        "el": "button",
+        "attrs": {
+          "type": "button",
+          "aria-haspopup": "menu",
+          "aria-label": "{name}"
+        },
+        "layout": {
+          "mode": "horizontal",
+          "gap": "3",
+          "align": "center",
+          "padding": "1",
+          "width": "fill"
+        },
+        "appearance": {
+          "background": "$none",
+          "radius": "sm"
+        },
+        "control": {
+          "chrome": "none",
+          "focus": {
+            "kind": "outline",
+            "color": "accent"
+          }
+        },
+        "states": {
+          "hover": {
+            "background": "subtleHover"
+          },
+          "pressed": {
+            "background": "subtlePressed"
+          },
+          "hoverPressed": {
+            "background": "subtlePressed"
+          }
+        },
+        "children": [
+          {
+            "id": "user-badge-avatar",
+            "el": "div",
+            "attrs": {
+              "aria-hidden": "true"
+            },
+            "layout": {
+              "mode": "horizontal",
+              "align": "center",
+              "justify": "center",
+              "width": 24,
+              "height": 24
+            },
+            "appearance": {
+              "background": "surface",
+              "borderColor": "controlLine",
+              "color": "muted",
+              "radius": "pill"
+            },
+            "children": [
+              {
+                "id": "user-badge-avatar-glyph",
+                "el": "svg",
+                "attrs": {
+                  "width": "14",
+                  "height": "14",
+                  "viewBox": "0 0 24 24",
+                  "fill": "none",
+                  "stroke": "currentColor",
+                  "stroke-width": "2",
+                  "stroke-linecap": "round",
+                  "stroke-linejoin": "round",
+                  "aria-hidden": "true"
+                },
+                "children": [
+                  {
+                    "id": "user-badge-avatar-head",
+                    "el": "circle",
+                    "attrs": {
+                      "cx": "12",
+                      "cy": "8",
+                      "r": "4"
+                    }
+                  },
+                  {
+                    "id": "user-badge-avatar-body",
+                    "el": "path",
+                    "attrs": {
+                      "d": "M4 20a8 8 0 0 1 16 0"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "user-badge-text",
+            "el": "div",
+            "layout": {
+              "mode": "vertical",
+              "align": "start",
+              "grow": true
+            },
+            "children": [
+              {
+                "id": "user-badge-name",
+                "el": "span",
+                "appearance": {
+                  "fontFamily": "body",
+                  "textStyle": "body",
+                  "color": "ink",
+                  "textAlign": "left"
+                },
+                "children": [
+                  "{name}"
+                ]
+              },
+              {
+                "id": "user-badge-status",
+                "el": "div",
+                "layout": {
+                  "mode": "horizontal",
+                  "gap": "1",
+                  "align": "center"
+                },
+                "children": [
+                  {
+                    "id": "user-badge-status-dot",
+                    "el": "span",
+                    "attrs": {
+                      "aria-hidden": "true"
+                    },
+                    "layout": {
+                      "mode": "horizontal",
+                      "width": 8,
+                      "height": 8
+                    },
+                    "appearance": {
+                      "background": "positive",
+                      "radius": "pill"
+                    }
+                  },
+                  {
+                    "id": "user-badge-status-label",
+                    "el": "span",
+                    "appearance": {
+                      "fontFamily": "body",
+                      "textStyle": "caption",
+                      "color": "muted",
+                      "textAlign": "left"
+                    },
+                    "children": [
+                      "{status}"
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -2294,112 +2464,14 @@
                     "children": [
                       {
                         "id": "workspace-owner",
-                        "el": "div",
-                        "attrs": {
-                          "role": "button",
-                          "aria-label": "Owner menu"
+                        "component": "UserIdentityBadge",
+                        "props": {
+                          "name": "{owner}",
+                          "status": "{status}"
                         },
                         "layout": {
-                          "mode": "horizontal",
-                          "gap": "3",
-                          "align": "center",
-                          "padding": "2",
                           "grow": true
-                        },
-                        "appearance": {
-                          "radius": "sm"
-                        },
-                        "children": [
-                          {
-                            "id": "workspace-owner-avatar",
-                            "el": "div",
-                            "attrs": {
-                              "aria-hidden": "true"
-                            },
-                            "layout": {
-                              "mode": "horizontal",
-                              "align": "center",
-                              "justify": "center",
-                              "width": 24,
-                              "height": 24
-                            },
-                            "appearance": {
-                              "background": "surface",
-                              "borderColor": "controlLine",
-                              "color": "muted",
-                              "radius": "pill"
-                            },
-                            "children": [
-                              {
-                                "id": "workspace-owner-avatar-glyph",
-                                "el": "svg",
-                                "attrs": {
-                                  "width": "14",
-                                  "height": "14",
-                                  "viewBox": "0 0 24 24",
-                                  "fill": "none",
-                                  "stroke": "currentColor",
-                                  "stroke-width": "2",
-                                  "stroke-linecap": "round",
-                                  "stroke-linejoin": "round",
-                                  "aria-hidden": "true"
-                                },
-                                "children": [
-                                  {
-                                    "id": "workspace-owner-avatar-head",
-                                    "el": "circle",
-                                    "attrs": {
-                                      "cx": "12",
-                                      "cy": "8",
-                                      "r": "4"
-                                    }
-                                  },
-                                  {
-                                    "id": "workspace-owner-avatar-body",
-                                    "el": "path",
-                                    "attrs": {
-                                      "d": "M4 20a8 8 0 0 1 16 0"
-                                    }
-                                  }
-                                ]
-                              }
-                            ]
-                          },
-                          {
-                            "id": "workspace-owner-text",
-                            "el": "div",
-                            "layout": {
-                              "mode": "vertical",
-                              "grow": true
-                            },
-                            "children": [
-                              {
-                                "id": "workspace-owner-name",
-                                "el": "span",
-                                "appearance": {
-                                  "fontFamily": "body",
-                                  "textStyle": "body",
-                                  "color": "ink"
-                                },
-                                "children": [
-                                  "{owner}"
-                                ]
-                              },
-                              {
-                                "id": "workspace-owner-status",
-                                "el": "span",
-                                "appearance": {
-                                  "fontFamily": "body",
-                                  "textStyle": "caption",
-                                  "color": "muted"
-                                },
-                                "children": [
-                                  "{status}"
-                                ]
-                              }
-                            ]
-                          }
-                        ]
+                        }
                       },
                       {
                         "id": "workspace-bell",
