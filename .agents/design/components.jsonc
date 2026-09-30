@@ -1085,69 +1085,41 @@
     },
     {
       "name": "AgentIdentityBadge",
-      "note": "Agent identity row from Controls/AgentIdentityBadge.xaml (#1541): a 32x32 PersonPicture avatar (circular, so `pill` radius) to the LEFT of a two-line stack — agent display name in body type over the agent id in caption `muted` (TextFillColorSecondary). A presence status dot rides the avatar's bottom-right corner (PersonPicture Badge slot): a 10px `pill` dot with a `paper` ring, previewed `positive` (connected). Its fill follows connection state like the ConnectionStatusFlyout dots — `positive` connected, `warning` attention, `critical` error, `muted` unknown — never color alone. Because it ships as the assistant-selector trigger and the Owner footer button, the whole row is a subtle transparent WinUI Button (SubtleFillColorTransparent rest via `control.chrome:none`, `subtleHover`/`subtlePressed` through `states`, and a `control.focus` accent focus rectangle); it spends no accent at rest. Column spacing 12px maps to token 3; MinHeight 40 and the PersonPicture initials/photo fallback are port notes. In-app the avatar is a real PersonPicture (initials or gateway avatar), previewed here with a person glyph.",
+      "note": "Agent identity row from Controls/AgentIdentityBadge.xaml (#1541): a 32x32 PersonPicture avatar (circular, so `pill` radius) to the LEFT of a two-line stack — agent display name in body type over the agent id in caption `muted` (TextFillColorSecondary) — with a trailing `muted` ChevronDown (Segoe Fluent U+E70D, previewed ~12px) marking it as the assistant selector's dropdown trigger. Column spacing 12px maps to token 3; MinHeight 40 and the PersonPicture initials/photo fallback are port notes. Used as the assistant selector trigger (the selected agent shown inside a transparent ComboBox that supplies the dropdown chrome, hover/pressed, and focus) and anywhere an agent is named. In-app the avatar is a real PersonPicture (initials or gateway avatar), previewed here with a person glyph.",
       "props": {
         "name": "Aurora",
         "handle": "agent-aurora"
       },
       "root": {
         "id": "agent-badge-root",
-        "el": "button",
-        "attrs": {
-          "type": "button",
-          "aria-label": "{name}"
-        },
+        "el": "div",
         "layout": {
           "mode": "horizontal",
           "gap": "3",
           "align": "center",
-          "padding": "1",
           "width": "fill"
-        },
-        "appearance": {
-          "background": "$none",
-          "radius": "sm"
-        },
-        "control": {
-          "chrome": "none",
-          "focus": { "kind": "outline", "color": "accent" }
-        },
-        "states": {
-          "hover": { "background": "subtleHover" },
-          "pressed": { "background": "subtlePressed" },
-          "hoverPressed": { "background": "subtlePressed" }
         },
         "children": [
           {
-            "id": "agent-badge-avatar-wrap",
+            "id": "agent-badge-avatar",
             "el": "div",
             "attrs": {
               "aria-hidden": "true"
             },
             "layout": {
-              "mode": "freeform",
+              "mode": "horizontal",
+              "align": "center",
+              "justify": "center",
               "width": 32,
               "height": 32
             },
+            "appearance": {
+              "background": "surface",
+              "borderColor": "controlLine",
+              "color": "muted",
+              "radius": "pill"
+            },
             "children": [
-              {
-                "id": "agent-badge-avatar",
-                "el": "div",
-                "position": { "mode": "absolute", "x": 0, "y": 0 },
-                "layout": {
-                  "mode": "horizontal",
-                  "align": "center",
-                  "justify": "center",
-                  "width": 32,
-                  "height": 32
-                },
-                "appearance": {
-                  "background": "surface",
-                  "borderColor": "controlLine",
-                  "color": "muted",
-                  "radius": "pill"
-                },
-                "children": [
               {
                 "id": "agent-badge-avatar-glyph",
                 "el": "svg",
@@ -1182,23 +1154,6 @@
                 ]
               }
             ]
-              },
-              {
-                "id": "agent-badge-status",
-                "el": "span",
-                "position": { "mode": "absolute", "x": 22, "y": 22 },
-                "layout": {
-                  "mode": "horizontal",
-                  "width": 10,
-                  "height": 10
-                },
-                "appearance": {
-                  "background": "positive",
-                  "borderColor": "paper",
-                  "radius": "pill"
-                }
-              }
-            ]
           },
           {
             "id": "agent-badge-text",
@@ -1231,6 +1186,33 @@
                 "children": [
                   "{handle}"
                 ]
+              }
+            ]
+          },
+          {
+            "id": "agent-badge-chevron",
+            "el": "svg",
+            "attrs": {
+              "width": "12",
+              "height": "12",
+              "viewBox": "0 0 24 24",
+              "fill": "none",
+              "stroke": "currentColor",
+              "stroke-width": "2",
+              "stroke-linecap": "round",
+              "stroke-linejoin": "round",
+              "aria-hidden": "true"
+            },
+            "appearance": {
+              "color": "muted"
+            },
+            "children": [
+              {
+                "id": "agent-badge-chevron-path",
+                "el": "path",
+                "attrs": {
+                  "d": "M6 9l6 6 6-6"
+                }
               }
             ]
           }
