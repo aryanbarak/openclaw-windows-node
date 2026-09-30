@@ -245,7 +245,8 @@ internal sealed class LocalAiInstallReconciler
                 RuntimeInstall: null,
                 ModelInstall: modelIsValid ? CreateModelInstall(install, localDataDirectory) : null,
                 OriginalInstall: originalInstall,
-                AdditionalModelInstalls: modelIsValid ? CreateAdditionalModelInstalls(install) : null);
+                AdditionalModelInstalls: modelIsValid ? CreateAdditionalModelInstalls(install) : null,
+                PendingReplacement: pendingReplacement);
         }
 
         if (!inspection.IsValid || !modelIsValid)

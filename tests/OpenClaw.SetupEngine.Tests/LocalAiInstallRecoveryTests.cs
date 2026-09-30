@@ -1280,14 +1280,21 @@ public sealed class LocalAiInstallRecoveryTests
     }
 
     [Theory]
-    [InlineData(false, null)]
-    [InlineData(true, null)]
-    [InlineData(false, "after-reconcile")]
-    [InlineData(true, "after-reconcile")]
-    [InlineData(false, "after-persist")]
-    [InlineData(true, "after-persist")]
+    [InlineData(false, false, null)]
+    [InlineData(true, false, null)]
+    [InlineData(false, true, null)]
+    [InlineData(true, true, null)]
+    [InlineData(false, false, "after-reconcile")]
+    [InlineData(true, false, "after-reconcile")]
+    [InlineData(false, true, "after-reconcile")]
+    [InlineData(true, true, "after-reconcile")]
+    [InlineData(false, false, "after-persist")]
+    [InlineData(true, false, "after-persist")]
+    [InlineData(false, true, "after-persist")]
+    [InlineData(true, true, "after-persist")]
     public async Task RuntimeUpgrade_MigratesModelAndRestoresOriginalReceiptOnFailure(
         bool usesHubCache,
+        bool pendingReplacement,
         string? failureStage)
     {
         using var temp = new TempDirectory();
@@ -1307,6 +1314,18 @@ public sealed class LocalAiInstallRecoveryTests
         {
             GatewayFallbackModel = "openai/gpt-5",
         };
+        if (pendingReplacement)
+        {
+            manifest = manifest with
+            {
+                ReplacedManifest = manifest with
+                {
+                    ModelCatalogId = "prior-model",
+                    ModelAlias = "prior-model",
+                },
+                PreviousEndpoints = [manifest.Endpoint!],
+            };
+        }
         string oldExecutable = paths.ResolveContainedPath(manifest.ExecutablePath, "executable");
         Directory.CreateDirectory(Path.GetDirectoryName(oldExecutable)!);
         await File.WriteAllTextAsync(oldExecutable, "old-server");
@@ -1355,9 +1374,14 @@ public sealed class LocalAiInstallRecoveryTests
             new ReconcileLocalAiInstallationStep(reconciler),
             new UpgradeCheckpointStep("after-reconcile", ctx =>
             {
-                Assert.Null(ctx.LocalAiRecoveryOriginalInstall);
-                Assert.Equal(manifest.SchemaVersion, ctx.LocalAiUpgradeOriginalInstall?.Manifest.SchemaVersion);
-                Assert.Equal(oldExecutable, ctx.LocalAiUpgradeOriginalInstall?.ExecutablePath);
+                Assert.Equal(pendingReplacement, ctx.LocalAiRecoveryOriginalInstall is not null);
+                Assert.Equal(pendingReplacement, ctx.LocalAiRecoveryPendingInstall is not null);
+                Assert.Equal(
+                    pendingReplacement ? null : manifest.SchemaVersion,
+                    ctx.LocalAiUpgradeOriginalInstall?.Manifest.SchemaVersion);
+                Assert.Equal(
+                    pendingReplacement ? null : oldExecutable,
+                    ctx.LocalAiUpgradeOriginalInstall?.ExecutablePath);
                 Assert.Equal(cacheRoot, ctx.LocalAiModelInstall?.CacheRoot);
                 cachedModel = ctx.LocalAiModelInstall!.ModelPath;
                 return failureStage == "after-reconcile";
@@ -1376,6 +1400,13 @@ public sealed class LocalAiInstallRecoveryTests
                 Assert.Equal(manifest.InstalledAtUtc, upgraded.Manifest.InstalledAtUtc);
                 Assert.Equal(manifest.GatewayFallbackModel, upgraded.Manifest.GatewayFallbackModel);
                 Assert.Null(upgraded.Endpoint);
+                Assert.Equal(pendingReplacement, upgraded.Manifest.ReplacedManifest is not null);
+                if (pendingReplacement)
+                {
+                    Assert.Equal("prior-model", upgraded.Manifest.ReplacedManifest!.ModelCatalogId);
+                    Assert.Equal(upgraded.Manifest.RuntimeId, upgraded.Manifest.ReplacedManifest.RuntimeId);
+                    Assert.Equal(upgraded.Manifest.RuntimeAssets, upgraded.Manifest.ReplacedManifest.RuntimeAssets);
+                }
                 newExecutable = upgraded.ExecutablePath;
                 Assert.True(File.Exists(newExecutable));
                 return failureStage == "after-persist";
