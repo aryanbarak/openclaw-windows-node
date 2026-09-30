@@ -1085,19 +1085,38 @@
     },
     {
       "name": "AgentIdentityBadge",
-      "note": "Agent identity row from Controls/AgentIdentityBadge.xaml (#1541): a 32x32 PersonPicture avatar (circular, so `pill` radius) to the LEFT of a two-line stack — agent display name in body type over the agent id in caption `muted` (TextFillColorSecondary) — with a trailing `muted` ChevronDown (Segoe Fluent U+E70D, previewed ~12px) marking it as the assistant selector's dropdown trigger. Column spacing 12px maps to token 3; MinHeight 40 and the PersonPicture initials/photo fallback are port notes. Used as the assistant selector trigger (the selected agent shown inside a transparent ComboBox that supplies the dropdown chrome, hover/pressed, and focus) and anywhere an agent is named. In-app the avatar is a real PersonPicture (initials or gateway avatar), previewed here with a person glyph.",
+      "note": "Agent identity row from Controls/AgentIdentityBadge.xaml (#1541): a 32x32 PersonPicture avatar (circular, so `pill` radius) to the LEFT of a two-line stack — agent display name in body type over the agent id in caption `muted` (TextFillColorSecondary) — with a trailing `muted` ChevronDown (Segoe Fluent U+E70D, previewed ~12px) marking it as the assistant selector's dropdown trigger. It ships as a subtle transparent WinUI DropDownButton (SubtleFillColorTransparent rest via `control.chrome:none`, `subtleHover`/`subtlePressed` through `states`, and a `control.focus` accent focus rectangle), so it stays quiet chrome and spends no accent at rest. Column spacing 12px maps to token 3; MinHeight 40 and the PersonPicture initials/photo fallback are port notes. Used as the assistant selector trigger and anywhere an agent is named. In-app the avatar is a real PersonPicture (initials or gateway avatar), previewed here with a person glyph.",
       "props": {
         "name": "Aurora",
         "handle": "agent-aurora"
       },
       "root": {
         "id": "agent-badge-root",
-        "el": "div",
+        "el": "button",
+        "attrs": {
+          "type": "button",
+          "aria-haspopup": "listbox",
+          "aria-label": "{name}"
+        },
         "layout": {
           "mode": "horizontal",
           "gap": "3",
           "align": "center",
+          "padding": "1",
           "width": "fill"
+        },
+        "appearance": {
+          "background": "$none",
+          "radius": "sm"
+        },
+        "control": {
+          "chrome": "none",
+          "focus": { "kind": "outline", "color": "accent" }
+        },
+        "states": {
+          "hover": { "background": "subtleHover" },
+          "pressed": { "background": "subtlePressed" },
+          "hoverPressed": { "background": "subtlePressed" }
         },
         "children": [
           {
@@ -1845,7 +1864,7 @@
     },
     {
       "name": "WorkspaceShell",
-      "note": "The native Home and Sessions workspace shell from Windows/WorkspaceWindow.xaml (#1541): the landing window. A Mica window (previewed as `paper`) with a title bar, a 256px left NavigationView pane, and a content host that mounts the Reactor chat (see ChatThread). The pane stacks a Back/Forward toolbar and an assistant selector (transparent ComboBox over AgentIdentityBadge; a New agent option adds `add` glyph U+E710) in the PaneHeader; a Home item and a Sessions header with an inline add button, then reusable session rows, in the menu; and an Owner button plus a Notifications bell (with an InfoBadge count and the NotificationFlyout) in the PaneFooter. The Owner button reads the authenticated users.self profile (display name over a live connection-status caption, honest Owner / Disconnected fallback). Selected session rows use the native subtle selection background with a leading `accent` indicator; nav rows use `sm` (ControlCornerRadius) corners. Toolbar/selector/footer subtle buttons are transparent with `subtleHover`/`subtlePressed` states. Pane hide/reopen, exact-key Back/Forward history, and Owner MenuFlyout live in WorkspaceWindow/WindowManager and are port notes.",
+      "note": "The native Home and Sessions workspace shell from Windows/WorkspaceWindow.xaml (#1541): the landing window. A Mica window (previewed as `paper`) with a title bar, a 256px left NavigationView pane, and a content host that mounts the Reactor chat (see ChatThread). The pane stacks a Back/Forward toolbar and an assistant selector (transparent ComboBox over AgentIdentityBadge; a New agent option adds `add` glyph U+E710) in the PaneHeader; a Home item and a Sessions header with an inline add button, then reusable session rows, in the menu; and an Owner button plus a Notifications bell (with an InfoBadge count and the NotificationFlyout) in the PaneFooter. The Owner button reads the authenticated users.self profile (display name over a live connection-status caption, honest Owner / Disconnected fallback). Selection is single across the pane like a NavigationView: exactly one destination (Home or a session) is selected at a time (shown here on Home), using the native subtle selection background with a leading `accent` indicator; nav rows use `sm` (ControlCornerRadius) corners. Toolbar/selector/footer subtle buttons are transparent with `subtleHover`/`subtlePressed` states. Pane hide/reopen, exact-key Back/Forward history, and Owner MenuFlyout live in WorkspaceWindow/WindowManager and are port notes.",
       "props": {
         "owner": "Fixture Owner",
         "status": "Connected"
@@ -2028,22 +2047,10 @@
                       {
                         "id": "workspace-selector",
                         "el": "div",
-                        "attrs": {
-                          "role": "button",
-                          "aria-label": "Assistant selector"
-                        },
                         "layout": {
                           "mode": "horizontal",
-                          "gap": "2",
                           "align": "center",
-                          "padding": {
-                            "x": "2",
-                            "y": "1"
-                          },
                           "width": "fill"
-                        },
-                        "appearance": {
-                          "radius": "sm"
                         },
                         "children": [
                           {
@@ -2056,33 +2063,6 @@
                             "layout": {
                               "grow": true
                             }
-                          },
-                          {
-                            "id": "workspace-selector-chevron",
-                            "el": "svg",
-                            "attrs": {
-                              "width": "16",
-                              "height": "16",
-                              "viewBox": "0 0 24 24",
-                              "fill": "none",
-                              "stroke": "currentColor",
-                              "stroke-width": "2",
-                              "stroke-linecap": "round",
-                              "stroke-linejoin": "round",
-                              "aria-hidden": "true"
-                            },
-                            "appearance": {
-                              "color": "muted"
-                            },
-                            "children": [
-                              {
-                                "id": "workspace-selector-chevron-path",
-                                "el": "path",
-                                "attrs": {
-                                  "d": "M6 9l6 6 6-6"
-                                }
-                              }
-                            ]
                           }
                         ]
                       }
@@ -2240,27 +2220,7 @@
                           },
                           "width": "fill"
                         },
-                        "appearance": {
-                          "background": "subtleHover",
-                          "radius": "sm"
-                        },
                         "children": [
-                          {
-                            "id": "workspace-session-1-indicator",
-                            "el": "span",
-                            "attrs": {
-                              "aria-hidden": "true"
-                            },
-                            "layout": {
-                              "mode": "horizontal",
-                              "width": 3,
-                              "height": 16
-                            },
-                            "appearance": {
-                              "background": "accent",
-                              "radius": "pill"
-                            }
-                          },
                           {
                             "id": "workspace-session-1-title",
                             "el": "span",
