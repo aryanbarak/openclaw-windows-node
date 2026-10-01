@@ -793,6 +793,82 @@ public sealed class LocalAiGatewayUninstallTests
     }
 
     [Fact]
+    public async Task Recovery_UpgradedPendingRouteRestoresCoherentRuntimeGeneration()
+    {
+        using var temp = new TempDirectory("local-ai-gateway-recovery-");
+        LocalAiResolvedInstall original = await SaveManifestAsync(temp.Path, "openai/gpt-5");
+        LocalAiInstallManifest oldPendingManifest = ReplacementManifest(original);
+        var store = new LocalAiManifestStore(new LocalAiPaths(temp.Path));
+        LocalAiResolvedInstall oldPending = store.ResolveAndValidate(oldPendingManifest);
+        LocalAiInstallManifest upgradedOriginal = original.Manifest with
+        {
+            EngineVersion = "b11026",
+            RuntimeId = "b11026-cuda13-arm64",
+        };
+        LocalAiInstallManifest upgradedReplacement = oldPendingManifest with
+        {
+            EngineVersion = upgradedOriginal.EngineVersion,
+            RuntimeId = upgradedOriginal.RuntimeId,
+            Endpoint = "http://127.0.0.1:39877/v1",
+            ReplacedManifest = upgradedOriginal,
+            PreviousEndpoints =
+            [
+                original.Endpoint!.AbsoluteUri,
+                oldPending.Endpoint!.AbsoluteUri,
+            ],
+        };
+        LocalAiInstallManifest upgradedPendingRoute = upgradedReplacement with
+        {
+            Endpoint = oldPending.Manifest.Endpoint,
+        };
+        await store.SaveAsync(upgradedReplacement);
+
+        string priorProvider = LocalAiGatewayProviderDefinition.BuildProviderJson(oldPending);
+        string primary = JsonSerializer.Serialize(
+            LocalAiGatewayProviderDefinition.BuildPrimaryModel(oldPending));
+        var commands = new GatewayStateCommandRunner(priorProvider, primary);
+        SetupContext context = CreateRecoveryContext(temp.Path, commands);
+        context.Config.RollbackOnFailure = true;
+        context.LocalAiRecoveryOriginalInstall = store.ResolveAndValidate(upgradedOriginal);
+        context.LocalAiRecoveryPendingInstall = store.ResolveAndValidate(upgradedPendingRoute);
+        context.LocalAiResolvedInstall = store.ResolveAndValidate(upgradedReplacement);
+
+        var configure = new ConfigureLocalAiGatewayStep();
+        StepResult configured = await configure.ExecuteAsync(context, CancellationToken.None);
+        var pipeline = new SetupPipeline(
+        [
+            new PreserveLocalAiRecoveryGatewayStep(
+                (_, _) => Task.FromResult(StepResult.Ok("not needed")),
+                (_, _) => Task.FromResult(true)),
+            new DelegatingRollbackStep("configured", configure.RollbackAsync),
+            new DelegatingRollbackStep(
+                "fail",
+                (_, _) => Task.CompletedTask,
+                (_, _) => Task.FromResult(StepResult.Fail("forced failure"))),
+        ]);
+
+        PipelineResult result = await pipeline.RunAsync(context);
+
+        Assert.Equal(StepOutcome.Success, configured.Outcome);
+        Assert.Equal(PipelineOutcome.Failed, result.Outcome);
+        LocalAiResolvedInstall restored = Assert.IsType<LocalAiResolvedInstall>(
+            await store.LoadAsync());
+        Assert.Equal(oldPending.Endpoint, restored.Endpoint);
+        Assert.Equal(upgradedReplacement.RuntimeId, restored.Manifest.RuntimeId);
+        LocalAiInstallManifest restoredOriginal = Assert.IsType<LocalAiInstallManifest>(
+            restored.Manifest.ReplacedManifest);
+        Assert.Equal(upgradedOriginal.RuntimeId, restoredOriginal.RuntimeId);
+        Assert.Equal(upgradedOriginal.ModelCatalogId, restoredOriginal.ModelCatalogId);
+        Assert.Equal(upgradedOriginal.Endpoint, restoredOriginal.Endpoint);
+        Assert.True(LocalAiGatewayProviderDefinition.MatchesProviderJson(
+            commands.ProviderJson!,
+            restored));
+        Assert.Equal(primary, commands.PrimaryJson);
+        Assert.False(context.LocalAiRecoveryRollbackUncertain);
+        Assert.False(context.LocalAiRecoveryProviderTransition);
+    }
+
+    [Fact]
     public async Task Recovery_FailedProviderCompensationKeepsReplacementReceipt()
     {
         using var temp = new TempDirectory("local-ai-gateway-recovery-");
