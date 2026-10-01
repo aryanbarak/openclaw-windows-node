@@ -18,6 +18,7 @@ internal sealed class LocalAiGatewayLifecycle(
 {
     private readonly LocalAiNativeBindingStore _store = new(paths);
     private readonly LocalAiApiCredentialStore _credentials = new(paths);
+    private readonly LocalAiGatewayDistroResolver _wslOwner = new(getRegistry());
     private NativeLocalAiGatewayTarget? _registeredTarget;
     private IGatewayAiSetupTransport? _registeredTransport;
     private int _resuming;
@@ -27,8 +28,9 @@ internal sealed class LocalAiGatewayLifecycle(
     private sealed record EndpointRecovery(string GatewayId, string ModelRef, Uri Endpoint, string ConfigHash);
     private EndpointRecovery? _endpointRecovery;
 
-    public bool IsNativeMode => _store.Exists ||
+    public bool IsNativeMode => _store.Exists || _registeredTarget is not null ||
         getRegistry()?.GetActive()?.NativePackageFamilyName is not null;
+    public bool CanStartWslAutomatically => !IsNativeMode && _wslOwner.Resolve().Success;
     public bool HasNativeBinding => _store.Exists;
     public bool HasReleasableOwnership => _store.Exists;
     public bool AutomaticRecoveryEnabled => _store.Load()?.AutomaticRecoveryEnabled ?? true;
@@ -202,7 +204,18 @@ internal sealed class LocalAiGatewayLifecycle(
 
     public async Task PrepareStartAsync(LocalAiResolvedInstall install, CancellationToken ct)
     {
-        if (_store.Load() is not { } binding) return;
+        ct.ThrowIfCancellationRequested();
+        if (_store.Load() is not { } binding)
+        {
+            // Admission precedes runtime mutation. No owner is not an uncertain write,
+            // and a staged native selection must never fall back to WSL.
+            if (IsNativeMode)
+                throw new LocalAiSelectionRejectedException("Choose Use Local AI for the selected native Gateway before starting it.");
+            var owner = _wslOwner.Resolve();
+            if (!owner.Success)
+                throw new LocalAiSelectionRejectedException(owner.Detail!);
+            return;
+        }
         var (target, transport) = await GetTransportAsync(binding, ct).ConfigureAwait(false);
         await PrepareCoreAsync(install, target, transport, ct).ConfigureAwait(false);
     }

@@ -13,6 +13,148 @@ namespace OpenClaw.SetupEngine.Tests;
 
 public sealed class NativeLocalAiLifecycleTests
 {
+    [Theory]
+    [InlineData("empty")]
+    [InlineData("remote")]
+    [InlineData("native")]
+    [InlineData("staged-native-with-wsl")]
+    [InlineData("ambiguous")]
+    [InlineData("unavailable")]
+    public async Task UnboundStartupRequiresAnExplicitWslOwner(string selection)
+    {
+        using var directory = new TempDirectory();
+        var registry = new GatewayRegistry(directory.Path);
+        var wsl = Record with { Id = "wsl", NativePackageFamilyName = null,
+            NativeRuntimeContract = null, SetupManagedDistroName = "fixture-wsl" };
+        if (selection is "native") registry.AddOrUpdate(Record);
+        if (selection is "remote") registry.AddOrUpdate(Record with
+        { IsLocal = false, NativePackageFamilyName = null, NativeRuntimeContract = null });
+        if (selection is "native" or "remote") registry.SetActive(Record.Id);
+        if (selection is "ambiguous" or "staged-native-with-wsl") registry.AddOrUpdate(wsl);
+        if (selection is "ambiguous") registry.AddOrUpdate(wsl with { Id = "second", SetupManagedDistroName = "second" });
+        var lifecycle = new LocalAiGatewayLifecycle(new(directory.Path), directory.Path,
+            () => selection == "unavailable" ? null : registry, () => null, new ForbiddenWsl(), NullLogger.Instance);
+        if (selection == "staged-native-with-wsl") lifecycle.Register(Record, new RpcTransport());
+
+        Assert.False(lifecycle.CanStartWslAutomatically);
+        await Assert.ThrowsAsync<LocalAiSelectionRejectedException>(() =>
+            lifecycle.PrepareStartAsync(LocalAiOnboardingTests.Install(), default));
+        Assert.False(lifecycle.HasNativeBinding);
+    }
+
+    [Fact]
+    public async Task WslStartupRevalidatesItsPinnedOwnerBeforeAdmission()
+    {
+        using var directory = new TempDirectory();
+        var registry = new GatewayRegistry(directory.Path);
+        var record = new GatewayRecord
+        { Id = "wsl", IsLocal = true, Url = "ws://127.0.0.1:18789", SetupManagedDistroName = "fixture-wsl" };
+        registry.AddOrUpdate(record);
+        var lifecycle = new LocalAiGatewayLifecycle(new(directory.Path), directory.Path,
+            () => registry, () => null, new ForbiddenWsl(), NullLogger.Instance);
+        Assert.True(lifecycle.CanStartWslAutomatically);
+        await lifecycle.PrepareStartAsync(LocalAiOnboardingTests.Install(), default);
+        registry.Remove(record.Id);
+        registry.AddOrUpdate(record with { Id = "replacement" });
+        Assert.False(lifecycle.CanStartWslAutomatically);
+        await Assert.ThrowsAsync<LocalAiSelectionRejectedException>(() =>
+            lifecycle.PrepareStartAsync(LocalAiOnboardingTests.Install(), default));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task RejectedNoOwnerStartupLeavesLegacyNativeRepairAvailable(bool verified)
+    {
+        using var directory = new TempDirectory();
+        var paths = new LocalAiPaths(directory.Path);
+        var store = new LocalAiManifestStore(paths);
+        var original = LocalAiOnboardingTests.Install().Manifest;
+        var revision = new string('a', 40);
+        var manifest = original with
+        {
+            RuntimeAssets = [original.ModelAsset with { FileName = "runtime.zip" }],
+            ModelId = $"test/model@{revision}",
+            ModelAsset = original.ModelAsset with
+            { SourceUrl = $"https://huggingface.co/test/model/resolve/{revision}/test.gguf" },
+        };
+        await store.SaveAsync(manifest);
+        var before = await File.ReadAllTextAsync(paths.ManifestPath);
+        var registry = new GatewayRegistry(directory.Path);
+        var lifecycle = new LocalAiGatewayLifecycle(paths, directory.Path,
+            () => registry, () => null, new ForbiddenWsl(), NullLogger.Instance);
+        await using var runtime = new LlamaServerRuntimeService(new()
+        { Paths = paths, EndpointLifecycle = lifecycle }, NullLogger.Instance);
+        Assert.False(runtime.Snapshot.GatewayRouteRequiresResolution);
+        Assert.False(lifecycle.CanStartWslAutomatically);
+
+        // Even a queued/explicit start is rejected before quiesce can mark an
+        // unowned route uncertain. No process or Gateway configuration is touched.
+        await Assert.ThrowsAsync<LocalAiSelectionRejectedException>(() => runtime.EnsureStartedAsync());
+        Assert.False(runtime.Snapshot.GatewayRouteRequiresResolution);
+        Assert.Equal(LocalAiOwnership.None, runtime.Snapshot.Ownership);
+        Assert.Null(runtime.Snapshot.ProcessId);
+
+        var rpc = new RpcTransport();
+        var host = new SetupLocalAiHost(() => throw new InvalidOperationException(), () => registry,
+            () => runtime, ct => store.LoadAsync(ct), (_, _) => Task.FromResult(verified),
+            _ => Task.FromResult(new HostHardwareInfo(Architecture.X64, 128L << 30, 100L << 30,
+                [new(GpuVendor.Nvidia, "Test GPU", 96L << 30, 80L << 30,
+                    DriverVersion: "615.0", CudaMajorVersion: 13, StableId: "GPU-test")], false)),
+            () => throw new InvalidOperationException(), nativeLifecycle: lifecycle);
+        host.ConfigureNative(Record, rpc, _ => Task.CompletedTask);
+        var observed = await host.ObserveAsync(default);
+        Assert.Equal(verified ? LocalAiOnboardingState.StartAndUse : LocalAiOnboardingState.Repair, observed.State);
+        if (!verified)
+            Assert.Equal(observed.Target, await host.RevalidateReviewAsync(observed, default));
+        Assert.False(lifecycle.HasNativeBinding);
+        Assert.Equal(0, rpc.Writes);
+        Assert.Empty(registry.GetAll());
+        Assert.Equal(before, await File.ReadAllTextAsync(paths.ManifestPath));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task NativeRepairRetainsGenuineOwnedOrUncertainRuntime(bool owned)
+    {
+        using var fixture = new Fixture();
+        var runtime = new LocalAiOnboardingTests.FakeRuntime(
+            LocalAiOnboardingTests.RuntimeSnapshot(fixture.Install, LocalAiRuntimeState.Failed) with
+            {
+                Ownership = owned ? LocalAiOwnership.CompanionManaged : LocalAiOwnership.None,
+                GatewayRouteRequiresResolution = !owned,
+            });
+        var host = new SetupLocalAiHost(() => throw new InvalidOperationException(), () => fixture.Registry,
+            () => runtime, _ => Task.FromResult<LocalAiResolvedInstall?>(fixture.Install),
+            (_, _) => Task.FromResult(false),
+            _ => Task.FromResult(new HostHardwareInfo(Architecture.X64, 128L << 30, 100L << 30,
+                [new(GpuVendor.Nvidia, "Test GPU", 96L << 30, 80L << 30,
+                    DriverVersion: "615.0", CudaMajorVersion: 13, StableId: "GPU-test")], false)),
+            () => throw new InvalidOperationException(), nativeLifecycle: fixture.Lifecycle);
+        host.ConfigureNative(Record, fixture.Rpc, _ => Task.CompletedTask);
+        var observed = await host.ObserveAsync(default);
+        Assert.Equal(LocalAiOnboardingState.Repair, observed.State);
+        await Assert.ThrowsAsync<LocalAiRepairRequiresStopException>(() => host.RevalidateReviewAsync(observed, default));
+        Assert.Equal(owned, runtime.Snapshot.Ownership == LocalAiOwnership.CompanionManaged);
+        Assert.Equal(!owned, runtime.Snapshot.GatewayRouteRequiresResolution);
+        Assert.Equal(0, fixture.Rpc.Writes);
+    }
+
+    [Fact]
+    public async Task ReopenedNativeBindingRequiresResolutionAcrossReadOnlyRefresh()
+    {
+        using var fixture = new Fixture();
+        await fixture.Lifecycle.PrepareAsync(fixture.Install, default);
+        await using var runtime = new LlamaServerRuntimeService(new()
+        { Paths = fixture.Paths, EndpointLifecycle = fixture.Lifecycle }, NullLogger.Instance);
+        Assert.True(runtime.Snapshot.GatewayRouteRequiresResolution);
+        Assert.True((await runtime.RefreshAsync()).GatewayRouteRequiresResolution);
+        Assert.True(fixture.Store.Exists);
+        Assert.Equal(0, fixture.Rpc.Writes);
+        Assert.False(fixture.Lifecycle.CanStartWslAutomatically);
+    }
+
     [Fact]
     public void LegacyBindingRetainsAutomaticRecoveryDefault()
     {
@@ -724,6 +866,7 @@ public sealed class NativeLocalAiLifecycleTests
     private sealed class Fixture : IDisposable
     {
         private readonly TempDirectory _directory = new();
+        public LocalAiPaths Paths => new(_directory.Path);
         public LocalAiResolvedInstall Install { get; } = LocalAiOnboardingTests.Install();
         public string Model => LocalAiGatewayProviderDefinition.BuildPrimaryModel(Install);
         public RpcTransport Rpc { get; } = new();

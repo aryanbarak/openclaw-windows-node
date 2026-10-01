@@ -159,7 +159,13 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
         _client = client ?? throw new ArgumentNullException(nameof(client));
         _modelFileVerifier = modelFileVerifier ?? new HuggingFaceLocalAiModelFileVerifier();
         _manifestStore = new LocalAiManifestStore(options.Paths);
-        _snapshot = LocalAiRuntimeSnapshot.Initial(options.InitialEndpoint, platform.UtcNow);
+        _gatewayRouteRequiresResolution = options.EndpointLifecycle.HasReleasableOwnership;
+        _snapshot = LocalAiRuntimeSnapshot.Initial(options.InitialEndpoint, platform.UtcNow) with
+        {
+            // An unbound runtime has not attempted a route write. Durable native
+            // ownership still requires reconciliation, even before this process starts.
+            GatewayRouteRequiresResolution = _gatewayRouteRequiresResolution,
+        };
     }
 
     public event EventHandler<LocalAiRuntimeSnapshotChangedEventArgs>? StateChanged;

@@ -81,6 +81,15 @@ alone is insufficient authority to delete a potentially externally edited route.
 
 Native automatic startup waits for the manager-owned connection and an existing
 confirmed selection. Observation and artifact acquisition never switch models.
+Legacy Windows artifact receipts alone do not authorize background WSL startup.
+`LocalAiGatewayLifecycle` admits automatic WSL startup only with one pinned,
+explicit setup-managed WSL owner and no native binding, active native Gateway or
+staged native selection. Explicit startup revalidates ownership before runtime
+mutation. An unbound runtime with no attempted route write does not report pending
+route reconciliation; a durable native binding or an actual uncertain write still
+does. Native setup can review damaged legacy artifacts without a WSL Gateway.
+Repair blocked by owned runtime or pending routing directs users to reconnect the
+original Gateway and stop/recover Local AI, never delete its receipt or models.
 Explicit Use publishes the authenticated endpoint, and the existing setup verifier
 performs real inference with the exact primary, without fallback. A changed
 revision is not silently adopted: explicit reconciliation requires the same
