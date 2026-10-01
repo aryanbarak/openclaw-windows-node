@@ -91,6 +91,9 @@ public sealed class NativeLocalAiLifecycleTests
         // Even a queued/explicit start is rejected before quiesce can mark an
         // unowned route uncertain. No process or Gateway configuration is touched.
         await Assert.ThrowsAsync<LocalAiSelectionRejectedException>(() => runtime.EnsureStartedAsync());
+        if (!verified)
+            Assert.Equal(LocalAiRuntimeState.Failed, (await runtime.RefreshAsync()).State);
+        await Assert.ThrowsAsync<LocalAiSelectionRejectedException>(() => runtime.StopAsync());
         Assert.False(runtime.Snapshot.GatewayRouteRequiresResolution);
         Assert.Equal(LocalAiOwnership.None, runtime.Snapshot.Ownership);
         Assert.Null(runtime.Snapshot.ProcessId);
@@ -154,6 +157,108 @@ public sealed class NativeLocalAiLifecycleTests
         Assert.Equal(0, fixture.Rpc.Writes);
         Assert.False(fixture.Lifecycle.CanStartWslAutomatically);
     }
+
+    [Theory]
+    [InlineData("missing")]
+    [InlineData("json")]
+    [InlineData("schema")]
+    public async Task MissingOrInvalidInstallCanStopOnlyAfterOriginalGatewayConfirmsWithdrawal(string damage)
+    {
+        using var fixture = new Fixture();
+        await fixture.Lifecycle.PrepareAsync(fixture.Install, default);
+        fixture.Store.Save(fixture.Store.Load()! with { Pending = true, AutomaticRecoveryEnabled = true });
+        if (damage != "missing")
+            await File.WriteAllTextAsync(fixture.Paths.ManifestPath, damage == "json" ? "{" : "{\"schemaVersion\":999}");
+        await using var runtime = new LlamaServerRuntimeService(new()
+        { Paths = fixture.Paths, EndpointLifecycle = fixture.Lifecycle }, NullLogger.Instance);
+        await fixture.Lifecycle.ResumeAsync(runtime);
+        Assert.True((await runtime.RefreshAsync()).GatewayRouteRequiresResolution);
+        Assert.Null(runtime.Snapshot.ProcessId);
+        var stopped = await runtime.StopAsync();
+        Assert.Equal(LocalAiRuntimeState.Stopped, stopped.State);
+        Assert.False(stopped.GatewayRouteRequiresResolution);
+        Assert.Equal(LocalAiOwnership.None, stopped.Ownership);
+        Assert.True(fixture.Store.Exists);
+        Assert.False(fixture.Store.Load()!.Pending);
+        Assert.False(fixture.Store.Load()!.AutomaticRecoveryEnabled);
+        Assert.Equal(0, fixture.Rpc.Writes);
+        Assert.Equal(0, fixture.Rpc.Verifications);
+
+        var host = new SetupLocalAiHost(() => throw new InvalidOperationException(), () => fixture.Registry,
+            () => runtime, ct => new LocalAiManifestStore(fixture.Paths).LoadAsync(ct),
+            (_, _) => Task.FromResult(false), _ => Task.FromResult(RepairHardware()),
+            () => throw new InvalidOperationException(), nativeLifecycle: fixture.Lifecycle);
+        host.ConfigureNative(Record, fixture.Rpc, _ => Task.CompletedTask);
+        var observed = await host.ObserveAsync(default);
+        Assert.Equal(damage == "missing" ? LocalAiOnboardingState.SetUp : LocalAiOnboardingState.Repair, observed.State);
+        Assert.Equal(observed.Target, await host.RevalidateReviewAsync(observed, default));
+        await fixture.Lifecycle.ForgetWithdrawnAsync(Record.Id, default);
+        Assert.False(fixture.Store.Exists);
+    }
+
+    [Theory]
+    [InlineData("provider")]
+    [InlineData("primary")]
+    [InlineData("allowlist")]
+    [InlineData("identity")]
+    [InlineData("offline")]
+    public async Task MissingInstallNeverClearsOwnershipWithoutExactWithdrawalProof(string conflict)
+    {
+        using var fixture = new Fixture();
+        await fixture.Lifecycle.PrepareAsync(fixture.Install, default);
+        fixture.Store.Save(fixture.Store.Load()! with { Pending = true, AutomaticRecoveryEnabled = true });
+        if (conflict == "provider") fixture.Rpc.Config["models"]!["providers"]!["llamacpp"] = new JsonObject();
+        if (conflict == "primary") fixture.Rpc.Config["agents"]!["defaults"]!["model"]!["primary"] = "changed/model";
+        if (conflict == "allowlist") fixture.Rpc.Config["agents"]!["defaults"]!["models"]![fixture.Model] = new JsonObject();
+        if (conflict == "identity") fixture.Rpc.Route = fixture.Rpc.Route with { IdentityBinding = new string('B', 64) };
+        if (conflict == "offline") fixture.Rpc.IsConnected = false;
+        var config = fixture.Rpc.Config.ToJsonString();
+        await using var runtime = new LlamaServerRuntimeService(new()
+        { Paths = fixture.Paths, EndpointLifecycle = fixture.Lifecycle }, NullLogger.Instance);
+        await Assert.ThrowsAnyAsync<InvalidOperationException>(() => runtime.StopAsync());
+        Assert.True(runtime.Snapshot.GatewayRouteRequiresResolution);
+        Assert.True(fixture.Store.Load()!.Pending);
+        Assert.False(fixture.Store.Load()!.AutomaticRecoveryEnabled);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => runtime.ReleaseOwnershipAsync());
+        Assert.Equal(config, fixture.Rpc.Config.ToJsonString());
+        Assert.Equal(0, fixture.Rpc.Writes);
+    }
+
+    [Fact]
+    public async Task PendingBindingWithMissingFilesHydratesStatusAndCanWithdrawBeforeRepair()
+    {
+        using var fixture = new Fixture();
+        var original = fixture.Install.Manifest;
+        var revision = new string('a', 40);
+        var store = new LocalAiManifestStore(fixture.Paths);
+        await store.SaveAsync(original with
+        {
+            RuntimeAssets = [original.ModelAsset with { FileName = "runtime.zip" }],
+            ModelId = $"test/model@{revision}",
+            ModelAsset = original.ModelAsset with
+            { SourceUrl = $"https://huggingface.co/test/model/resolve/{revision}/test.gguf" },
+        });
+        await fixture.Lifecycle.PrepareAsync(fixture.Install, default);
+        fixture.Store.Save(fixture.Store.Load()! with { Pending = true, AutomaticRecoveryEnabled = true });
+        await using var runtime = new LlamaServerRuntimeService(new()
+        { Paths = fixture.Paths, EndpointLifecycle = fixture.Lifecycle }, NullLogger.Instance);
+        await fixture.Lifecycle.ResumeAsync(runtime);
+        var observed = await runtime.RefreshAsync();
+        Assert.Equal(LocalAiRuntimeState.Failed, observed.State);
+        Assert.Equal(original.ModelCatalogId, observed.ModelId);
+        Assert.True(observed.GatewayRouteRequiresResolution);
+        var stopped = await runtime.StopAsync();
+        Assert.Equal(LocalAiRuntimeState.Stopped, stopped.State);
+        Assert.False(stopped.GatewayRouteRequiresResolution);
+        Assert.True(fixture.Store.Exists);
+        Assert.False(fixture.Store.Load()!.Pending);
+        Assert.Null(stopped.ProcessId);
+        Assert.Equal(0, fixture.Rpc.Writes);
+    }
+
+    private static HostHardwareInfo RepairHardware() => new(Architecture.X64, 128L << 30, 100L << 30,
+        [new(GpuVendor.Nvidia, "Test GPU", 96L << 30, 80L << 30,
+            DriverVersion: "615.0", CudaMajorVersion: 13, StableId: "GPU-test")], false);
 
     [Fact]
     public void LegacyBindingRetainsAutomaticRecoveryDefault()
@@ -912,7 +1017,7 @@ public sealed class NativeLocalAiLifecycleTests
         public GatewayAiSetupRoute Route { get; set; } = new(Record.Id, "main", "page-authority",
             GatewayDashboardBinding.Capture(Record), new string('A', 64), "agent:main:main");
         public long Generation => 1;
-        public bool IsConnected => true;
+        public bool IsConnected { get; set; } = true;
         public IReadOnlyCollection<string> Methods => ["config.get", "config.patch", "openclaw.setup.verify"];
         public IReadOnlyCollection<string> OperatorScopes => ["operator.admin"];
         public JsonObject Config { get; } = JsonNode.Parse("""

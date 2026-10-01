@@ -55,14 +55,43 @@ internal sealed class LocalAiGatewayLifecycle(
         var binding = _store.Load();
         if (binding?.GatewayId != gatewayId || binding.Pending || binding.AutomaticRecoveryEnabled)
             throw new InvalidOperationException("The native Local AI ownership receipt is not safe to release.");
+        await CaptureWithdrawnAsync(binding, ct).ConfigureAwait(false);
+        _store.Delete();
+    }
+
+    public Task PrepareUnownedStopAsync(CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!_store.Exists)
+        {
+            var owner = _wslOwner.Resolve();
+            if (!owner.Success)
+                throw new LocalAiSelectionRejectedException(owner.Detail!);
+        }
+        return Task.CompletedTask;
+    }
+
+    public async Task ConfirmWithdrawnWithoutInstallAsync(CancellationToken ct)
+    {
+        await using var lease = await _store.AcquireAsync(ct).ConfigureAwait(false);
+        var binding = _store.Load() ?? throw new InvalidOperationException("The Local AI ownership receipt is unavailable.");
+        if (binding.AutomaticRecoveryEnabled)
+            throw new InvalidOperationException("Stop Local AI before confirming its Gateway withdrawal.");
+        var current = await CaptureWithdrawnAsync(binding, ct).ConfigureAwait(false);
+        _store.Save(binding with { Pending = false, ConfigHash = current.Hash });
+    }
+
+    private async Task<LocalAiGatewayConfigurationSnapshot> CaptureWithdrawnAsync(LocalAiNativeBinding binding, CancellationToken ct)
+    {
         var (target, transport) = await GetTransportAsync(binding, ct).ConfigureAwait(false);
         var current = await new LocalAiGatewayRpcConfigurationTransport(target, transport).CaptureAsync(ct).ConfigureAwait(false);
         var config = JsonNode.Parse(current.Config.GetRawText())!;
         if (config["models"]?["providers"]?["llamacpp"] is not null ||
             config["agents"]?["defaults"]?["model"]?["primary"]?.GetValue<string>() != binding.PreviousPrimary ||
             binding.AddedAllowlistEntry && config["agents"]?["defaults"]?["models"]?[binding.ModelRef] is not null)
-            throw new InvalidOperationException("The original Gateway has not confirmed withdrawal. Its ownership receipt was retained.");
-        _store.Delete();
+            throw new InvalidOperationException(
+                "The original Gateway has not confirmed withdrawal. Restore the installation receipt, or use the original Gateway's configuration tools to remove the Local AI provider, restore its saved primary model, and remove its Companion-added allowlist entry. Keep the ownership receipt.");
+        return current;
     }
 
     public async Task ReleaseOwnershipAsync(CancellationToken ct)

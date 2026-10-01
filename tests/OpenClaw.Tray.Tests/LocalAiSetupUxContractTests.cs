@@ -12,6 +12,10 @@ public sealed class LocalAiSetupUxContractTests
             "src", "OpenClaw.SetupEngine.UI", "Pages", "AiSetupPage.xaml.cs"));
         // Retire when ReportFailure can be invoked in a mounted WinUI fixture.
         Assert.Contains("error is LocalAiRepairRequiresStopException ? \"LocalRepairRequiresStop\"", source);
+        var review = File.ReadAllText(Path.Combine(root,
+            "src", "OpenClaw.SetupEngine.UI", "Pages", "GatewaySetupDetailPage.xaml.cs"));
+        Assert.Contains("error is LocalAiRepairRequiresStopException", review);
+        Assert.Contains("\"Onboarding_AiSetup_LocalRepairRequiresStop\"", review);
         foreach (var locale in new[] { "en-us", "fr-fr", "nl-nl", "pt-br", "zh-cn", "zh-tw" })
         {
             var resources = System.Xml.Linq.XDocument.Load(Path.Combine(root,
