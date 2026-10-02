@@ -347,6 +347,7 @@ foreach ($token in @(
         "./scripts/test-ci-change-classifier.ps1",
         "./scripts/test-ci-gate-results.ps1",
         "./scripts/test-ci-workflow-contract.ps1",
+        "./scripts/test-signed-llama-runtime-release.ps1",
         "./scripts/Test-InstallerScriptCompiles.ps1 -RequireCompiler",
         "choco install innosetup -y --no-progress",
         "./scripts/test-stable-correction-release-validator.ps1"

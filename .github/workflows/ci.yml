@@ -114,6 +114,10 @@ jobs:
       shell: pwsh
       run: ./scripts/test-ci-workflow-contract.ps1
 
+    - name: Validate signed llama.cpp runtime release contract
+      shell: pwsh
+      run: ./scripts/test-signed-llama-runtime-release.ps1
+
     - name: Validate MSIX CI artifacts
       shell: pwsh
       run: ./scripts/test-msix-ci-artifacts.ps1

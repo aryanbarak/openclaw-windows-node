@@ -670,6 +670,21 @@ unreviewed-branch or MSIX-only version allocator is introduced.
 Only OpenClaw-owned binaries should be signed by the OpenClaw release signing
 identity.
 
+The separately published managed llama.cpp runtime is an explicit exception to
+the ordinary Companion payload policy. Its main upstream archive is authorized
+by reviewed size and SHA-256 pins before Azure login, reduced to the exact
+server runtime closure, and signed in the dedicated main-only
+`signed-llama-runtime-release.yml` workflow. The workflow does not sign the
+third-party LLVM OpenMP runtime or the separately distributed NVIDIA CUDA
+dependencies. It publishes the signed bundles and their generated hash manifest
+to the immutable release named by `.github/llama-runtime-release.json`.
+
+Changing the upstream release, signed file set, signing revision, or output
+names requires review of that manifest and workflow. After the official release
+is published, update `LlamaRuntimeCatalog` in a follow-up change with the
+generated archive sizes and SHA-256 values. Do not remove the catalog's archive
+integrity pin to combine publishing and consumption into one change.
+
 OpenClaw-owned binaries:
 
 - `OpenClaw.Tray.WinUI.exe`

@@ -1,0 +1,230 @@
+name: Publish signed llama.cpp runtime
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: signed-llama-runtime-release
+  cancel-in-progress: false
+
+jobs:
+  authorize:
+    if: github.repository == 'openclaw/openclaw-windows-node' && github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    outputs:
+      release_tag: ${{ steps.manifest.outputs.release_tag }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read reviewed release identity
+        id: manifest
+        shell: pwsh
+        run: |
+          $manifest = Get-Content .github/llama-runtime-release.json -Raw | ConvertFrom-Json
+          "release_tag=$($manifest.releaseTag)" >> $env:GITHUB_OUTPUT
+
+      - name: Reject an existing tag or release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.manifest.outputs.release_tag }}
+        run: |
+          $remoteTag = git ls-remote --tags origin "refs/tags/$env:RELEASE_TAG"
+          if (-not [string]::IsNullOrWhiteSpace($remoteTag)) {
+            throw "Release tag $env:RELEASE_TAG already exists."
+          }
+          gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY *> $null
+          $releaseLookupExitCode = $LASTEXITCODE
+          $global:LASTEXITCODE = 0
+          if ($releaseLookupExitCode -eq 0) {
+            throw "Release $env:RELEASE_TAG already exists."
+          }
+          if ($releaseLookupExitCode -ne 1) {
+            throw "Could not determine whether release $env:RELEASE_TAG exists. gh exited $releaseLookupExitCode."
+          }
+
+      - name: Authorize pinned upstream runtime inputs
+        shell: pwsh
+        run: .\scripts\Prepare-SignedLlamaRuntime.ps1 -OutputPath authorized-runtime
+
+      - name: Verify authorized bytes before credential access
+        shell: pwsh
+        run: |
+          .\scripts\Test-SignedLlamaRuntimePayload.ps1 `
+            -PayloadPath authorized-runtime `
+            -AuthorizationPath authorized-runtime\authorization.json `
+            -VerifyAuthorizedHashes
+
+      - name: Upload authorized signing input
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
+        with:
+          name: authorized-llama-runtime
+          path: authorized-runtime
+          if-no-files-found: error
+          retention-days: 1
+
+  sign:
+    needs: authorize
+    runs-on: windows-latest
+    environment: release-signing
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Download authorized signing input
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.0
+        with:
+          name: authorized-llama-runtime
+          path: authorized-runtime
+
+      - name: Reverify authorized bytes before Azure login
+        shell: pwsh
+        run: |
+          .\scripts\Test-SignedLlamaRuntimePayload.ps1 `
+            -PayloadPath authorized-runtime `
+            -AuthorizationPath authorized-runtime\authorization.json `
+            -VerifyAuthorizedHashes
+
+      - name: Stage only llama.cpp-owned binaries for signing
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path signing-input | Out-Null
+          foreach ($architecture in @('x64', 'arm64')) {
+            $destination = New-Item -ItemType Directory -Path "signing-input\$architecture"
+            Get-ChildItem -LiteralPath "authorized-runtime\$architecture" -File |
+              Where-Object { $_.Extension -in '.exe', '.dll' -and $_.Name -ne 'libomp.dll' } |
+              ForEach-Object {
+                New-Item -ItemType HardLink -Path (Join-Path $destination.FullName $_.Name) -Target $_.FullName | Out-Null
+              }
+          }
+
+      - name: Azure login for release signing
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.0.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Sign authorized llama.cpp binaries
+        uses: azure/artifact-signing-action@c7ab2a863ab5f9a846ddb8265964877ef296ee82 # v2.0.0
+        with:
+          endpoint: https://eus.codesigning.azure.net/
+          signing-account-name: openclaw
+          certificate-profile-name: openclaw
+          files-folder: signing-input
+          files-folder-filter: exe,dll
+          files-folder-recurse: true
+          files-folder-depth: 2
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Verify signed runtime policy
+        shell: pwsh
+        run: |
+          .\scripts\Test-SignedLlamaRuntimePayload.ps1 `
+            -PayloadPath authorized-runtime `
+            -AuthorizationPath authorized-runtime\authorization.json `
+            -RequireOpenClawSignatures
+
+      - name: Create signed runtime archives and release manifest
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release-assets | Out-Null
+          $authorization = Get-Content authorized-runtime\authorization.json -Raw | ConvertFrom-Json
+          $publishedAssets = @()
+          foreach ($asset in @($authorization.assets)) {
+            $archivePath = Join-Path release-assets $asset.outputName
+            Compress-Archive -Path "authorized-runtime\$($asset.architecture)\*" -DestinationPath $archivePath -CompressionLevel Optimal
+            $archive = Get-Item -LiteralPath $archivePath
+            $publishedAssets += [ordered]@{
+              architecture = $asset.architecture
+              name = $asset.outputName
+              size = $archive.Length
+              sha256 = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+            }
+          }
+          [ordered]@{
+            schemaVersion = 1
+            releaseTag = $authorization.releaseTag
+            upstream = $authorization.upstream
+            signerSubject = $authorization.signerSubject
+            assets = $publishedAssets
+          } | ConvertTo-Json -Depth 6 | Set-Content release-assets\signed-runtime-manifest.json -Encoding utf8NoBOM
+          @"
+          OpenClaw-signed minimal llama.cpp runtime bundles.
+
+          Upstream: $($authorization.upstream.repository) $($authorization.upstream.tag) ($($authorization.upstream.commit))
+          Signing identity: $($authorization.signerSubject)
+
+          The CUDA dependency archives remain the NVIDIA-distributed, hash-pinned upstream assets. This release signs only the llama.cpp-owned executable and DLL closure. The third-party LLVM OpenMP runtime remains unmodified and its license is included.
+          "@ | Set-Content release-assets\release-notes.md -Encoding utf8NoBOM
+
+      - name: Upload signed release assets
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.0
+        with:
+          name: signed-llama-runtime
+          path: release-assets
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [authorize, sign]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Download signed release assets
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.0
+        with:
+          name: signed-llama-runtime
+          path: release-assets
+
+      - name: Create or verify immutable release tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.authorize.outputs.release_tag }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          if ! git show-ref --verify --quiet "refs/tags/$RELEASE_TAG"; then
+            git tag "$RELEASE_TAG" "$TARGET_SHA"
+            if ! git push origin "refs/tags/$RELEASE_TAG"; then
+              git tag --delete "$RELEASE_TAG"
+              git fetch origin "refs/tags/$RELEASE_TAG:refs/tags/$RELEASE_TAG"
+            fi
+          fi
+          tagged_sha="$(git rev-list -n 1 "refs/tags/$RELEASE_TAG")"
+          if [[ "$tagged_sha" != "$TARGET_SHA" ]]; then
+            echo "::error::Release tag $RELEASE_TAG points to $tagged_sha instead of $TARGET_SHA."
+            exit 1
+          fi
+
+      - name: Publish immutable signed runtime release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ needs.authorize.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          gh release create "$RELEASE_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "OpenClaw signed llama.cpp runtime $RELEASE_TAG" \
+            --latest=false \
+            --notes-file release-assets/release-notes.md \
+            release-assets/openclaw-llama-*.zip \
+            release-assets/signed-runtime-manifest.json
