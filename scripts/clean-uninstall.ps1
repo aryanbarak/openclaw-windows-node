@@ -58,11 +58,48 @@ function Get-CleanFullPath([string]$Path) {
         throw "Expected an absolute local literal path, not a wildcard, UNC path, or stream: $Path"
     }
     foreach ($segment in $Path.Substring(3).Split('\') | Where-Object { $_ }) {
-        if ($segment -match '[. ]$|~[0-9]' -or $segment -match '^(?i:CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])(?:\.|$)') {
+        if ($segment -match '[. ]$' -or $segment -match '^(?i:CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])(?:\.|$)') {
             throw "Refusing an ambiguous Windows path segment: $Path"
         }
     }
-    return [IO.Path]::GetFullPath($Path).TrimEnd('\')
+    $full = [IO.Path]::GetFullPath($Path)
+    if ($full -match '~[0-9]') { $full = Expand-CleanLongPath $full }
+    if ($full.Length -eq 3) { return $full }
+    return $full.TrimEnd('\')
+}
+
+function Expand-CleanLongPath([string]$Path) {
+    if (-not ('OpenClawCleanup.NativePaths' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.Text;
+using System.Runtime.InteropServices;
+namespace OpenClawCleanup {
+    public static class NativePaths {
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern uint GetLongPathName(string path, StringBuilder buffer, uint length);
+    }
+}
+'@
+    }
+    $cursor = $Path
+    $suffix = [Collections.Generic.Stack[string]]::new()
+    while (-not (Test-Path -LiteralPath $cursor)) {
+        $leaf = Split-Path -Leaf $cursor
+        if (-not $leaf -or $leaf -match '~[0-9]') {
+            throw "Refusing an unresolved ambiguous Windows short path: $Path"
+        }
+        $suffix.Push($leaf)
+        $cursor = Split-Path -Parent $cursor
+    }
+    $buffer = [Text.StringBuilder]::new(32768)
+    $length = [OpenClawCleanup.NativePaths]::GetLongPathName($cursor, $buffer, $buffer.Capacity)
+    if ($length -eq 0 -or $length -ge $buffer.Capacity -or $buffer.ToString() -match '~[0-9]') {
+        throw "Cannot resolve Windows short path safely: $Path"
+    }
+    $full = $buffer.ToString()
+    while ($suffix.Count) { $full = Join-Path $full $suffix.Pop() }
+    return $full
 }
 
 function Test-CleanWithin([string]$Path, [string]$Root) {
@@ -72,12 +109,16 @@ function Test-CleanWithin([string]$Path, [string]$Root) {
 
 function Assert-CleanPath([string]$Path) {
     $full = Get-CleanFullPath $Path
+    if ($full -eq [IO.Path]::GetPathRoot($full)) { throw "Refusing a filesystem root: $full" }
     $protected = @($env:USERPROFILE, $env:APPDATA, $env:LOCALAPPDATA, $env:TEMP,
         $env:WINDIR, $env:ProgramFiles, ${env:ProgramFiles(x86)}, $PSHOME, $PSScriptRoot)
     foreach ($folder in [Enum]::GetValues([Environment+SpecialFolder])) {
         $protected += [Environment]::GetFolderPath($folder)
     }
     foreach ($root in $protected | Where-Object { $_ }) {
+        # Targets are local drive paths; redirected UNC special folders cannot
+        # be their ancestors. Do not contact the server or treat it as a target.
+        if ($root.StartsWith('\\')) { continue }
         if (Test-CleanWithin (Get-CleanFullPath $root) $full) {
             throw "Refusing a protected directory or its ancestor: $full"
         }
@@ -94,7 +135,12 @@ function Assert-CleanPath([string]$Path) {
         $full -notmatch '(?i)\\\.copilot\\session-state\\[0-9a-f-]{36}\\files\\[^\\]+(?:\\.*)?$') {
         throw "Refusing a shared cache, package root, or Copilot workspace root: $full"
     }
-    $cursor = $full
+    Assert-CleanNoReparsePath $full
+    return $full
+}
+
+function Assert-CleanNoReparsePath([string]$Path) {
+    $cursor = $Path
     while ($cursor) {
         if (Test-Path -LiteralPath $cursor) {
             $item = Get-Item -LiteralPath $cursor -Force
@@ -104,7 +150,6 @@ function Assert-CleanPath([string]$Path) {
         }
         $cursor = Split-Path -Parent $cursor
     }
-    return $full
 }
 
 function Get-CleanTree([string]$Path) {
@@ -134,20 +179,35 @@ function Get-CleanPackages([bool]$Dev) {
 }
 
 function Get-CleanWin32([bool]$Dev) {
-    $names = @('OpenClaw Companion')
-    if ($Dev) { $names += 'OpenClaw Companion (Dev)' }
+    $identities = @{ '{M0LTB0T-TRAY-4PP1-D3N7}_is1' = 'OpenClaw Companion' }
+    if ($Dev) { $identities['{M0LTB0T-TRAY-4PP1-DEV}_is1'] = 'OpenClaw Companion (Dev)' }
     foreach ($root in @('HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall',
         'HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall',
         'HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall')) {
         if (-not (Test-Path -LiteralPath $root)) { continue }
         foreach ($key in Get-ChildItem -LiteralPath $root) {
             $entry = Get-ItemProperty -LiteralPath $key.PSPath
-            if ((Get-CleanProperty $entry 'DisplayName') -notin $names) { continue }
+            $keyName = $key.PSChildName
+            $display = [string](Get-CleanProperty $entry 'DisplayName')
+            if (-not $identities.ContainsKey($keyName)) {
+                foreach ($name in $identities.Values) {
+                    if ($display -eq $name -or $display.StartsWith("$name version ", [StringComparison]::OrdinalIgnoreCase)) {
+                        throw "Unrecognized Companion registration. Remove it in Installed apps first: $display"
+                    }
+                }
+                continue
+            }
+            $name = $identities[$keyName]
+            $version = [string](Get-CleanProperty $entry 'DisplayVersion')
+            if ((Get-CleanProperty $entry 'Publisher') -ne 'OpenClaw Foundation' -or
+                ($display -ne $name -and ($version -notmatch '^\d+(?:\.\d+){1,3}(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$' -or $display -ne "$name version $version"))) {
+                throw "Inno registration identity is inconsistent: $keyName"
+            }
             $command = [string](Get-CleanProperty $entry 'UninstallString')
             if ($command -notmatch '^"(?<exe>[A-Za-z]:\\[^"]+\\unins[0-9]+\.exe)"\s*$') {
                 throw "Unsupported Win32 uninstaller. Remove '$($entry.DisplayName)' in Installed apps first."
             }
-            $exe = $Matches.exe
+            $exe = Get-CleanFullPath $Matches.exe
             $install = Get-CleanFullPath ([string](Get-CleanProperty $entry 'InstallLocation'))
             if (-not (Test-CleanWithin $exe $install) -or -not (Test-Path -LiteralPath $exe -PathType Leaf)) {
                 throw "Uninstaller is missing or outside its registered install location: $exe"
@@ -157,14 +217,62 @@ function Get-CleanWin32([bool]$Dev) {
     }
 }
 
-function Get-CleanDistros {
+function Get-CleanDistroRecords {
     # Query registrations without starting WSL or invoking its first-install stub.
     $root = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss'
     if (-not (Test-Path -LiteralPath $root)) { return }
     foreach ($key in Get-ChildItem -LiteralPath $root) {
-        $name = Get-CleanProperty (Get-ItemProperty -LiteralPath $key.PSPath) 'DistributionName'
+        $entry = Get-ItemProperty -LiteralPath $key.PSPath
+        $name = Get-CleanProperty $entry 'DistributionName'
         if ([string]::IsNullOrWhiteSpace($name)) { throw 'WSL registration cannot be identified. Inspect it before cleanup.' }
-        $name
+        $basePath = [string](Get-CleanProperty $entry 'BasePath')
+        if ($basePath.StartsWith('\\?\') -and $basePath.Substring(4) -match '^[A-Za-z]:\\') {
+            $basePath = $basePath.Substring(4)
+        }
+        $basePath = Get-CleanFullPath $basePath
+        Assert-CleanNoReparsePath $basePath
+        [pscustomobject]@{ Name = $name; BasePath = $basePath }
+    }
+}
+
+function Get-CleanDistros {
+    Get-CleanDistroRecords | ForEach-Object { $_.Name }
+}
+
+function Assert-CleanDistroStorage([object[]]$Records, [string[]]$Targets, [string[]]$Removing = @()) {
+    foreach ($record in $Records) {
+        if ($record.Name -in $Removing) { continue }
+        foreach ($target in $Targets) {
+            $target = Get-CleanFullPath $target
+            if ((Test-CleanWithin $record.BasePath $target) -or (Test-CleanWithin $target $record.BasePath)) {
+                throw "Preserved WSL storage overlaps cleanup target '$target': $($record.Name) at $($record.BasePath). Explicitly select its removal or relocate/exclude the target."
+            }
+        }
+    }
+}
+
+function Get-CleanModelProvenance($Asset) {
+    $source = [string](Get-CleanProperty $Asset 'SourceUrl')
+    # Match the original URL, not a Uri-normalized path that can erase traversal.
+    if ($source -cnotmatch '^https://huggingface\.co/([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+)/resolve/([0-9a-f]{40})/([^?#]+)(?:\?download=true)?$') {
+        throw 'Model receipt source must be an immutable Hugging Face resolve URL.'
+    }
+    $owner = $Matches[1]
+    $repo = $Matches[2]
+    $revision = $Matches[3]
+    $relative = [Uri]::UnescapeDataString($Matches[4])
+    foreach ($part in @($owner, $repo) + @($relative.Split('/'))) {
+        if (-not $part -or $part -match '[\\:*?"<>|\x00-\x1f]' -or $part -match '[. ]$' -or
+            $part -match '^(?i:CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])(?:\.|$)') {
+            throw 'Model receipt source contains an unsafe path segment.'
+        }
+    }
+    if (($relative.Split('/')[-1]) -cne (Get-CleanProperty $Asset 'FileName')) {
+        throw 'Model receipt filename disagrees with its source.'
+    }
+    [pscustomobject]@{
+        ModelId = "$owner/$repo@$revision"
+        SnapshotPath = "models--$owner--$repo\snapshots\$revision\$($relative.Replace('/', '\'))"
     }
 }
 
@@ -178,16 +286,31 @@ function Get-CleanModels([object[]]$Files) {
         $paths = @([string](Get-CleanProperty $receipt 'CachedModelPath'))
         $assets = @((Get-CleanProperty $receipt 'ModelAsset'))
         if ($schema -eq 5) {
-            $paths += @((Get-CleanProperty $receipt 'AdditionalModelPaths'))
-            $assets += @((Get-CleanProperty $receipt 'AdditionalModelAssets'))
+            $additionalPaths = @((Get-CleanProperty $receipt 'AdditionalModelPaths'))
+            $additionalAssets = @((Get-CleanProperty $receipt 'AdditionalModelAssets'))
+            if ($additionalPaths.Count -eq 0 -or $additionalPaths.Count -ne $additionalAssets.Count) { throw 'Invalid additional model receipts.' }
+            $paths += $additionalPaths
+            $assets += $additionalAssets
+        } elseif (@(Get-CleanProperty $receipt 'AdditionalModelPaths' | Where-Object { $null -ne $_ }).Count -gt 0 -or
+            @(Get-CleanProperty $receipt 'AdditionalModelAssets' | Where-Object { $null -ne $_ }).Count -gt 0) {
+            throw 'Only schema-5 receipts can contain additional model assets.'
         }
         if ($paths.Count -ne $assets.Count) { throw "Invalid model receipt: $($file.FullName)" }
+        $seenNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
         for ($index = 0; $index -lt $paths.Count; $index++) {
             $path = Assert-CleanPath $paths[$index]
+            $provenance = Get-CleanModelProvenance $assets[$index]
+            if (-not $seenNames.Add([string](Get-CleanProperty $assets[$index] 'FileName'))) {
+                throw 'Model receipt asset filenames must be unique.'
+            }
+            if ($index -eq 0 -and $provenance.ModelId -cne (Get-CleanProperty $receipt 'ModelId')) {
+                throw 'Primary model receipt provenance disagrees with ModelId.'
+            }
+            $expected = Get-CleanFullPath (Join-Path $cache $provenance.SnapshotPath)
             $prefix = $cache + '\'
             if (-not $path.StartsWith($prefix, [StringComparison]::OrdinalIgnoreCase) -or
-                $path.Substring($prefix.Length) -notmatch '^models--[^\\]+\\snapshots\\[0-9a-f]{40}\\[^\\]+\.gguf$' -or
-                [IO.Path]::GetFileName($path) -ne (Get-CleanProperty $assets[$index] 'FileName')) {
+                -not $path.Equals($expected, [StringComparison]::OrdinalIgnoreCase) -or
+                [IO.Path]::GetExtension($path) -ne '.gguf') {
                 throw "Model receipt does not name an exact Hugging Face snapshot GGUF: $path"
             }
             $hash = [string](Get-CleanProperty $assets[$index] 'Sha256')
@@ -209,9 +332,10 @@ function Get-CleanProcesses([string[]]$OwnedRoots) {
         if ($process.Name -notmatch '^(OpenClaw\.Tray\.WinUI|llama-server|openclaw-wsl-keepalive)\.exe$') { continue }
         $path = $process.ExecutablePath
         if (-not $path) { throw "Cannot determine ownership of candidate process PID $($process.ProcessId). Close it manually." }
+        $path = Get-CleanFullPath $path
         $owned = $false
         foreach ($root in $OwnedRoots) {
-            if (Test-CleanWithin $path $root) { $owned = $true; break }
+            if (Test-CleanWithin $path (Get-CleanFullPath $root)) { $owned = $true; break }
         }
         if (-not $owned) { throw "Candidate process is outside selected roots. Close it manually before cleanup: PID $($process.ProcessId), $path" }
         $process
@@ -302,6 +426,17 @@ function Invoke-CleanWin32($App) {
     if (-not $process.HasExited) { $null = $process.WaitForExit(30000) }
 }
 
+function Assert-CleanStartupExecutable([string]$Executable, [string[]]$OwnedRoots) {
+    if ($Executable -match '^"([^"]+)"$') { $Executable = $Matches[1] }
+    if ($Executable.Contains('"')) { throw 'Startup executable has ambiguous quoting.' }
+    $path = Get-CleanFullPath $Executable
+    if ([IO.Path]::GetFileName($path) -ne 'OpenClaw.Tray.WinUI.exe') { throw 'Startup executable is not Companion.' }
+    foreach ($root in $OwnedRoots) {
+        if (Test-CleanWithin $path (Get-CleanFullPath $root)) { return }
+    }
+    throw "Startup executable is outside selected ownership roots: $path"
+}
+
 function Get-CleanStartup([bool]$Dev, [string[]]$OwnedRoots) {
     $runKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run'
     $names = @('OpenClawTray')
@@ -312,6 +447,11 @@ function Get-CleanStartup([bool]$Dev, [string[]]$OwnedRoots) {
         foreach ($name in $names) {
             $value = Get-CleanProperty $values $name
             if ($null -ne $value) {
+                if ($value -notmatch '^(?:"([^"]+)"|([^\s"]+))(?:\s+--background)?\s*$') {
+                    throw "Startup Run command is not a supported Companion command: $name"
+                }
+                $executable = if ($Matches[1]) { $Matches[1] } else { $Matches[2] }
+                Assert-CleanStartupExecutable $executable $OwnedRoots
                 [pscustomobject]@{ Kind = 'Run'; Name = $name; Key = $runKey; Value = $value }
             }
         }
@@ -319,19 +459,15 @@ function Get-CleanStartup([bool]$Dev, [string[]]$OwnedRoots) {
     $sid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
     foreach ($task in Get-ScheduledTask -ErrorAction Stop | Where-Object { $_.TaskName -in $taskNames }) {
         $principal = $task.Principal.UserId
+        if ([string]::IsNullOrWhiteSpace($principal)) { throw 'Startup task has no identifiable principal.' }
         if ($principal -notmatch '^S-1-') {
             $principal = ([Security.Principal.NTAccount]$principal).Translate([Security.Principal.SecurityIdentifier]).Value
         }
         $actions = @($task.Actions)
-        $owned = $false
-        if ($actions.Count -eq 1) {
-            foreach ($root in $OwnedRoots) {
-                if (Test-CleanWithin $actions[0].Execute $root) { $owned = $true }
-            }
-        }
-        if ($principal -ne $sid -or -not $owned -or $task.TaskPath -ne '\') {
+        if ($principal -ne $sid -or $actions.Count -ne 1 -or $task.TaskPath -ne '\') {
             throw "Startup task has unexpected ownership. Inspect it manually: $($task.TaskPath)$($task.TaskName)"
         }
+        Assert-CleanStartupExecutable $actions[0].Execute $OwnedRoots
         [pscustomobject]@{ Kind = 'Task'; Name = $task.TaskName; Key = $task.TaskPath; Value = (Export-ScheduledTask -InputObject $task) }
     }
 }
@@ -348,7 +484,8 @@ function Invoke-OpenClawClean {
     if ($overrides.Count -gt 0) { throw "Clear path overrides before cleanup. Use -AdditionalProfilePath explicitly: $($overrides.Name -join ', ')" }
     $packages = @(Get-CleanPackages $Dev)
     $apps = @(Get-CleanWin32 $Dev)
-    $distros = @(Get-CleanDistros)
+    $distroRecords = @(Get-CleanDistroRecords)
+    $distros = @($distroRecords | ForEach-Object { $_.Name })
     $selectedDistros = @()
     if ($Wsl) {
         $distroNames = @('OpenClawGateway')
@@ -371,6 +508,17 @@ function Invoke-OpenClawClean {
         @($apps | ForEach-Object { $_.Install })
     $packageData = @($packages | ForEach-Object { Join-Path $env:LOCALAPPDATA "Packages\$($_.PackageFamilyName)" })
     $ownedRoots += $packageData
+    $ownedRoots = @($ownedRoots | ForEach-Object { Get-CleanFullPath $_ } | Select-Object -Unique)
+    $deletionTargets = @($profiles + $packageData + @($apps | ForEach-Object { $_.Install }))
+    Assert-CleanDistroStorage $distroRecords $deletionTargets $selectedDistros
+    $preservedStorage = @()
+    foreach ($record in $distroRecords | Where-Object { $_.Name -notin $selectedDistros }) {
+        if (Test-Path -LiteralPath $record.BasePath) {
+            $preservedStorage += $record.BasePath
+            $preservedStorage += @(Get-ChildItem -LiteralPath $record.BasePath -File -Filter '*.vhdx' -Force |
+                ForEach-Object { $_.FullName })
+        }
+    }
     $packagesRoot = Join-Path $env:LOCALAPPDATA 'Packages'
     if (Test-Path -LiteralPath $packagesRoot) {
         foreach ($directory in Get-ChildItem -LiteralPath $packagesRoot -Directory -Force) {
@@ -420,6 +568,7 @@ function Invoke-OpenClawClean {
     if (-not $Reports) { $Reports = Join-Path $env:TEMP ("OpenClawCleanReports\" + [guid]::NewGuid().ToString('N')) }
     $Reports = Assert-CleanPath $Reports
     foreach ($target in @($profiles + $packageData + @($apps | ForEach-Object { $_.Install }))) {
+        $target = Get-CleanFullPath $target
         if ((Test-CleanWithin $Reports $target) -or (Test-CleanWithin $target $Reports)) { throw 'Report directory overlaps a cleanup target.' }
     }
     if (Test-Path -LiteralPath $Reports) { throw "Use a new report directory: $Reports" }
@@ -456,6 +605,7 @@ function Invoke-OpenClawClean {
         foreach ($package in $packages) {
             if ($package.PackageFullName -notin $livePackages) { throw 'Package inventory changed. Preview again before cleanup.' }
         }
+        Assert-CleanDistroStorage @(Get-CleanDistroRecords) $deletionTargets $selectedDistros
         foreach ($process in $processes) { Stop-CleanProcess $process }
         foreach ($gateway in $gateways) {
             Write-Host "TEARDOWN: $($gateway.PackageFullName)"
@@ -493,6 +643,9 @@ function Invoke-OpenClawClean {
         }
         if (@(Get-CleanPackages $Dev).Count -gt 0 -or @(Get-CleanWin32 $Dev).Count -gt 0) { throw 'An app is still registered. State deletion stopped.' }
         if (@(Get-CleanProcesses $ownedRoots).Count -gt 0) { throw 'An owned process is still running. State deletion stopped.' }
+        # Even an approved distro must be fully unregistered before its storage
+        # can be removed as profile data.
+        Assert-CleanDistroStorage @(Get-CleanDistroRecords) $deletionTargets
         foreach ($path in $packageData) {
             if (@(Get-CleanTree $path | Where-Object { -not $_.PSIsContainer }).Count -gt 0) {
                 throw "Package data remains after uninstall. State deletion stopped: $path"
@@ -520,12 +673,19 @@ function Invoke-OpenClawClean {
             if (Test-Path -LiteralPath $path) { throw "Target remains: $path" }
         }
         if (@(Get-CleanStartup $Dev $ownedRoots).Count -gt 0) { throw 'A startup entry remains.' }
-        $afterDistros = @(Get-CleanDistros)
+        $afterRecords = @(Get-CleanDistroRecords)
+        $afterDistros = @($afterRecords | ForEach-Object { $_.Name })
         foreach ($distro in $selectedDistros) {
             if ($distro -in $afterDistros) { throw "WSL distro remains: $distro" }
         }
         foreach ($distro in $distros | Where-Object { $_ -notin $selectedDistros }) {
             if ($distro -notin $afterDistros) { throw "A preserved WSL distro was removed (check the interactive uninstaller): $distro" }
+            $before = @($distroRecords | Where-Object { $_.Name -eq $distro })[0]
+            $after = @($afterRecords | Where-Object { $_.Name -eq $distro })[0]
+            if ($before.BasePath -ne $after.BasePath) { throw "Preserved WSL storage location changed: $distro" }
+        }
+        foreach ($path in $preservedStorage) {
+            if (-not (Test-Path -LiteralPath $path)) { throw "Preserved WSL storage disappeared: $path" }
         }
         Write-Host 'SUCCESS: selected apps, startup entries, profiles, and opt-in targets are absent. No app was relaunched.'
     } catch {

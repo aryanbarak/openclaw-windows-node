@@ -23,6 +23,19 @@ The default selects release Companion/native Gateway packages, supported Inno
 Companion installations, and ordinary release roaming/local profiles. Native
 MXC teardown runs before package removal. Inno uninstall stays interactive:
 choose **No** to preserve WSL. Cancelling or failing an uninstall stops cleanup.
+Known Inno AppId keys, publisher, versioned display names, and uninstaller paths
+must agree. Selected live install registrations are never swept away as profile
+data; unrelated installers' metadata is not interpreted as a cleanup target.
+
+WSL registrations are inventoried with their storage paths. If a preserved
+distro's storage overlaps any selected profile or uninstall directory, preview
+and apply both stop before teardown. The usual
+`%LOCALAPPDATA%\OpenClawTray\wsl\OpenClawGateway` location therefore requires
+explicit `-RemoveWslGateway` consent, or moving the distro outside cleanup targets
+using supported WSL tools first. Selecting **No** in Inno is not sufficient to
+protect a disk inside a profile selected for deletion. Storage overlap is checked
+again before mutation and profile deletion; preserved registrations and existing
+disk files must still be present at completion.
 
 | Option | Additional scope |
 | --- | --- |
@@ -60,6 +73,10 @@ Cache-root precedence is `HF_HUB_CACHE`, `HUGGINGFACE_HUB_CACHE`, `HF_HOME\hub`,
 `XDG_CACHE_HOME\huggingface\hub`, then the default above. The cleanup script uses
 the exact paths in selected profiles' `LocalAI\state.json` receipts, not today's
 environment settings, so it also finds previously customized cache locations.
+Nested artifacts such as `snapshots\<revision>\weights\model.gguf` are supported.
+The primary model ID and immutable Hugging Face source URL must agree with the
+recorded cache path. Each additional asset is checked against its own source
+repository, revision, and relative path before any teardown or hashing.
 
 **Shared cached weights are preserved by default.** Add `-RemoveCachedModels` (or `-All`)
 to both preview and apply to delete only the listed receipt-backed files,
@@ -74,6 +91,14 @@ changed PID identity, failed native teardown, and unsupported uninstall entries.
 Close development/test instances outside selected install/profile roots manually
 before running; the script will not kill them by name. Clear path override
 environment variables and supply extra profile paths explicitly.
+Supported quoted startup executables must resolve inside selected ownership
+roots, including Run entries. Existing Windows 8.3 aliases are expanded before
+path comparisons; unresolved short aliases still stop cleanup. Unrelated UNC
+special-folder redirection does not block local cleanup, but UNC deletion targets
+and reparse-point paths remain unsupported.
+Remove an out-of-scope portable/worktree instance's startup registration through
+that instance before cleanup; matching a startup name alone does not authorize
+the script to change another instance's registration.
 
 Already-uninstalled native packages with orphan `session.json` records need the
 matching package repaired/reinstalled for supported teardown. The script does not

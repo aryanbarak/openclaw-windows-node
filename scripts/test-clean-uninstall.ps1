@@ -17,7 +17,7 @@ if ($errors.Count) { throw ($errors | Out-String) }
 foreach ($definition in $ast.EndBlock.Statements | Where-Object { $_ -is [Management.Automation.Language.FunctionDefinitionAst] }) {
     Invoke-Expression $definition.Extent.Text
 }
-$fixture = Join-Path ([IO.Path]::GetTempPath()) ("openclaw-clean-tests-" + [guid]::NewGuid().ToString('N'))
+$fixture = Get-CleanFullPath (Join-Path ([IO.Path]::GetTempPath()) ("openclaw-clean-tests-" + [guid]::NewGuid().ToString('N')))
 $passed = 0
 function Assert-True([bool]$Condition, [string]$Message) {
     if (-not $Condition) { throw $Message }
@@ -76,6 +76,100 @@ try {
         }
         Assert-Throws { Assert-CleanPath (Join-Path (Split-Path $env:USERPROFILE) 'UnrelatedUser\Documents') } "another user's"
     }
+    Test-Case 'protected short paths expand and unrelated UNC locations do not block local targets' {
+        $oldTemp = $env:TEMP
+        $fso = New-Object -ComObject Scripting.FileSystemObject
+        try {
+            $short = $fso.GetFolder($fixture).ShortPath
+            $env:TEMP = $short
+            Assert-True ((Get-CleanFullPath "$short\future-child") -eq "$fixture\future-child") 'Short path was not expanded.'
+            $null = Assert-CleanPath "$fixture\future-child"
+            Assert-Throws { Assert-CleanPath $short } 'protected'
+            $env:TEMP = '\\uncontacted-server\redirected-folder'
+            $null = Assert-CleanPath "$fixture\local-child"
+        } finally {
+            $env:TEMP = $oldTemp
+            [Runtime.InteropServices.Marshal]::FinalReleaseComObject($fso) | Out-Null
+        }
+    }
+    Test-Case 'real Inno display names and publisher identity are detected' {
+        $keyName = '{M0LTB0T-TRAY-4PP1-D3N7}_is1'
+        $entry = [pscustomobject]@{
+            DisplayName = 'OpenClaw Companion version 2026.9.7'
+            DisplayVersion = '2026.9.7'; Publisher = 'OpenClaw Foundation'
+            InstallLocation = "$fixture\inno-install"; UninstallString = "`"$fixture\inno-install\unins000.exe`""
+        }
+        function Test-Path {
+            param($LiteralPath, $PathType)
+            return $LiteralPath -eq 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall' -or
+                $LiteralPath -eq "$fixture\inno-install\unins000.exe"
+        }
+        function Get-ChildItem { [pscustomobject]@{ PSPath = 'fake-key'; PSChildName = $keyName } }
+        function Get-ItemProperty { $entry }
+        $apps = @(Get-CleanWin32 $false)
+        Assert-True ($apps.Count -eq 1 -and $apps[0].Exe -eq "$fixture\inno-install\unins000.exe") 'Real Inno registration was missed.'
+        foreach ($version in @('2026.9.7-preview.1', '2026.9.7-1')) {
+            $entry.DisplayVersion = $version
+            $entry.DisplayName = "OpenClaw Companion version $version"
+            Assert-True (@(Get-CleanWin32 $false).Count -eq 1) 'Supported Inno version was missed.'
+        }
+        $entry.DisplayVersion = '2026.9.7'
+        $keyName = '{M0LTB0T-TRAY-4PP1-DEV}_is1'
+        $entry.DisplayName = 'OpenClaw Companion (Dev) version 2026.9.7'
+        Assert-True (@(Get-CleanWin32 $false).Count -eq 0) 'Release cleanup selected dev Inno.'
+        Assert-True (@(Get-CleanWin32 $true).Count -eq 1) 'Dev Inno was missed.'
+        $entry.Publisher = 'Unexpected publisher'
+        Assert-Throws { Get-CleanWin32 $true } 'identity is inconsistent'
+        $entry.Publisher = 'OpenClaw Foundation'
+        $keyName = 'unknown-inno-key'
+        Assert-Throws { Get-CleanWin32 $true } 'Unrecognized Companion'
+    }
+    Test-Case 'unrelated uninstall metadata is not interpreted as a cleanup target' {
+        function Test-Path { param($LiteralPath) return $LiteralPath -like 'HKCU:*' }
+        function Get-ChildItem { [pscustomobject]@{ PSPath = 'live-key'; PSChildName = 'OtherApplication' } }
+        function Get-ItemProperty { [pscustomobject]@{ DisplayName = 'OtherApplication'; InstallLocation = $location } }
+        foreach ($location in @('C:/Unrelated', 'C:\', '%ProgramFiles%\Foo', 'C:\Unknown~1\App', 'C:\TrailingSpace ')) {
+            Assert-True (@(Get-CleanWin32 $true).Count -eq 0) 'Unrelated install metadata blocked cleanup.'
+        }
+    }
+    Test-Case 'WSL inventory retains storage paths and guards preserved disks' {
+        $entry = [pscustomobject]@{ DistributionName = 'OpenClawGateway'; BasePath = "\\?\$fixture\profile\wsl\OpenClawGateway" }
+        function Test-Path { param($LiteralPath) return $LiteralPath -like 'HKCU:*' }
+        function Get-ChildItem { [pscustomobject]@{ PSPath = 'wsl-key' } }
+        function Get-ItemProperty { $entry }
+        $records = @(Get-CleanDistroRecords)
+        Assert-True ($records[0].BasePath -eq "$fixture\profile\wsl\OpenClawGateway") 'WSL BasePath was lost.'
+        Assert-Throws { Assert-CleanDistroStorage $records @("$fixture\profile") } 'Preserved WSL storage overlaps'
+        Assert-CleanDistroStorage $records @("$fixture\profile") @('OpenClawGateway')
+        Assert-Throws { Assert-CleanDistroStorage $records @("$fixture\profile\wsl\OpenClawGateway\child") } 'Preserved WSL storage overlaps'
+        $entry.DistributionName = 'UnrelatedDistro'
+        $entry.BasePath = "$fixture\hub"
+        Assert-CleanDistroStorage @(Get-CleanDistroRecords) @("$fixture\profile")
+        $entry.BasePath = 'Z:\'
+        Assert-CleanDistroStorage @(Get-CleanDistroRecords) @("$fixture\profile")
+        $entry.BasePath = $null
+        Assert-Throws { Get-CleanDistroRecords } 'absolute local literal'
+    }
+    Test-Case 'startup commands normalize quoting and reject unowned or ambiguous executables' {
+        $run = [pscustomobject]@{ OpenClawTray = "`"$fixture\selected\OpenClaw.Tray.WinUI.exe`" --background" }
+        $task = [pscustomobject]@{
+            TaskName = 'OpenClaw Companion'; TaskPath = '\'
+            Principal = [pscustomobject]@{ UserId = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value }
+            Actions = @([pscustomobject]@{ Execute = "`"$fixture\selected\OpenClaw.Tray.WinUI.exe`"" })
+        }
+        function Test-Path { param($LiteralPath) return $LiteralPath -like 'HKCU:*' }
+        function Get-ItemProperty { $run }
+        function Get-ScheduledTask { $task }
+        function Export-ScheduledTask { 'fixture task XML' }
+        Assert-True (@(Get-CleanStartup $false @("$fixture\selected")).Count -eq 2) 'Quoted owned startup was rejected.'
+        $run.OpenClawTray = "`"$fixture\unselected\OpenClaw.Tray.WinUI.exe`" --background"
+        Assert-Throws { Get-CleanStartup $false @("$fixture\selected") } 'outside selected ownership'
+        $run.OpenClawTray = "`"$fixture\selected\OpenClaw.Tray.WinUI.exe`" --background ; evil"
+        Assert-Throws { Get-CleanStartup $false @("$fixture\selected") } 'not a supported Companion'
+        $run.OpenClawTray = "$fixture\selected\OpenClaw.Tray.WinUI.exe"
+        $task.Principal.UserId = ''
+        Assert-Throws { Get-CleanStartup $false @("$fixture\selected") } 'no identifiable principal'
+    }
     Test-Case 'tree inventory includes hidden files but refuses source checkout' {
         $tree = Join-Path $fixture 'tree'
         New-Item -ItemType Directory -Path $tree | Out-Null
@@ -107,14 +201,14 @@ try {
         New-Item -ItemType Directory -Path $snapshot,$localAi -Force | Out-Null
         Set-Content -LiteralPath "$snapshot\model.gguf" -Value 'model'
         Set-Content -LiteralPath "$snapshot\draft.gguf" -Value 'draft'
-        $asset = [ordered]@{ FileName = 'model.gguf'; SizeBytes = (Get-Item "$snapshot\model.gguf").Length; Sha256 = (Get-FileHash "$snapshot\model.gguf").Hash }
-        $manifest = [ordered]@{ SchemaVersion = 4; ModelCacheRoot = $cache; CachedModelPath = "$snapshot\model.gguf"; ModelAsset = $asset }
+        $asset = [ordered]@{ FileName = 'model.gguf'; SourceUrl = "https://huggingface.co/test/model/resolve/$('a' * 40)/model.gguf"; SizeBytes = (Get-Item "$snapshot\model.gguf").Length; Sha256 = (Get-FileHash "$snapshot\model.gguf").Hash }
+        $manifest = [ordered]@{ SchemaVersion = 4; ModelId = "test/model@$('a' * 40)"; ModelCacheRoot = $cache; CachedModelPath = "$snapshot\model.gguf"; ModelAsset = $asset }
         $receiptFile = "$localAi\state.json"
         $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $receiptFile
         Assert-True (@(Get-CleanModels @((Get-Item $receiptFile))).Count -eq 1) 'Schema 4 lost model.'
         $manifest.SchemaVersion = 5
         $manifest.AdditionalModelPaths = @("$snapshot\draft.gguf")
-        $manifest.AdditionalModelAssets = @([ordered]@{ FileName = 'draft.gguf'; SizeBytes = (Get-Item "$snapshot\draft.gguf").Length; Sha256 = (Get-FileHash "$snapshot\draft.gguf").Hash })
+        $manifest.AdditionalModelAssets = @([ordered]@{ FileName = 'draft.gguf'; SourceUrl = "https://huggingface.co/test/model/resolve/$('a' * 40)/draft.gguf"; SizeBytes = (Get-Item "$snapshot\draft.gguf").Length; Sha256 = (Get-FileHash "$snapshot\draft.gguf").Hash })
         $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $receiptFile
         Assert-True (@(Get-CleanModels @((Get-Item $receiptFile))).Count -eq 2) 'Schema 5 lost additional asset.'
         $manifest.CachedModelPath = "$fixture\unrelated.gguf"
@@ -125,10 +219,61 @@ try {
         $manifest | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $receiptFile
         Assert-Throws { Get-CleanModels @((Get-Item $receiptFile)) } 'size/type mismatch'
     }
+    Test-Case 'nested camelCase receipts validate primary and independent additional provenance' {
+        $cache = "$fixture\nested-cache"
+        $revision = 'b' * 40
+        $primary = "$cache\models--test--primary\snapshots\$revision\weights\model.gguf"
+        $additional = "$cache\models--test--draft\snapshots\$revision\checkpoints\draft.gguf"
+        $receiptFile = "$fixture\nested-profile\LocalAI\state.json"
+        foreach ($path in @($primary, $additional, $receiptFile)) {
+            New-Item -ItemType Directory -Path (Split-Path $path) -Force | Out-Null
+        }
+        Set-Content -LiteralPath $primary -Value 'primary'
+        Set-Content -LiteralPath $additional -Value 'draft'
+        $manifest = @{
+            schemaVersion = 5; modelId = "test/primary@$revision"; modelCacheRoot = $cache; cachedModelPath = $primary
+            modelAsset = @{ fileName = 'model.gguf'; sourceUrl = "https://huggingface.co/test/primary/resolve/$revision/weights/model.gguf?download=true"; sizeBytes = (Get-Item $primary).Length; sha256 = (Get-FileHash $primary).Hash }
+            additionalModelPaths = @($additional)
+            additionalModelAssets = @(@{ fileName = 'draft.gguf'; sourceUrl = "https://huggingface.co/test/draft/resolve/$revision/checkpoints/draft.gguf"; sizeBytes = (Get-Item $additional).Length; sha256 = (Get-FileHash $additional).Hash })
+        }
+        function Save-Receipt { $manifest | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $receiptFile }
+        Save-Receipt
+        Assert-True (@(Get-CleanModels @((Get-Item $receiptFile))).Count -eq 2) 'Nested/camelCase/additional model contract failed.'
+        $manifest.modelId = "test/wrong@$revision"
+        Save-Receipt
+        Assert-Throws { Get-CleanModels @((Get-Item $receiptFile)) } 'provenance disagrees'
+        $manifest.modelId = "test/primary@$revision"
+        $originalSource = $manifest.modelAsset.sourceUrl
+        $manifest.modelAsset.sourceUrl = "https://huggingface.co/test/primary/resolve/$revision/%2e%2e/model.gguf"
+        Save-Receipt
+        Assert-Throws { Get-CleanModels @((Get-Item $receiptFile)) } 'unsafe path segment'
+        $manifest.modelAsset.sourceUrl = $originalSource
+        $manifest.additionalModelAssets[0].sourceUrl = "https://huggingface.co/test/wrong/resolve/$revision/checkpoints/draft.gguf"
+        Save-Receipt
+        Assert-Throws { Get-CleanModels @((Get-Item $receiptFile)) } 'exact Hugging Face'
+        $manifest.additionalModelAssets[0].sourceUrl = "https://huggingface.co/test/draft/resolve/$revision/checkpoints/draft.gguf"
+        $manifest.cachedModelPath = $primary.Replace('models--test--primary', 'models--test--wrong')
+        New-Item -ItemType Directory -Path (Split-Path $manifest.cachedModelPath) -Force | Out-Null
+        Copy-Item -LiteralPath $primary -Destination $manifest.cachedModelPath
+        Save-Receipt
+        Assert-Throws { Get-CleanModels @((Get-Item $receiptFile)) } 'exact Hugging Face'
+    }
     Test-Case 'PID reuse never stops a replacement process' {
         function Get-CimInstance { [pscustomobject]@{ ProcessId = 42; ExecutablePath = 'C:\other.exe'; CreationDate = 'new' } }
         function Stop-Process { throw 'TEST FAILURE: a real stop was attempted' }
         Assert-Throws { Stop-CleanProcess ([pscustomobject]@{ ProcessId = 42; ExecutablePath = 'C:\owned.exe'; CreationDate = 'old' }) } 'changed identity'
+    }
+    Test-Case 'process ownership compares short and long paths without changing PID identity observations' {
+        $fso = New-Object -ComObject Scripting.FileSystemObject
+        try {
+            $short = $fso.GetFolder($fixture).ShortPath
+            $candidate = [pscustomobject]@{ Name = 'OpenClaw.Tray.WinUI.exe'; ExecutablePath = "$fixture\OpenClaw.Tray.WinUI.exe"; ProcessId = 456; CreationDate = 'original-time' }
+            function Get-CimInstance { $candidate }
+            $found = @(Get-CleanProcesses @($short))
+            Assert-True ($found.Count -eq 1 -and $found[0].ExecutablePath -eq $candidate.ExecutablePath -and $found[0].CreationDate -eq 'original-time') 'Process identity or ownership changed.'
+        } finally {
+            [Runtime.InteropServices.Marshal]::FinalReleaseComObject($fso) | Out-Null
+        }
     }
     Test-Case 'native capture preserves nonzero exit codes and bounds waits' {
         $powerShell = Join-Path $env:WINDIR 'System32\WindowsPowerShell\v1.0\powershell.exe'
@@ -179,8 +324,15 @@ try {
         Assert-Throws { Invoke-CleanTeardown $gateway $reports } 'did not confirm success'
     }
     $script:distroInventory = @('UnrelatedDistro')
+    $script:distroPaths = @{}
     function Get-CleanPackages { if ($script:registered) { $script:gateway } }
     function Get-CleanWin32 { }
+    function Get-CleanDistroRecords {
+        foreach ($name in $script:distroInventory) {
+            $base = if ($script:distroPaths.ContainsKey($name)) { $script:distroPaths[$name] } else { "$fixture\wsl-outside\$name" }
+            [pscustomobject]@{ Name = $name; BasePath = $base }
+        }
+    }
     function Get-CleanDistros { $script:distroInventory }
     function wsl.exe {
         Assert-True ($args.Count -eq 2 -and $args[0] -eq '--unregister') 'Unexpected WSL command.'
@@ -207,6 +359,18 @@ try {
         Set-Content -LiteralPath "$env:APPDATA\OpenClawTray\settings.json" -Value '{}'
     }
     New-Profile
+    Test-Case 'default cleanup blocks before mutation when a preserved WSL disk is inside a profile' {
+        $script:distroInventory = @('OpenClawGateway', 'UnrelatedDistro')
+        $script:distroPaths['OpenClawGateway'] = "$env:LOCALAPPDATA\OpenClawTray\wsl\OpenClawGateway"
+        New-Item -ItemType Directory -Path $script:distroPaths['OpenClawGateway'] -Force | Out-Null
+        $disk = Join-Path $script:distroPaths['OpenClawGateway'] 'ext4.vhdx'
+        Set-Content -LiteralPath $disk -Value 'fixture disk, not a real VHDX'
+        Assert-Throws { Invoke-OpenClawClean -Apply $false -Dev $false -Models $false -Wsl $false -Extra @() } 'Preserved WSL storage overlaps'
+        Assert-Throws { Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $false -Extra @() } 'Preserved WSL storage overlaps'
+        Assert-True ($events.Count -eq 0 -and (Test-Path -LiteralPath $disk)) 'Preserved WSL storage was mutated.'
+        $script:distroPaths.Clear()
+        $script:distroInventory = @('UnrelatedDistro')
+    }
     Test-Case 'default preview and WhatIf never mutate targets or create reports' {
         $report = Join-Path $fixture 'dry-reports'
         Invoke-OpenClawClean -Apply $false -Dev $false -Models $false -Wsl $false -Extra @() -Reports $report
@@ -255,7 +419,7 @@ try {
         $script:distroInventory = @('OpenClawGateway', 'UnrelatedDistro')
         function Get-CleanWin32 {
             if ($script:win32Registered) {
-                [pscustomobject]@{ Name = 'OpenClaw Companion'; Install = "$fixture\inno"; Exe = "$fixture\inno\unins000.exe" }
+                [pscustomobject]@{ Name = 'OpenClaw Companion'; Key = 'fake-inno-key'; Install = "$fixture\inno"; Exe = "$fixture\inno\unins000.exe" }
             }
         }
         function Invoke-CleanWin32 {
@@ -266,6 +430,18 @@ try {
         Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $true -Extra @() -Reports "$fixture\inno-wsl-reports"
         Assert-True (($events -join ',') -eq 'inno') 'An already-removed distro was unregistered again.'
         Assert-True (-not (Test-Path "$env:APPDATA\OpenClawTray")) 'Inno WSL removal prevented profile cleanup.'
+    }
+    Test-Case 'still-registered selected Inno app blocks profile deletion' {
+        $script:registered = $false
+        New-Profile
+        function Get-CleanWin32 {
+            [pscustomobject]@{ Name = 'OpenClaw Companion'; Install = "$env:LOCALAPPDATA\OpenClawTray"; Exe = "$env:LOCALAPPDATA\OpenClawTray\unins000.exe" }
+        }
+        function Invoke-CleanWin32 { }
+        Assert-Throws {
+            Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $false -Extra @() -Reports "$fixture\registered-inno-reports"
+        } 'still registered'
+        Assert-True (Test-Path -LiteralPath "$env:APPDATA\OpenClawTray\settings.json") 'Profile removed while Inno registration remained.'
     }
     Test-Case 'remaining package data blocks deletion instead of claiming a clean device' {
         $events.Clear()
