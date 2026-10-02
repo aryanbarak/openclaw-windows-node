@@ -792,8 +792,11 @@ public sealed class LocalAiGatewayUninstallTests
             command => command.Contains("OPENCLAW_LOCAL_AI_BATCH_B64", StringComparison.Ordinal));
     }
 
-    [Fact]
-    public async Task Recovery_UpgradedPendingRouteRestoresCoherentRuntimeGeneration()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Recovery_UpgradedRouteSettlementSurvivesRemainingRollback(
+        bool priorRouteWasPending)
     {
         using var temp = new TempDirectory("local-ai-gateway-recovery-");
         LocalAiResolvedInstall original = await SaveManifestAsync(temp.Path, "openai/gpt-5");
@@ -823,47 +826,69 @@ public sealed class LocalAiGatewayUninstallTests
         };
         await store.SaveAsync(upgradedReplacement);
 
-        string priorProvider = LocalAiGatewayProviderDefinition.BuildProviderJson(oldPending);
+        LocalAiResolvedInstall priorRoute = priorRouteWasPending ? oldPending : original;
+        string priorProvider = LocalAiGatewayProviderDefinition.BuildProviderJson(priorRoute);
         string primary = JsonSerializer.Serialize(
-            LocalAiGatewayProviderDefinition.BuildPrimaryModel(oldPending));
+            LocalAiGatewayProviderDefinition.BuildPrimaryModel(priorRoute));
         var commands = new GatewayStateCommandRunner(priorProvider, primary);
         SetupContext context = CreateRecoveryContext(temp.Path, commands);
         context.Config.RollbackOnFailure = true;
         context.LocalAiRecoveryOriginalInstall = store.ResolveAndValidate(upgradedOriginal);
         context.LocalAiRecoveryPendingInstall = store.ResolveAndValidate(upgradedPendingRoute);
+        context.LocalAiUpgradeOriginalInstall = oldPending;
         context.LocalAiResolvedInstall = store.ResolveAndValidate(upgradedReplacement);
+        context.LocalAiRuntimeBorrowed = true;
+        var runtime = new SettlementTrackingRuntime(store);
+        context.LocalAiRuntime = runtime;
+        context.LocalAiRuntimeInstall = new LlamaRuntimeInstallResult(
+            Path.GetDirectoryName(context.LocalAiResolvedInstall.ExecutablePath)!,
+            context.LocalAiResolvedInstall.ExecutablePath,
+            LlamaRuntimeInstallDisposition.Installed,
+            CreatedThisRun: true,
+            VerifiedArchives: [],
+            Rollback: null);
+        var runtimeAcquirer = new TrackingRuntimeAcquirer();
 
         var configure = new ConfigureLocalAiGatewayStep();
         StepResult configured = await configure.ExecuteAsync(context, CancellationToken.None);
-        var pipeline = new SetupPipeline(
-        [
-            new PreserveLocalAiRecoveryGatewayStep(
+        await configure.RollbackAsync(context, CancellationToken.None);
+        await new PreserveLocalAiRecoveryGatewayStep(
                 (_, _) => Task.FromResult(StepResult.Ok("not needed")),
-                (_, _) => Task.FromResult(true)),
-            new DelegatingRollbackStep("configured", configure.RollbackAsync),
-            new DelegatingRollbackStep(
-                "fail",
-                (_, _) => Task.CompletedTask,
-                (_, _) => Task.FromResult(StepResult.Fail("forced failure"))),
-        ]);
-
-        PipelineResult result = await pipeline.RunAsync(context);
+                (_, _) => Task.FromResult(true),
+                (_, _, _, _, _) => Task.FromResult(true))
+            .RollbackAsync(context, CancellationToken.None);
+        await new PersistLocalAiManifestStep().RollbackAsync(context, CancellationToken.None);
+        await new AcquireLocalAiRuntimeStep(runtimeAcquirer)
+            .RollbackAsync(context, CancellationToken.None);
 
         Assert.Equal(StepOutcome.Success, configured.Outcome);
-        Assert.Equal(PipelineOutcome.Failed, result.Outcome);
+        Assert.Equal(1, runtime.RestartForSetupCalls);
+        Assert.Equal(0, runtime.RestartForSetupRollbackCalls);
+        Assert.Null(context.LocalAiUpgradeOriginalInstall);
+        Assert.Null(context.LocalAiRecoveryOriginalInstall);
         LocalAiResolvedInstall restored = Assert.IsType<LocalAiResolvedInstall>(
             await store.LoadAsync());
-        Assert.Equal(oldPending.Endpoint, restored.Endpoint);
+        Assert.Equal(priorRoute.Endpoint, restored.Endpoint);
+        Assert.Equal(priorRoute.Manifest.ModelCatalogId, restored.Manifest.ModelCatalogId);
         Assert.Equal(upgradedReplacement.RuntimeId, restored.Manifest.RuntimeId);
-        LocalAiInstallManifest restoredOriginal = Assert.IsType<LocalAiInstallManifest>(
-            restored.Manifest.ReplacedManifest);
-        Assert.Equal(upgradedOriginal.RuntimeId, restoredOriginal.RuntimeId);
-        Assert.Equal(upgradedOriginal.ModelCatalogId, restoredOriginal.ModelCatalogId);
-        Assert.Equal(upgradedOriginal.Endpoint, restoredOriginal.Endpoint);
+        if (priorRouteWasPending)
+        {
+            LocalAiInstallManifest restoredOriginal = Assert.IsType<LocalAiInstallManifest>(
+                restored.Manifest.ReplacedManifest);
+            Assert.Equal(upgradedOriginal.RuntimeId, restoredOriginal.RuntimeId);
+            Assert.Equal(upgradedOriginal.ModelCatalogId, restoredOriginal.ModelCatalogId);
+            Assert.Equal(upgradedOriginal.Endpoint, restoredOriginal.Endpoint);
+        }
+        else
+        {
+            Assert.Null(restored.Manifest.ReplacedManifest);
+        }
         Assert.True(LocalAiGatewayProviderDefinition.MatchesProviderJson(
             commands.ProviderJson!,
             restored));
         Assert.Equal(primary, commands.PrimaryJson);
+        Assert.Null(context.LocalAiRuntimeInstall);
+        Assert.Equal(0, runtimeAcquirer.RemoveCalls);
         Assert.False(context.LocalAiRecoveryRollbackUncertain);
         Assert.False(context.LocalAiRecoveryProviderTransition);
     }
@@ -1353,6 +1378,99 @@ public sealed class LocalAiGatewayUninstallTests
             throw new IOException("acknowledgement failed");
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     }
+
+    private sealed class SettlementTrackingRuntime(LocalAiManifestStore store) : ILocalAiRuntime
+    {
+        public int RestartForSetupCalls { get; private set; }
+        public int RestartForSetupRollbackCalls { get; private set; }
+
+        public LocalAiRuntimeSnapshot Snapshot { get; private set; } = LocalAiRuntimeSnapshot.Initial(
+            new Uri("http://127.0.0.1:18800/v1"),
+            DateTimeOffset.UtcNow);
+
+        public event EventHandler<LocalAiRuntimeSnapshotChangedEventArgs>? StateChanged
+        {
+            add { }
+            remove { }
+        }
+
+        public Task<LocalAiRuntimeSnapshot> EnsureStartedAsync(
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task<LocalAiRuntimeSnapshot> ResumeAsync(
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task<LocalAiRuntimeSnapshot> StopAsync(
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task<LocalAiRuntimeSnapshot> RestartAsync(
+            CancellationToken cancellationToken = default) => LoadSnapshotAsync(cancellationToken);
+
+        public async Task<LocalAiRuntimeSnapshot> RestartForSetupAsync(
+            CancellationToken cancellationToken = default)
+        {
+            RestartForSetupCalls++;
+            return await LoadSnapshotAsync(cancellationToken);
+        }
+
+        public Task<LocalAiRuntimeSnapshot> RefreshAsync(
+            CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task<LocalAiRuntimeSnapshot> AcknowledgeSetupGatewayRouteAsync(
+            CancellationToken cancellationToken = default) => Task.FromResult(Snapshot);
+
+        public async Task<LocalAiRuntimeSnapshot> RestartForSetupRollbackAsync(
+            CancellationToken cancellationToken = default)
+        {
+            RestartForSetupRollbackCalls++;
+            return await LoadSnapshotAsync(cancellationToken);
+        }
+
+        private async Task<LocalAiRuntimeSnapshot> LoadSnapshotAsync(
+            CancellationToken cancellationToken)
+        {
+            LocalAiResolvedInstall restored = await store.LoadAsync(cancellationToken)
+                ?? throw new InvalidDataException("The restored Local AI receipt is unavailable.");
+            Snapshot = HealthySnapshot(restored);
+            return Snapshot;
+        }
+
+        public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    }
+
+    private sealed class TrackingRuntimeAcquirer : ILlamaRuntimeAcquirer
+    {
+        public int RemoveCalls { get; private set; }
+
+        public Task<LlamaRuntimeInstallResult> InstallAsync(
+            string localDataDirectory,
+            LlamaRuntimeVariant runtime,
+            IProgress<LocalAiArtifactInstallProgress>? progress,
+            CancellationToken cancellationToken) => throw new NotSupportedException();
+
+        public void RemoveInstalledRuntime(
+            string localDataDirectory,
+            LlamaRuntimeInstallResult install) => RemoveCalls++;
+    }
+
+    private static LocalAiRuntimeSnapshot HealthySnapshot(LocalAiResolvedInstall install) => new(
+        LocalAiRuntimeState.Healthy,
+        LocalAiOwnership.CompanionManaged,
+        install.Endpoint!,
+        install.Manifest.EngineVersion,
+        install.Manifest.ModelCatalogId,
+        new LocalAiModelEvidence(
+            LocalAiModelAvailabilityState.Verified,
+            DateTimeOffset.UtcNow,
+            install.Manifest.ModelAsset.Sha256,
+            install.Manifest.ModelAsset.SizeBytes),
+        42,
+        DateTimeOffset.UtcNow,
+        null,
+        DateTimeOffset.UtcNow)
+    {
+        GatewayRouteRequiresResolution = false,
+    };
 
     private sealed class DelegatingRollbackStep(
         string id,
