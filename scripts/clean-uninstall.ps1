@@ -18,6 +18,9 @@
     Shorthand for -IncludeDev -RemoveCachedModels -RemoveWslGateway.
     Still previews unless -ConfirmDestructive is supplied. Extra isolated profiles
     must still be named with -AdditionalProfilePath; no directories are auto-swept.
+.PARAMETER ExcludeCachedModels
+    Preserve external shared cached models even with -All or -RemoveCachedModels.
+    Models inside deleted app profiles or WSL filesystems are still removed.
 .EXAMPLE
     .\clean-uninstall.ps1
 .EXAMPLE
@@ -29,6 +32,8 @@
 .EXAMPLE
     .\clean-uninstall.ps1 -All -ConfirmDestructive
 .EXAMPLE
+    .\clean-uninstall.ps1 -All -ExcludeCachedModels -ConfirmDestructive
+.EXAMPLE
     .\clean-uninstall.ps1 -AdditionalProfilePath C:\Demo\OpenClawTest -ConfirmDestructive
 #>
 [CmdletBinding(SupportsShouldProcess)]
@@ -37,6 +42,7 @@ param(
     [switch]$All,
     [switch]$IncludeDev,
     [switch]$RemoveCachedModels,
+    [switch]$ExcludeCachedModels,
     [switch]$RemoveWslGateway,
     [string[]]$AdditionalProfilePath = @(),
     [string]$ReportDirectory
@@ -697,5 +703,5 @@ function Invoke-OpenClawClean {
 }
 
 Invoke-OpenClawClean -Apply ([bool]$ConfirmDestructive) -Dev ($All -or $IncludeDev) `
-    -Models ($All -or $RemoveCachedModels) -Wsl ($All -or $RemoveWslGateway) `
+    -Models (($All -or $RemoveCachedModels) -and -not $ExcludeCachedModels) -Wsl ($All -or $RemoveWslGateway) `
     -Extra $AdditionalProfilePath -Reports $ReportDirectory

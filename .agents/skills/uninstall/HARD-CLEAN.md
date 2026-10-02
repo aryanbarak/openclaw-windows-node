@@ -42,6 +42,7 @@ disk files must still be present at completion.
 | `-All` | Shorthand for `-IncludeDev -RemoveCachedModels -RemoveWslGateway`. Still previews by default and respects `-WhatIf`. Extra profile paths must still be supplied explicitly. |
 | `-IncludeDev` | Dev Companion package, ordinary dev profiles/startup entries; also the dev distro when `-RemoveWslGateway` is supplied. |
 | `-RemoveCachedModels` | Exact GGUF files referenced by schema-4/schema-5 receipts within selected profiles. Preview prints each path/size; apply verifies SHA-256. Shared cache roots and unrelated blobs are never removed. |
+| `-ExcludeCachedModels` | Preserve external shared cached models. Overrides both `-All` and `-RemoveCachedModels`, regardless of argument order. Models inside deleted profiles or WSL filesystems are still removed. |
 | `-RemoveWslGateway` | Registered `OpenClawGateway`, plus `OpenClawGateway-Dev` only with `-IncludeDev`. Permanently destroys their filesystems. |
 | `-AdditionalProfilePath` | Explicit absolute isolated-data directories. No wildcard, automatic session sweep, source checkout, or package-data root is accepted. Pass arrays when calling from PowerShell directly. |
 | `-ReportDirectory` | A new local directory outside cleanup targets. Default: a unique `%TEMP%\OpenClawCleanReports\<id>` directory. |
@@ -58,6 +59,13 @@ To include all built-in optional scopes without remembering each flag:
 model files, not every directory on the device. It does not discover or sweep
 custom test profiles. If needed, add
 `-AdditionalProfilePath 'C:\Demo\OpenClawTest'` to both commands.
+
+To select all built-in scopes except external shared cached models:
+
+```powershell
+.\clean-uninstall.ps1 -All -ExcludeCachedModels
+.\clean-uninstall.ps1 -All -ExcludeCachedModels -ConfirmDestructive
+```
 
 The apply run saves a target plan, transcript, native teardown output, and
 hash-verified copies of existing `openclaw-diagnostics-*.zip` files found in
@@ -80,7 +88,8 @@ repository, revision, and relative path before any teardown or hashing.
 
 **Shared cached weights are preserved by default.** Add `-RemoveCachedModels` (or `-All`)
 to both preview and apply to delete only the listed receipt-backed files,
-including additional schema-5 model assets. This does not sweep the hub, orphan
+including additional schema-5 model assets. `-ExcludeCachedModels` overrides either
+removal option. This does not sweep the hub, orphan
 downloads, unreferenced snapshots, or shared blobs. Symlinked snapshots are
 rejected rather than following links into shared blobs. Older app-owned copies
 under `<local-profile>\LocalAI\models` are part of profile removal regardless of

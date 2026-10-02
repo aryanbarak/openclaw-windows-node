@@ -61,6 +61,17 @@ try {
         Assert-True (($confirmed.Extra -join '|') -eq ($extras -join '|') -and $confirmed.Reports -eq "$fixture\reports") 'Explicit paths were not preserved.'
         $whatIf = & $entryPoint -All -ConfirmDestructive -WhatIf
         Assert-True ($whatIf.WhatIf) 'All did not propagate WhatIf.'
+        $excluded = & $entryPoint -all -excludecachedmodels
+        Assert-True (-not $excluded.Apply -and $excluded.Dev -and -not $excluded.Models -and $excluded.Wsl) 'Cached-model opt-out did not preserve the rest of All.'
+        $explicitConflict = & $entryPoint -ExcludeCachedModels -RemoveCachedModels
+        Assert-True (-not $explicitConflict.Models -and -not $explicitConflict.Apply -and -not $explicitConflict.Dev -and -not $explicitConflict.Wsl) 'Model exclusion must override explicit removal without expanding scope.'
+        $allConflict = & $entryPoint -All -RemoveCachedModels -ExcludeCachedModels -ConfirmDestructive -WhatIf -AdditionalProfilePath $extras
+        Assert-True ($allConflict.Apply -and $allConflict.Dev -and -not $allConflict.Models -and $allConflict.Wsl -and $allConflict.WhatIf) 'Excluded All changed confirmation, WhatIf, or scope.'
+        Assert-True (($allConflict.Extra -join '|') -eq ($extras -join '|')) 'Excluded All lost explicit profile paths.'
+        $exclusionOff = & $entryPoint -All -ExcludeCachedModels:$false
+        Assert-True ($exclusionOff.Models) 'Explicit false exclusion disabled model removal.'
+        $excludeOnly = & $entryPoint -ExcludeCachedModels
+        Assert-True (-not $excludeOnly.Apply -and -not $excludeOnly.Dev -and -not $excludeOnly.Models -and -not $excludeOnly.Wsl) 'Exclusion alone expanded default scope.'
     }
     Test-Case 'root, ancestor, system, and session guards' {
         foreach ($path in @($env:USERPROFILE, $env:TEMP, 'C:\', "$env:USERPROFILE\.copilot",

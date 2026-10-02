@@ -21,6 +21,9 @@ ask for confirmation before stopping processes or changing installed state.
 The standalone script's `-All` flag enables dev state, receipt-backed cached models,
 and owned release/dev WSL distro removal. It does not imply `-ConfirmDestructive`
 or discover custom profile paths. Review and confirm the expanded scope first.
+Use `-All -ExcludeCachedModels` to preserve external shared cached models while
+selecting the other built-in scopes. The exclusion overrides `-RemoveCachedModels`
+too; models inside deleted profiles or WSL filesystems are still removed.
 
 Existing helpers are narrower than a hard clean:
 
