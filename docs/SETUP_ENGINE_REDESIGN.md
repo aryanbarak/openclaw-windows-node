@@ -471,6 +471,28 @@ materialization copies from that same verified open handle. A configured cache
 root equal to or below the app-owned `LocalAI` directory is rejected before
 mutation because uninstall removes that managed tree recursively.
 
+### Local AI native paths under MSIX
+
+MSIX can redirect managed reads and writes under AppData into the package's
+`LocalCache` while the native DLL loader cannot resolve dependencies through the
+same logical path. `File.Exists` and pinned-file validation can therefore succeed
+even when launching `llama-server.exe` fails with `0xC0000135` (DLL not found).
+
+`LlamaServerRuntimeService` keeps receipt, acquisition, and cleanup paths unchanged.
+After validation and atomic preset publication, it uses `NativeFilePath` to resolve
+the executable and preset through existing file handles, and launches from the
+physical executable directory. Legacy app-owned model paths are also resolved
+before generating the preset and checking the router's model identity. Shared-cache
+primary and draft models retain their already verified handle-resolved paths.
+Resolution failures stop startup with an explicit error, not a logical-path fallback.
+Recovery rollback also resolves the old model path before checking the original
+endpoint, so a physical-path response is not mistaken for a different model.
+
+Regression proof must run under an actual MSIX identity with no pre-existing
+unvirtualized runtime: the logical AppData launch fails, while the same payload
+launched using handle-resolved executable and preset paths succeeds. An unpackaged
+development run alone does not cover this failure.
+
 ### Local AI runtime archive cache
 
 Verified llama.cpp runtime zips are kept in

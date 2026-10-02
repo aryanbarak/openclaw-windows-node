@@ -291,6 +291,127 @@ public sealed class LocalAiPortLifecycleTests
         Assert.NotNull(host.LastSpec);
     }
 
+    [Fact]
+    public async Task Runtime_UsesPhysicalLaunchAndModelPathsWithoutRewritingReceipt()
+    {
+        using var temp = new TempDirectory("local-ai-virtual-path-");
+        LocalAiPaths paths = await PrepareInstallAsync(temp);
+        var store = new LocalAiManifestStore(paths);
+        LocalAiResolvedInstall original = (await store.LoadAsync())!;
+        string physicalRoot = temp.Combine("physical package cache");
+        string Resolve(string path)
+        {
+            Assert.True(File.Exists(path), $"Resolve only existing, published files: {path}");
+            return Path.Combine(physicalRoot, Path.GetRelativePath(paths.RootDirectory, path));
+        }
+        var events = new SynchronizedEventLog();
+        var platform = new FakePlatform { ResolveFilePathOverride = Resolve };
+        var host = new FakeProcessHost(platform, events, selectedPort: 28_765);
+        var client = new FakeClient(events, (modelPath, _) =>
+        {
+            Assert.Equal(Resolve(original.ModelPath), modelPath);
+            return ReadyProbe(modelPath);
+        });
+        await using var runtime = CreateRuntime(paths, host, platform, client, new FakeLifecycle(events));
+
+        for (int attempt = 0; attempt < 2; attempt++)
+        {
+            LocalAiRuntimeSnapshot snapshot = attempt == 0
+                ? await runtime.EnsureStartedAsync()
+                : await runtime.RestartAsync();
+
+            Assert.Equal(LocalAiRuntimeState.Healthy, snapshot.State);
+            LocalAiProcessStartSpec spec = Assert.IsType<LocalAiProcessStartSpec>(host.LastSpec);
+            Assert.Equal(Resolve(original.ExecutablePath), spec.ExecutablePath);
+            Assert.Equal(Path.GetDirectoryName(spec.ExecutablePath), spec.WorkingDirectory);
+            Assert.Equal(Resolve(paths.RouterPresetPath), ArgumentAfter(spec.Arguments, "--models-preset"));
+            Assert.Contains($"model = {Resolve(original.ModelPath)}", await File.ReadAllTextAsync(paths.RouterPresetPath));
+            LocalAiResolvedInstall saved = (await store.LoadAsync())!;
+            Assert.Equal(original.Manifest.ExecutablePath, saved.Manifest.ExecutablePath);
+            Assert.Equal(original.Manifest.ModelPath, saved.Manifest.ModelPath);
+            Assert.Equal(original.ExecutablePath, saved.ExecutablePath);
+        }
+    }
+
+    [Theory]
+    [InlineData("llama-server.exe")]
+    [InlineData("llama-server-models.ini")]
+    [InlineData("Qwen3.6-35B-A3B-UD-Q4_K_M.gguf")]
+    public async Task Runtime_PathResolutionFailureFailsBeforeLaunching(string failedFile)
+    {
+        using var temp = new TempDirectory("local-ai-path-failure-");
+        LocalAiPaths paths = await PrepareInstallAsync(temp);
+        var events = new SynchronizedEventLog();
+        var platform = new FakePlatform
+        {
+            ResolveFilePathOverride = path => Path.GetFileName(path) == failedFile
+                ? throw new IOException("Physical path resolution failed.")
+                : path,
+        };
+        var host = new FakeProcessHost(platform, events, selectedPort: 28_765);
+        await using var runtime = CreateRuntime(
+            paths, host, platform, new FakeClient(events), new FakeLifecycle(events));
+
+        LocalAiRuntimeSnapshot snapshot = await runtime.EnsureStartedAsync();
+
+        Assert.Equal(LocalAiRuntimeState.Failed, snapshot.State);
+        Assert.Contains("Physical path resolution failed", snapshot.Detail);
+        Assert.Null(host.LastSpec);
+        Assert.DoesNotContain("start", events);
+    }
+
+    [Fact]
+    public async Task Runtime_HubCacheRetainsVerifiedModelIdentityWhileResolvingLaunchPaths()
+    {
+        using var temp = new TempDirectory("local-ai-hub-native-path-");
+        LocalAiPaths paths = await PrepareInstallAsync(temp);
+        var store = new LocalAiManifestStore(paths);
+        LocalAiResolvedInstall original = (await store.LoadAsync())!;
+        LocalModelInfo model = LocalModelCatalog.FindInstalled(original.Manifest.ModelCatalogId)!;
+        var source = (HuggingFaceRevisionSource)model.Weights.Source;
+        string cacheRoot = temp.Combine("hub");
+        Assert.True(HuggingFaceHubCache.TryGetSnapshotPaths(
+            cacheRoot, source.RepositoryId, source.RevisionSha, model.Weights.RelativePath,
+            out string cachedModelPath, out _, out string error), error);
+        Directory.CreateDirectory(Path.GetDirectoryName(cachedModelPath)!);
+        await File.WriteAllTextAsync(cachedModelPath, "verified by test lease");
+        await store.SaveAsync(original.Manifest with
+        {
+            SchemaVersion = LocalAiInstallManifest.HubCacheReceiptSchemaVersion,
+            ModelCacheRoot = cacheRoot,
+            CachedModelPath = cachedModelPath,
+        });
+        string verifiedModelPath = temp.Combine("physical-verified-model.gguf");
+        var resolvedPaths = new List<string>();
+        var events = new SynchronizedEventLog();
+        var platform = new FakePlatform
+        {
+            ResolveFilePathOverride = path =>
+            {
+                Assert.DoesNotContain(".gguf", path);
+                resolvedPaths.Add(path);
+                return Path.Combine(temp.Path, "physical", Path.GetFileName(path));
+            },
+        };
+        var host = new FakeProcessHost(platform, events, selectedPort: 28_765);
+        await using var runtime = CreateRuntime(
+            paths, host, platform, new FakeClient(events, (modelPath, _) =>
+            {
+                Assert.Equal(verifiedModelPath, modelPath);
+                return ReadyProbe(modelPath);
+            }), new FakeLifecycle(events), modelFileVerifier: new FakeModelFileVerifier(verifiedModelPath));
+
+        LocalAiRuntimeSnapshot snapshot = await runtime.EnsureStartedAsync();
+
+        Assert.Equal(LocalAiRuntimeState.Healthy, snapshot.State);
+        Assert.Equal([original.ExecutablePath, paths.RouterPresetPath], resolvedPaths);
+        Assert.Equal(temp.Combine("physical", "llama-server.exe"), host.LastSpec!.ExecutablePath);
+        Assert.Equal(temp.Combine("physical", "llama-server-models.ini"),
+            ArgumentAfter(host.LastSpec.Arguments, "--models-preset"));
+        Assert.Contains($"model = {verifiedModelPath}", await File.ReadAllTextAsync(paths.RouterPresetPath));
+        Assert.Equal(cachedModelPath, (await store.LoadAsync())!.Manifest.CachedModelPath);
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("local-api-test-credential")]
@@ -3235,6 +3356,9 @@ public sealed class LocalAiPortLifecycleTests
     private sealed class FakePlatform : ILlamaServerRuntimePlatform
     {
         public DateTimeOffset UtcNow { get; private set; } = DateTimeOffset.Parse("2026-08-18T12:00:00Z");
+        public Func<string, string>? ResolveFilePathOverride { get; init; }
+        public string ResolveFilePath(string path) =>
+            ResolveFilePathOverride?.Invoke(path) ?? OpenClaw.Shared.IO.NativeFilePath.ResolveFile(path);
         public List<WindowsTcpListenerInfo> Listeners { get; } = [];
         public bool Ipv4Complete { get; set; } = true;
         public Action? AfterCapture { get; init; }

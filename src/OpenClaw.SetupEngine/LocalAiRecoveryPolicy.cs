@@ -255,14 +255,37 @@ public sealed class PreserveLocalAiRecoveryGatewayStep : SetupStep
         LocalAiResolvedInstall original,
         CancellationToken ct)
     {
+        using var client = new LlamaServerClient();
+        return await ProbeOriginalEndpointAsync(
+            original, ct, client, OpenClaw.Shared.IO.NativeFilePath.ResolveFile).ConfigureAwait(false);
+    }
+
+    internal static async Task<bool> ProbeOriginalEndpointAsync(
+        LocalAiResolvedInstall original,
+        CancellationToken ct,
+        ILlamaServerClient client,
+        Func<string, string> resolveFilePath)
+    {
+        ct.ThrowIfCancellationRequested();
         if (original.Endpoint is null)
             return true;
 
-        using var client = new LlamaServerClient();
+        string modelPath;
+        try
+        {
+            modelPath = resolveFilePath(original.ModelPath);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Rollback reports that the old endpoint could not be verified. Never restore
+            // a receipt by comparing the router's physical path with a virtual alias.
+            return false;
+        }
+
         LlamaServerRouterProbeResult probe = await client.ProbeManagedModelAsync(
             original.Endpoint,
             original.Manifest.ModelAlias,
-            original.ModelPath,
+            modelPath,
             ct).ConfigureAwait(false);
         return probe.IsHealthy;
     }

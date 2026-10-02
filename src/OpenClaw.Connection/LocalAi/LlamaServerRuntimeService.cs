@@ -42,6 +42,7 @@ public sealed record LlamaServerRuntimeOptions
 internal interface ILlamaServerRuntimePlatform
 {
     DateTimeOffset UtcNow { get; }
+    string ResolveFilePath(string path);
     WindowsTcpListenerSnapshotResult CaptureListeners();
     Task DelayAsync(TimeSpan delay, CancellationToken cancellationToken);
 }
@@ -49,6 +50,7 @@ internal interface ILlamaServerRuntimePlatform
 internal sealed class SystemLlamaServerRuntimePlatform : ILlamaServerRuntimePlatform
 {
     public DateTimeOffset UtcNow => DateTimeOffset.UtcNow;
+    public string ResolveFilePath(string path) => OpenClaw.Shared.IO.NativeFilePath.ResolveFile(path);
     public WindowsTcpListenerSnapshotResult CaptureListeners() => WindowsTcpListenerSnapshot.Capture();
     public Task DelayAsync(TimeSpan delay, CancellationToken cancellationToken) => Task.Delay(delay, cancellationToken);
 }
@@ -490,6 +492,7 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
         }
 
         LlamaServerRouterLaunchPlan launchPlan;
+        string executablePath;
         try
         {
             await ValidateInstalledFilesAsync(install, cancellationToken).ConfigureAwait(false);
@@ -507,6 +510,15 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
                         "LLAMA_API_KEY", LocalAiApiCredentialStore.RequireApiKey(apiKey)),
                 };
             await WritePresetAtomicallyAsync(launchPlan, cancellationToken).ConfigureAwait(false);
+            // Resolve only after validation and atomic publication. The packaged parent can
+            // read virtual AppData paths that the native DLL loader and model reader cannot.
+            executablePath = _platform.ResolveFilePath(install.ExecutablePath);
+            string presetPath = _platform.ResolveFilePath(launchPlan.PresetPath);
+            launchPlan = launchPlan with
+            {
+                Arguments = launchPlan.Arguments.Replace(launchPlan.PresetPath, presetPath),
+                PresetPath = presetPath,
+            };
         }
         catch (OperationCanceledException)
         {
@@ -527,8 +539,8 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
         long generation = ++_generation;
         Publish(LocalAiRuntimeState.Starting, LocalAiOwnership.CompanionManaged, "Starting the local AI router.");
         var spec = new LocalAiProcessStartSpec(
-            install.ExecutablePath,
-            Path.GetDirectoryName(install.ExecutablePath)!,
+            executablePath,
+            Path.GetDirectoryName(executablePath)!,
             launchPlan.Arguments,
             launchPlan.Environment,
             _options.Paths.StandardOutputLogPath,
@@ -992,7 +1004,7 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
 
         if (!install.Manifest.UsesHubCache)
         {
-            _runtimeModelPath = install.ModelPath;
+            _runtimeModelPath = _platform.ResolveFilePath(install.ModelPath);
             return;
         }
 

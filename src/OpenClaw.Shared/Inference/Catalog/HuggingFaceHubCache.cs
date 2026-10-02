@@ -2,7 +2,6 @@ using Microsoft.Win32.SafeHandles;
 using OpenClaw.Shared.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace OpenClaw.Shared.Inference.Catalog;
 
@@ -744,44 +743,7 @@ public static class HuggingFaceHubCache
     }
 
     private static string GetFinalPathFromHandle(SafeFileHandle handle, string fallbackPath)
-    {
-        if (!OperatingSystem.IsWindows())
-        {
-            FileSystemInfo? resolved = new FileInfo(fallbackPath).ResolveLinkTarget(returnFinalTarget: true);
-            return WindowsPathSafety.NormalizePath(resolved?.FullName ?? fallbackPath);
-        }
-
-        int capacity = 512;
-        while (capacity <= 32_768)
-        {
-            var builder = new StringBuilder(capacity);
-            uint length = GetFinalPathNameByHandleW(handle, builder, (uint)builder.Capacity, 0);
-            if (length == 0)
-            {
-                throw new IOException(
-                    $"Cannot resolve a Hugging Face cache handle (Win32 error {Marshal.GetLastWin32Error()}).");
-            }
-
-            if (length < builder.Capacity)
-                return WindowsPathSafety.NormalizePath(NormalizeFinalPath(builder.ToString()));
-
-            capacity = checked((int)length + 1);
-        }
-
-        throw new IOException("A resolved Hugging Face cache path exceeded the supported length.");
-    }
-
-    private static string NormalizeFinalPath(string path)
-    {
-        const string extendedPrefix = @"\\?\";
-        const string extendedUncPrefix = @"\\?\UNC\";
-        if (path.StartsWith(extendedUncPrefix, StringComparison.OrdinalIgnoreCase))
-            return @"\\" + path[extendedUncPrefix.Length..];
-
-        return path.StartsWith(extendedPrefix, StringComparison.OrdinalIgnoreCase)
-            ? path[extendedPrefix.Length..]
-            : path;
-    }
+        => NativeFilePath.ResolveHandle(handle, fallbackPath);
 
     private static string NormalizeConfiguredPath(
         string path,
@@ -818,10 +780,4 @@ public static class HuggingFaceHubCache
         uint flagsAndAttributes,
         IntPtr templateFile);
 
-    [DllImport("kernel32.dll", EntryPoint = "GetFinalPathNameByHandleW", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern uint GetFinalPathNameByHandleW(
-        SafeFileHandle file,
-        StringBuilder filePath,
-        uint filePathLength,
-        uint flags);
 }

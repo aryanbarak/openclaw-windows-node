@@ -10,6 +10,47 @@ namespace OpenClaw.SetupEngine.Tests;
 
 public sealed class LocalAiGatewayUninstallTests
 {
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Recovery_ProbesPhysicalModelPathAndRejectsResolutionFailure(bool resolutionFails)
+    {
+        using var temp = new TempDirectory("local-ai-recovery-path-");
+        LocalAiResolvedInstall original = await SaveManifestAsync(temp.Path);
+        string physicalModelPath = temp.Combine("physical", "model.gguf");
+        using var client = new RecordingRecoveryClient();
+
+        bool healthy = await PreserveLocalAiRecoveryGatewayStep.ProbeOriginalEndpointAsync(
+            original, CancellationToken.None, client, path =>
+            {
+                Assert.Equal(original.ModelPath, path);
+                return resolutionFails
+                    ? throw new IOException("Cannot resolve model path.")
+                    : physicalModelPath;
+            });
+
+        Assert.Equal(!resolutionFails, healthy);
+        Assert.Equal(resolutionFails ? null : physicalModelPath, client.ExpectedModelPath);
+        Assert.Equal(resolutionFails ? null : original.Endpoint, client.Endpoint);
+    }
+
+    private sealed class RecordingRecoveryClient : ILlamaServerClient
+    {
+        public string? ExpectedModelPath { get; private set; }
+        public Uri? Endpoint { get; private set; }
+
+        public Task<LlamaServerRouterProbeResult> ProbeManagedModelAsync(
+            Uri endpoint, string modelAlias, string expectedModelPath, CancellationToken cancellationToken = default)
+        {
+            Endpoint = endpoint;
+            ExpectedModelPath = expectedModelPath;
+            return Task.FromResult(new LlamaServerRouterProbeResult(
+                true, LocalAiModelAvailabilityState.Verified, expectedModelPath, null));
+        }
+
+        public void Dispose() { }
+    }
+
     [Fact]
     public async Task Repair_RollbackRestoresFallbackAfterRetainedEndpointCycle()
     {
