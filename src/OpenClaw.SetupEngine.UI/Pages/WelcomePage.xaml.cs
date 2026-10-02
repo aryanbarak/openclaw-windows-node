@@ -26,7 +26,9 @@ public sealed partial class WelcomePage : Page
     public WelcomePage()
     {
         InitializeComponent();
-        AutomationProperties.SetName(NativeChoice, SetupLocalization.GetString("Onboarding_Native_Title.Text"));
+        AutomationProperties.SetName(NativeChoice,
+            SetupLocalization.GetString("Onboarding_Native_Title.Text") +
+            ", " + SetupLocalization.GetString("Onboarding_Native_Recommended.Text"));
         AutomationProperties.SetName(InstallChoice, SetupLocalization.GetString("Onboarding_Wsl_Title.Text"));
         Loaded += OnLoaded;
         Unloaded += (_, _) =>
@@ -135,15 +137,28 @@ public sealed partial class WelcomePage : Page
     {
         bool available = eligibility == NativeGatewayEligibility.Available;
         NativeChoice.IsEnabled = available;
-        NativeChoice.Visibility = eligibility is NativeGatewayEligibility.CapabilityUnavailable or
-            NativeGatewayEligibility.UnsupportedPlatform
-            ? Visibility.Collapsed
-            : Visibility.Visible;
-        NativeRecommendedBadge.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
-        string accessibleName = SetupLocalization.GetString("Onboarding_Native_Title.Text");
-        if (available)
-            accessibleName += ", " + SetupLocalization.GetString("Onboarding_Native_Recommended.Text");
-        AutomationProperties.SetName(NativeChoice, accessibleName);
+        PlaceNativeChoice(available ? 0 : GatewayChoiceSelector.Items.Count - 1);
+    }
+
+    private void PlaceNativeChoice(int targetIndex)
+    {
+        int currentIndex = GatewayChoiceSelector.Items.IndexOf(NativeChoice);
+        if (currentIndex == targetIndex)
+            return;
+
+        object? selectedItem = GatewayChoiceSelector.SelectedItem;
+        bool wasSuppressingSelectionWrite = _suppressSelectionWrite;
+        _suppressSelectionWrite = true;
+        try
+        {
+            GatewayChoiceSelector.Items.RemoveAt(currentIndex);
+            GatewayChoiceSelector.Items.Insert(targetIndex, NativeChoice);
+            GatewayChoiceSelector.SelectedItem = selectedItem;
+        }
+        finally
+        {
+            _suppressSelectionWrite = wasSuppressingSelectionWrite;
+        }
     }
 
     private void WindowsUpdate_Click(object sender, RoutedEventArgs e) =>

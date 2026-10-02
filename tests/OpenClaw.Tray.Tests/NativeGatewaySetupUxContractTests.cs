@@ -215,18 +215,18 @@ public sealed class NativeGatewaySetupUxContractTests
         var primary = Assert.Single(document.Descendants(xaml + "ListView"));
         Assert.Equal("GatewayChoiceSelector", (string?)primary.Attribute(names + "Name"));
         Assert.Equal("Single", (string?)primary.Attribute("SelectionMode"));
-        Assert.Equal(new[] { "NativeChoice", "InstallChoice", "ConnectChoice" },
+        Assert.Equal(new[] { "InstallChoice", "ConnectChoice", "NativeChoice" },
             primary.Elements(xaml + "ListViewItem").Select(element => (string?)element.Attribute(names + "Name")));
-        var native = primary.Elements().First();
+        var native = primary.Elements().Last();
         Assert.Equal("False", (string?)native.Attribute("IsEnabled"));
         var nativeBadge = Assert.Single(native.Descendants(), element =>
             element.Name.LocalName == "RecommendedBadge" &&
             (string?)element.Attribute(names + "Name") == "NativeRecommendedBadge");
-        Assert.Equal("Collapsed", (string?)nativeBadge.Attribute("Visibility"));
+        Assert.Null(nativeBadge.Attribute("Visibility"));
         Assert.Empty(document.Descendants(xaml + "Expander"));
         Assert.DoesNotContain(document.Descendants(), element =>
             (string?)element.Attribute("Content") == "Check again");
-        var wsl = primary.Elements(xaml + "ListViewItem").ElementAt(1);
+        var wsl = primary.Elements(xaml + "ListViewItem").First();
         Assert.Null(wsl.Attribute("Visibility"));
         Assert.Null(wsl.Attribute("IsEnabled"));
         Assert.Contains(wsl.Descendants(), element =>
@@ -241,9 +241,13 @@ public sealed class NativeGatewaySetupUxContractTests
         Assert.Contains("NativeGatewayEligibility.Available", source);
         Assert.Contains("ApplyNativeChoicePresentation(null)", source);
         Assert.Contains("ApplyNativeChoicePresentation(eligibility)", source);
-        Assert.Contains("NativeChoice.Visibility = eligibility is NativeGatewayEligibility.CapabilityUnavailable or", source);
-        Assert.Contains("NativeGatewayEligibility.UnsupportedPlatform", source);
-        Assert.Contains("NativeRecommendedBadge.Visibility = available ? Visibility.Visible : Visibility.Collapsed", source);
+        Assert.Contains("PlaceNativeChoice(available ? 0 : GatewayChoiceSelector.Items.Count - 1)", source);
+        Assert.Contains("object? selectedItem = GatewayChoiceSelector.SelectedItem", source);
+        Assert.Contains("GatewayChoiceSelector.Items.RemoveAt(currentIndex)", source);
+        Assert.Contains("GatewayChoiceSelector.Items.Insert(targetIndex, NativeChoice)", source);
+        Assert.Contains("GatewayChoiceSelector.SelectedItem = selectedItem", source);
+        Assert.DoesNotContain("NativeChoice.Visibility", source);
+        Assert.DoesNotContain("NativeRecommendedBadge.Visibility", source);
         Assert.Contains("WslRecommendedBadge.Visibility = available ? Visibility.Collapsed : Visibility.Visible", source);
         Assert.Contains("GatewaySetupChoice.Wsl => InstallChoice", source);
         Assert.Contains("ReferenceEquals(GatewayChoiceSelector.SelectedItem, InstallChoice)", source);
@@ -258,7 +262,7 @@ public sealed class NativeGatewaySetupUxContractTests
     }
 
     [Fact]
-    public void Welcome_HidesUnsupportedNativeChoiceAndKeepsSeparateSupportCard()
+    public void Welcome_KeepsUnsupportedNativeChoiceLastWithSeparateSupportCard()
     {
         var pages = Path.Combine(TestRepositoryPaths.GetRepositoryRoot(), "src", "OpenClaw.SetupEngine.UI", "Pages");
         var document = XDocument.Load(Path.Combine(pages, "WelcomePage.xaml"));
@@ -270,7 +274,7 @@ public sealed class NativeGatewaySetupUxContractTests
         var nativeBadge = Assert.Single(native.Descendants(), element =>
             element.Name.LocalName == "RecommendedBadge" &&
             (string?)element.Attribute(names + "Name") == "NativeRecommendedBadge");
-        Assert.Equal("Collapsed", (string?)nativeBadge.Attribute("Visibility"));
+        Assert.Null(nativeBadge.Attribute("Visibility"));
         var card = Named("NativeSupportCard");
         var selector = Named("GatewayChoiceSelector");
         Assert.Contains(card, selector.ElementsAfterSelf());
@@ -281,8 +285,9 @@ public sealed class NativeGatewaySetupUxContractTests
         Assert.DoesNotContain(native, card.Ancestors());
         var source = File.ReadAllText(Path.Combine(pages, "WelcomePage.xaml.cs"));
         Assert.Contains("NativeChoice.IsEnabled = available", source);
-        Assert.Contains("NativeChoice.Visibility = eligibility is NativeGatewayEligibility.CapabilityUnavailable or", source);
-        Assert.Contains("NativeRecommendedBadge.Visibility = available ? Visibility.Visible : Visibility.Collapsed", source);
+        Assert.Contains("PlaceNativeChoice(available ? 0 : GatewayChoiceSelector.Items.Count - 1)", source);
+        Assert.DoesNotContain("NativeChoice.Visibility", source);
+        Assert.DoesNotContain("NativeRecommendedBadge.Visibility", source);
         Assert.Contains("WslRecommendedBadge.Visibility = available ? Visibility.Collapsed : Visibility.Visible", source);
         Assert.Contains("NativeSupportCard.Visibility = available ? Visibility.Collapsed : Visibility.Visible", source);
         Assert.Contains("\", \" + SetupLocalization.GetString(\"Onboarding_Native_Recommended.Text\")", source);
