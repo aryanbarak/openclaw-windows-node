@@ -24,6 +24,11 @@ or discover custom profile paths. Review and confirm the expanded scope first.
 Use `-All -ExcludeCachedModels` to preserve external shared cached models while
 selecting the other built-in scopes. The exclusion overrides `-RemoveCachedModels`
 too; models inside deleted profiles or WSL filesystems are still removed.
+For explicitly identified leftover Windows isolated-profile registrations, use
+`-RemoveIsolatedProfilePath` with exact paths. Preview first; confirmed removal
+requires elevation as the same user and accepts only unloaded, non-special
+`S-1-5-110` profiles. `-All` never selects these automatically. See HARD-CLEAN.md
+for the distinction between profile cleanup and native session teardown.
 
 Existing helpers are narrower than a hard clean:
 

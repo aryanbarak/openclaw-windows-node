@@ -45,14 +45,17 @@ try {
         $entryPoint = [scriptblock]::Create(
             $attributes + "`n" + $ast.ParamBlock.Extent.Text + "`n" + $ast.EndBlock.Statements[-1].Extent.Text)
         function Invoke-OpenClawClean {
-            param([bool]$Apply, [bool]$Dev, [bool]$Models, [bool]$Wsl, [string[]]$Extra, [string]$Reports)
-            [pscustomobject]@{ Apply = $Apply; Dev = $Dev; Models = $Models; Wsl = $Wsl; Extra = $Extra; Reports = $Reports; WhatIf = $WhatIfPreference }
+            param([bool]$Apply, [bool]$Dev, [bool]$Models, [bool]$Wsl, [string[]]$Extra, [string]$Reports, [string[]]$IsolatedProfiles)
+            [pscustomobject]@{ Apply = $Apply; Dev = $Dev; Models = $Models; Wsl = $Wsl; Extra = $Extra; Reports = $Reports; WhatIf = $WhatIfPreference; IsolatedProfiles = $IsolatedProfiles }
         }
         $defaults = & $entryPoint
         Assert-True (-not $defaults.Apply -and -not $defaults.Dev -and -not $defaults.Models -and -not $defaults.Wsl) 'Default scope changed.'
         $all = & $entryPoint -all
         Assert-True (-not $all.Apply -and $all.Dev -and $all.Models -and $all.Wsl) 'All did not expand safely.'
         Assert-True (@($all.Extra).Count -eq 0) 'All invented extra profile paths.'
+        Assert-True (@($all.IsolatedProfiles).Count -eq 0) 'All invented Windows profile targets.'
+        $explicitProfiles = & $entryPoint -All -ExcludeCachedModels -RemoveIsolatedProfilePath @("$fixture\user-one", "$fixture\user-two")
+        Assert-True (-not $explicitProfiles.Apply -and -not $explicitProfiles.Models -and $explicitProfiles.IsolatedProfiles.Count -eq 2) 'Explicit Windows profile scope changed confirmation or model selection.'
         $individual = & $entryPoint -All:$false -RemoveCachedModels
         Assert-True (-not $individual.Apply -and -not $individual.Dev -and $individual.Models -and -not $individual.Wsl) 'Individual flags stopped working.'
         $extras = @("$fixture\extra-one", "$fixture\extra-two")
@@ -78,6 +81,76 @@ try {
             "$env:USERPROFILE\.copilot\session-state\11111111-1111-1111-1111-111111111111",
             "$env:USERPROFILE\.cache\huggingface\hub", "$env:WINDIR\System32")) {
             Assert-Throws { Assert-CleanPath $path } 'Refusing'
+        }
+        Test-Case 'explicit isolated profile cleanup removes registration when its folder is already absent' {
+            $root = "$fixture\windows-users"
+            $path = "$root\isolated-test"
+            $profile = [pscustomobject]@{ LocalPath = $path; SID = 'S-1-5-110-1-2-3-1001'; Loaded = $false; Special = $false }
+            $state = [pscustomobject]@{ Items = @($profile); Removed = 0 }
+            function Get-ItemProperty { [pscustomobject]@{ ProfilesDirectory = "$fixture\windows-users" } }
+            function Get-CimInstance { param($ClassName) Assert-True ($ClassName -eq 'Win32_UserProfile') 'Wrong CIM inventory.'; $state.Items }
+            function Remove-CimInstance {
+                param($InputObject, $Confirm, $ErrorAction)
+                Assert-True ($InputObject -eq $profile) 'Wrong profile removal target.'
+                $state.Removed++
+                $state.Items = @()
+            }
+            $selected = @(Get-CleanIsolatedProfiles @($path, $path) @(Get-CleanWindowsProfiles))
+            Assert-True ($selected.Count -eq 1 -and $state.Removed -eq 0) 'Selection mutated or duplicated a profile.'
+            Remove-CleanIsolatedProfile $selected[0]
+            Remove-CleanIsolatedProfile $selected[0]
+            Assert-True ($state.Removed -eq 1) 'Absent profile was deleted again.'
+        }
+        Test-Case 'isolated profile selection rejects ordinary, loaded, special, ambiguous, and unregistered targets' {
+            $root = "$fixture\windows-users"
+            $profile = [pscustomobject]@{ LocalPath = "$root\isolated"; SID = 'S-1-5-110-1-2-3-1001'; Loaded = $false; Special = $false }
+            function Get-ItemProperty { [pscustomobject]@{ ProfilesDirectory = "$fixture\windows-users" } }
+            foreach ($sid in @('S-1-5-21-1-2-3-1001','S-1-5-18','not-a-sid')) {
+                $profile.SID = $sid
+                Assert-Throws { Get-CleanIsolatedProfiles @($profile.LocalPath) @($profile) } 'Refusing'
+            }
+            $profile.SID = 'S-1-5-110-1-2-3-1001'
+            $profile.Loaded = $true
+            Assert-Throws { Get-CleanIsolatedProfiles @($profile.LocalPath) @($profile) } 'Refusing'
+            $profile.Loaded = $false; $profile.Special = $true
+            Assert-Throws { Get-CleanIsolatedProfiles @($profile.LocalPath) @($profile) } 'Refusing'
+            $profile.Special = $null
+            Assert-Throws { Get-CleanIsolatedProfiles @($profile.LocalPath) @($profile) } 'Refusing'
+            $profile.Special = $false
+            Assert-Throws { Get-CleanIsolatedProfiles @($profile.LocalPath) @($profile, $profile) } 'Refusing'
+            foreach ($path in @($root, "$root\isolated\child", $env:USERPROFILE)) {
+                Assert-Throws { Get-CleanIsolatedProfiles @($path) @($profile) } 'directly under'
+            }
+            New-Item -ItemType Directory -Path $profile.LocalPath -Force | Out-Null
+            Assert-Throws { Get-CleanIsolatedProfiles @($profile.LocalPath) @() } 'No Windows profile registration'
+        }
+        Test-Case 'isolated profile removal rechecks identity and propagates provider failures and leftovers' {
+            $root = "$fixture\windows-users"
+            $profile = [pscustomobject]@{ LocalPath = "$root\missing-files"; SID = 'S-1-5-110-1-2-3-1001'; Loaded = $false; Special = $false }
+            $state = [pscustomobject]@{ Items = @($profile); Calls = 0; Fail = $false }
+            function Get-ItemProperty { [pscustomobject]@{ ProfilesDirectory = "$fixture\windows-users" } }
+            function Get-CleanWindowsProfiles { $state.Items }
+            function Remove-CimInstance {
+                param($InputObject, $Confirm, $ErrorAction)
+                $state.Calls++
+                if ($state.Fail) { throw 'TEST profile provider denied removal' }
+            }
+            $expected = @(Get-CleanIsolatedProfiles @($profile.LocalPath) $state.Items)[0]
+            $profile.Loaded = $true
+            Assert-Throws { Remove-CleanIsolatedProfile $expected } 'Refusing'
+            $profile.Loaded = $false; $profile.SID = 'S-1-5-110-1-2-3-1002'
+            Assert-Throws { Remove-CleanIsolatedProfile $expected } 'identity changed'
+            $profile.SID = $expected.SID; $profile.LocalPath = "$root\moved"
+            Assert-Throws { Remove-CleanIsolatedProfile $expected } 'SID moved'
+            Assert-True ($state.Calls -eq 0) 'Identity rejection invoked profile deletion.'
+            $profile.LocalPath = $expected.Path
+            $state.Fail = $true
+            Assert-Throws { Remove-CleanIsolatedProfile $expected } 'provider denied'
+            $state.Fail = $false
+            Assert-Throws { Remove-CleanIsolatedProfile $expected } 'registration or files remain'
+            $state.Items = @()
+            New-Item -ItemType Directory -Path $expected.Path -Force | Out-Null
+            Assert-Throws { Remove-CleanIsolatedProfile $expected } 'No Windows profile registration'
         }
         foreach ($path in @('', '.', 'C:relative', '\\server\share', "$fixture\*", "$fixture\x:stream")) {
             Assert-Throws { Assert-CleanPath $path } 'absolute local literal'
@@ -338,6 +411,7 @@ try {
     $script:distroPaths = @{}
     function Get-CleanPackages { if ($script:registered) { $script:gateway } }
     function Get-CleanWin32 { }
+    function Get-CleanWindowsProfiles { }
     function Get-CleanDistroRecords {
         foreach ($name in $script:distroInventory) {
             $base = if ($script:distroPaths.ContainsKey($name)) { $script:distroPaths[$name] } else { "$fixture\wsl-outside\$name" }
@@ -370,6 +444,27 @@ try {
         Set-Content -LiteralPath "$env:APPDATA\OpenClawTray\settings.json" -Value '{}'
     }
     New-Profile
+    Test-Case 'explicit Windows profiles obey preview, WhatIf, elevation, and WSL preservation gates' {
+        $root = "$fixture\windows-users"
+        $path = "$root\explicit-lifecycle"
+        $profile = [pscustomobject]@{ LocalPath = $path; SID = 'S-1-5-110-1-2-3-1001'; Loaded = $false; Special = $false }
+        function Get-ItemProperty { [pscustomobject]@{ ProfilesDirectory = "$fixture\windows-users" } }
+        function Get-CleanWindowsProfiles { $profile }
+        function Assert-CleanProfileRemovalAccess { throw 'TEST elevation required' }
+        function Remove-CimInstance { throw 'Preview invoked Windows profile removal' }
+        Invoke-OpenClawClean -Apply $false -Dev $true -Models $false -Wsl $true -Extra @() -IsolatedProfiles @($path)
+        Invoke-OpenClawClean -Apply $true -Dev $true -Models $false -Wsl $true -Extra @() -IsolatedProfiles @($path) -WhatIf
+        Assert-Throws {
+            Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $false -Extra @() -IsolatedProfiles @($path)
+        } 'elevation required'
+        Assert-True ($events.Count -eq 0) 'Elevation gate ran after native mutation.'
+        $script:distroPaths['UnrelatedDistro'] = "$path\wsl"
+        try {
+            Assert-Throws {
+                Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $false -Extra @() -IsolatedProfiles @($path)
+            } 'Preserved WSL storage overlaps'
+        } finally { $script:distroPaths.Clear() }
+    }
     Test-Case 'default cleanup blocks before mutation when a preserved WSL disk is inside a profile' {
         $script:distroInventory = @('OpenClawGateway', 'UnrelatedDistro')
         $script:distroPaths['OpenClawGateway'] = "$env:LOCALAPPDATA\OpenClawTray\wsl\OpenClawGateway"
@@ -464,6 +559,37 @@ try {
         Assert-Throws { Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $false -Extra @() -Reports "$fixture\package-remnant-reports" } 'Package data remains'
         Assert-True (Test-Path "$env:APPDATA\OpenClawTray\settings.json") 'Profiles removed despite incomplete package cleanup.'
         Assert-True (Test-Path "$leftover\remaining.txt") 'Package-managed data was deleted manually.'
+    }
+    Test-Case 'confirmed isolated profile removal records exact scope and preserves unselected profiles' {
+        $script:registered = $false
+        $root = "$fixture\windows-users"
+        $path = "$root\selected-profile"
+        $selected = [pscustomobject]@{ LocalPath = $path; SID = 'S-1-5-110-1-2-3-1001'; Loaded = $false; Special = $false }
+        $unselected = [pscustomobject]@{ LocalPath = "$root\unselected-profile"; SID = 'S-1-5-110-1-2-3-1002'; Loaded = $false; Special = $false }
+        $state = [pscustomobject]@{ Items = @($selected, $unselected); Calls = 0 }
+        foreach ($directory in @($selected.LocalPath, $unselected.LocalPath)) {
+            New-Item -ItemType Directory -Path $directory -Force | Out-Null
+            Set-Content -LiteralPath "$directory\keep-or-remove.txt" -Value 'fixture profile data'
+        }
+        function Get-ItemProperty { [pscustomobject]@{ ProfilesDirectory = "$fixture\windows-users" } }
+        function Get-CleanWindowsProfiles { $state.Items }
+        function Assert-CleanProfileRemovalAccess { }
+        function Remove-CimInstance {
+            param($InputObject, $Confirm, $ErrorAction)
+            Assert-True ($InputObject.SID -eq $selected.SID) 'Unselected profile reached deletion.'
+            $state.Calls++
+            Remove-Item -LiteralPath $selected.LocalPath -Recurse -Force
+            $state.Items = @($unselected)
+        }
+        Assert-Throws {
+            Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $false -Extra @() -IsolatedProfiles @($path) -Reports "$path\report"
+        } 'Report directory overlaps'
+        Assert-True ($state.Calls -eq 0) 'Report overlap invoked profile removal.'
+        Invoke-OpenClawClean -Apply $true -Dev $false -Models $false -Wsl $false -Extra @() -IsolatedProfiles @($path) -Reports "$fixture\profile-removal-report"
+        $plan = Get-Content -LiteralPath "$fixture\profile-removal-report\plan.json" -Raw | ConvertFrom-Json
+        Assert-True ($plan.isolatedWindowsProfiles.Count -eq 1 -and $plan.isolatedWindowsProfiles[0].SID -eq $selected.SID) 'Explicit SID missing from plan.'
+        Assert-True ($state.Calls -eq 1 -and -not (Test-Path -LiteralPath $path)) 'Selected profile was not removed.'
+        Assert-True (Test-Path -LiteralPath "$root\unselected-profile\keep-or-remove.txt") 'Unselected profile files were changed.'
     }
 } finally {
     foreach ($name in $environmentNames) { [Environment]::SetEnvironmentVariable($name, $oldEnvironment[$name]) }

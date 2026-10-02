@@ -45,6 +45,7 @@ disk files must still be present at completion.
 | `-ExcludeCachedModels` | Preserve external shared cached models. Overrides both `-All` and `-RemoveCachedModels`, regardless of argument order. Models inside deleted profiles or WSL filesystems are still removed. |
 | `-RemoveWslGateway` | Registered `OpenClawGateway`, plus `OpenClawGateway-Dev` only with `-IncludeDev`. Permanently destroys their filesystems. |
 | `-AdditionalProfilePath` | Explicit absolute isolated-data directories. No wildcard, automatic session sweep, source checkout, or package-data root is accepted. Pass arrays when calling from PowerShell directly. |
+| `-RemoveIsolatedProfilePath` | Exact Windows isolated-profile directories. Uses `Win32_UserProfile` to remove registration and remaining files, including registrations whose folders were already deleted. Only unloaded, non-special `S-1-5-110` profiles directly under Windows `ProfilesDirectory` qualify. Never implied by `-All`; apply requires elevation as the same affected user. |
 | `-ReportDirectory` | A new local directory outside cleanup targets. Default: a unique `%TEMP%\OpenClawCleanReports\<id>` directory. |
 | `-WhatIf` | Preview even when `-ConfirmDestructive` is present. |
 
@@ -66,6 +67,34 @@ To select all built-in scopes except external shared cached models:
 .\clean-uninstall.ps1 -All -ExcludeCachedModels
 .\clean-uninstall.ps1 -All -ExcludeCachedModels -ConfirmDestructive
 ```
+
+### Leftover Windows isolated profiles
+
+Deleting a directory under `C:\Users` manually can leave its Windows profile
+registration behind. Native teardown verifies the currently recorded session,
+not every profile from an older installation. The script reports unselected
+`S-1-5-110` profiles as ownership-unverified; it never assumes they are OpenClaw's.
+Only select profiles you have independently identified as disposable leftovers.
+
+```powershell
+# Use single quotes to keep the literal $ in generated profile names.
+$leftovers = @('C:\Users\Demo_A1-B2_$', 'C:\Users\Demo_C3-D4_$')
+.\clean-uninstall.ps1 -All -ExcludeCachedModels -RemoveIsolatedProfilePath $leftovers
+
+# Apply from elevated Windows PowerShell as the same affected user.
+.\clean-uninstall.ps1 -All -ExcludeCachedModels -RemoveIsolatedProfilePath $leftovers -ConfirmDestructive
+```
+
+This destroys all data inside the selected Windows profiles, including models
+stored there. Shared caches outside those profiles remain excluded. The script
+rechecks SID/path identity and loaded/special state immediately before removal,
+then verifies both registration and directory absence. It refuses ordinary user
+profiles, ambiguous identities, reparse-point profile roots, and directories
+without a corresponding registration. If both registration and directory are
+already gone, repeating the command is harmless. Provider/access failures stop
+cleanup; there is no fallback to manually deleting registry keys or directories.
+This option removes profile registrations and files, not unrecorded MXC backend
+sessions or local accounts, and does not replace supported native teardown.
 
 The apply run saves a target plan, transcript, native teardown output, and
 hash-verified copies of existing `openclaw-diagnostics-*.zip` files found in

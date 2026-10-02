@@ -21,6 +21,11 @@
 .PARAMETER ExcludeCachedModels
     Preserve external shared cached models even with -All or -RemoveCachedModels.
     Models inside deleted app profiles or WSL filesystems are still removed.
+.PARAMETER RemoveIsolatedProfilePath
+    Explicit Windows isolated-profile directories to remove through Win32_UserProfile.
+    Only unloaded, non-special S-1-5-110 profiles directly under ProfilesDirectory
+    are eligible. Works when the folder was already deleted but its registration
+    remains. Never implied by -All. Applying this option requires elevation.
 .EXAMPLE
     .\clean-uninstall.ps1
 .EXAMPLE
@@ -45,6 +50,7 @@ param(
     [switch]$ExcludeCachedModels,
     [switch]$RemoveWslGateway,
     [string[]]$AdditionalProfilePath = @(),
+    [string[]]$RemoveIsolatedProfilePath = @(),
     [string]$ReportDirectory
 )
 
@@ -182,6 +188,74 @@ function Get-CleanPackages([bool]$Dev) {
     $names = @('OpenClawFoundation.OpenClaw', 'OpenClawFoundation.OpenClawGateway', 'OpenClaw.Gateway')
     if ($Dev) { $names += 'OpenClawFoundation.OpenClaw.Dev' }
     @(Get-AppxPackage -ErrorAction Stop | Where-Object { $_.Name -in $names })
+}
+
+function Get-CleanWindowsProfiles {
+    Get-CimInstance Win32_UserProfile -ErrorAction Stop
+}
+
+function Get-CleanIsolatedProfiles([string[]]$Paths, [object[]]$Inventory) {
+    if (-not $Paths) { return }
+    $settings = Get-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList'
+    $root = Get-CleanFullPath ([Environment]::ExpandEnvironmentVariables($settings.ProfilesDirectory))
+    foreach ($path in @($Paths | ForEach-Object { Get-CleanFullPath $_ } | Select-Object -Unique)) {
+        if ((Split-Path -Parent $path) -ne $root -or
+            $path -eq (Get-CleanFullPath $env:USERPROFILE)) {
+            throw "Select an isolated profile directly under '$root', never a current-user or nested path: $path"
+        }
+        Assert-CleanNoReparsePath $path
+        $matches = @($Inventory | Where-Object { (Get-CleanFullPath $_.LocalPath) -eq $path })
+        if ($matches.Count -eq 0) {
+            if (Test-Path -LiteralPath $path) { throw "No Windows profile registration proves this directory's identity: $path" }
+            Write-Host "Already absent isolated profile path: $path"
+            continue
+        }
+        $profile = $matches[0]
+        if ($matches.Count -ne 1 -or $profile.SID -notmatch '^S-1-5-110-\d+-\d+-\d+-\d+$' -or
+            @($Inventory | Where-Object { $_.SID -eq $profile.SID }).Count -ne 1 -or
+            $profile.Loaded -isnot [bool] -or $profile.Loaded -or
+            $profile.Special -isnot [bool] -or $profile.Special) {
+            throw "Refusing a loaded, special, ordinary, or ambiguous Windows profile: $path"
+        }
+        $null = [Security.Principal.SecurityIdentifier]::new($profile.SID)
+        [pscustomobject]@{ Path = $path; SID = $profile.SID; Instance = $profile }
+    }
+}
+
+function Assert-CleanProfileRemovalAccess {
+    $principal = [Security.Principal.WindowsPrincipal]::new([Security.Principal.WindowsIdentity]::GetCurrent())
+    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        throw 'Explicit Windows profile removal requires an elevated Windows PowerShell running as the same affected user. No cleanup started.'
+    }
+}
+
+function Get-CleanIsolatedProfileForRemoval($Expected) {
+    $inventory = @(Get-CleanWindowsProfiles)
+    $current = @(Get-CleanIsolatedProfiles @($Expected.Path) $inventory)
+    if ($current.Count -eq 0) {
+        if (@($inventory | Where-Object { $_.SID -eq $Expected.SID }).Count) {
+            throw "Isolated profile SID moved to a different path: $($Expected.SID)"
+        }
+        return
+    }
+    if ($current[0].SID -ne $Expected.SID) { throw "Isolated profile identity changed: $($Expected.Path)" }
+    return $current[0].Instance
+}
+
+function Remove-CleanIsolatedProfile($Expected) {
+    $current = Get-CleanIsolatedProfileForRemoval $Expected
+    if ($null -ne $current) {
+        # Windows owns both profile registration and file cleanup. Never fall
+        # back to deleting ProfileList keys or recursively sweeping C:\Users.
+        Remove-CimInstance -InputObject $current -Confirm:$false -ErrorAction Stop
+    }
+    $remaining = @(Get-CleanWindowsProfiles | Where-Object {
+        $_.SID -eq $Expected.SID -or (Get-CleanFullPath $_.LocalPath) -eq $Expected.Path
+    })
+    if ($remaining.Count -gt 0 -or (Test-Path -LiteralPath $Expected.Path)) {
+        throw "Isolated Windows profile registration or files remain: $($Expected.Path)"
+    }
+    Write-Host "REMOVED isolated Windows profile: $($Expected.Path) [$($Expected.SID)]"
 }
 
 function Get-CleanWin32([bool]$Dev) {
@@ -480,7 +554,8 @@ function Get-CleanStartup([bool]$Dev, [string[]]$OwnedRoots) {
 
 function Invoke-OpenClawClean {
     [CmdletBinding(SupportsShouldProcess)]
-    param([bool]$Apply, [bool]$Dev, [bool]$Models, [bool]$Wsl, [string[]]$Extra, [string]$Reports)
+    param([bool]$Apply, [bool]$Dev, [bool]$Models, [bool]$Wsl, [string[]]$Extra, [string]$Reports,
+        [string[]]$IsolatedProfiles = @())
 
     $overrides = @(Get-ChildItem Env: | Where-Object {
         $_.Name -in @('OPENCLAW_TRAY_DATA_DIR','OPENCLAW_TRAY_APPDATA_DIR',
@@ -490,6 +565,8 @@ function Invoke-OpenClawClean {
     if ($overrides.Count -gt 0) { throw "Clear path overrides before cleanup. Use -AdditionalProfilePath explicitly: $($overrides.Name -join ', ')" }
     $packages = @(Get-CleanPackages $Dev)
     $apps = @(Get-CleanWin32 $Dev)
+    $windowsProfiles = @(Get-CleanWindowsProfiles)
+    $isolatedToRemove = @(Get-CleanIsolatedProfiles $IsolatedProfiles $windowsProfiles)
     $distroRecords = @(Get-CleanDistroRecords)
     $distros = @($distroRecords | ForEach-Object { $_.Name })
     $selectedDistros = @()
@@ -515,7 +592,8 @@ function Invoke-OpenClawClean {
     $packageData = @($packages | ForEach-Object { Join-Path $env:LOCALAPPDATA "Packages\$($_.PackageFamilyName)" })
     $ownedRoots += $packageData
     $ownedRoots = @($ownedRoots | ForEach-Object { Get-CleanFullPath $_ } | Select-Object -Unique)
-    $deletionTargets = @($profiles + $packageData + @($apps | ForEach-Object { $_.Install }))
+    $deletionTargets = @($profiles + $packageData + @($apps | ForEach-Object { $_.Install }) +
+        @($isolatedToRemove | ForEach-Object { $_.Path }))
     Assert-CleanDistroStorage $distroRecords $deletionTargets $selectedDistros
     $preservedStorage = @()
     foreach ($record in $distroRecords | Where-Object { $_.Name -notin $selectedDistros }) {
@@ -556,6 +634,13 @@ function Invoke-OpenClawClean {
     foreach ($package in $packages) { Write-Host "REMOVE package: $($package.PackageFullName)" }
     foreach ($app in $apps) { Write-Host "UNINSTALL interactively: $($app.Name) [$($app.Exe)]. Choose No to preserve WSL." }
     foreach ($profile in $profiles) { Write-Host "REMOVE profile if present: $profile" }
+    foreach ($profile in $isolatedToRemove) {
+        Write-Host "REMOVE isolated Windows profile and registration: $($profile.Path) [$($profile.SID)]"
+    }
+    $selectedProfileSids = @($isolatedToRemove | ForEach-Object { $_.SID })
+    foreach ($profile in $windowsProfiles | Where-Object { $_.SID -like 'S-1-5-110-*' -and $_.SID -notin $selectedProfileSids }) {
+        Write-Warning "Unselected isolated Windows profile (OpenClaw ownership unverified): $($profile.LocalPath) [$($profile.SID)]. Preserved; use -RemoveIsolatedProfilePath only after confirming ownership."
+    }
     foreach ($model in $modelsToRemove) { Write-Host "REMOVE shared model: $($model.Path) ($($model.Size) bytes; digest checked before removal)" }
     foreach ($process in $processes) { Write-Host "STOP PID $($process.ProcessId): $($process.ExecutablePath) [$($process.CreationDate)]" }
     foreach ($entry in $startup) { Write-Host "REMOVE $($entry.Kind): $($entry.Key)\$($entry.Name)" }
@@ -570,10 +655,11 @@ function Invoke-OpenClawClean {
     if (-not $Models) { Write-Host 'Preserved: external shared model weights. Use -RemoveCachedModels only after reviewing ownership.' }
     if (-not $Apply) { Write-Host 'DRY RUN. Nothing changed. Repeat the same options with -ConfirmDestructive to apply.'; return }
     if (-not $PSCmdlet.ShouldProcess('the exact OpenClaw targets printed above', 'Permanently remove apps, identities, state, and selected models/distros')) { return }
+    if ($isolatedToRemove.Count) { Assert-CleanProfileRemovalAccess }
 
     if (-not $Reports) { $Reports = Join-Path $env:TEMP ("OpenClawCleanReports\" + [guid]::NewGuid().ToString('N')) }
     $Reports = Assert-CleanPath $Reports
-    foreach ($target in @($profiles + $packageData + @($apps | ForEach-Object { $_.Install }))) {
+    foreach ($target in $deletionTargets) {
         $target = Get-CleanFullPath $target
         if ((Test-CleanWithin $Reports $target) -or (Test-CleanWithin $target $Reports)) { throw 'Report directory overlaps a cleanup target.' }
     }
@@ -588,6 +674,7 @@ function Invoke-OpenClawClean {
             packages = @($packages | ForEach-Object { $_.PackageFullName })
             win32Apps = @($apps | ForEach-Object { $_.Name })
             profiles = $profiles
+            isolatedWindowsProfiles = @($isolatedToRemove | Select-Object Path, SID)
             models = $modelsToRemove
             processes = @($processes | Select-Object ProcessId, CreationDate, ExecutablePath)
             startup = @($startup | Select-Object Kind, Key, Name)
@@ -612,6 +699,7 @@ function Invoke-OpenClawClean {
             if ($package.PackageFullName -notin $livePackages) { throw 'Package inventory changed. Preview again before cleanup.' }
         }
         Assert-CleanDistroStorage @(Get-CleanDistroRecords) $deletionTargets $selectedDistros
+        foreach ($profile in $isolatedToRemove) { $null = Get-CleanIsolatedProfileForRemoval $profile }
         foreach ($process in $processes) { Stop-CleanProcess $process }
         foreach ($gateway in $gateways) {
             Write-Host "TEARDOWN: $($gateway.PackageFullName)"
@@ -657,6 +745,7 @@ function Invoke-OpenClawClean {
                 throw "Package data remains after uninstall. State deletion stopped: $path"
             }
         }
+        foreach ($profile in $isolatedToRemove) { Remove-CleanIsolatedProfile $profile }
         foreach ($profile in $profiles) {
             $null = @(Get-CleanTree $profile)
             if (Test-Path -LiteralPath $profile) {
@@ -704,4 +793,4 @@ function Invoke-OpenClawClean {
 
 Invoke-OpenClawClean -Apply ([bool]$ConfirmDestructive) -Dev ($All -or $IncludeDev) `
     -Models (($All -or $RemoveCachedModels) -and -not $ExcludeCachedModels) -Wsl ($All -or $RemoveWslGateway) `
-    -Extra $AdditionalProfilePath -Reports $ReportDirectory
+    -Extra $AdditionalProfilePath -Reports $ReportDirectory -IsolatedProfiles $RemoveIsolatedProfilePath
