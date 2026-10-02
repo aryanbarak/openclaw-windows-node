@@ -86,6 +86,11 @@ internal sealed class LocalAiGatewayLifecycle(
         var (target, transport) = await GetTransportAsync(binding, ct).ConfigureAwait(false);
         var current = await new LocalAiGatewayRpcConfigurationTransport(target, transport).CaptureAsync(ct).ConfigureAwait(false);
         var config = JsonNode.Parse(current.Config.GetRawText())!;
+        if (binding.AddedAllowlistEntry &&
+            config["agents"]?["defaults"]?["models"]?[binding.ModelRef] is { } entry &&
+            entry is not JsonObject { Count: 0 })
+            throw new InvalidOperationException(
+                "The Local AI allowlist entry contains user customizations. Do not delete this metadata or the ownership receipt. Restore the original installation receipt from your backup, then retry Stop to preserve the edited entry. Companion cannot restore a missing receipt automatically.");
         if (config["models"]?["providers"]?["llamacpp"] is not null ||
             config["agents"]?["defaults"]?["model"]?["primary"]?.GetValue<string>() != binding.PreviousPrimary ||
             binding.AddedAllowlistEntry && config["agents"]?["defaults"]?["models"]?[binding.ModelRef] is not null)

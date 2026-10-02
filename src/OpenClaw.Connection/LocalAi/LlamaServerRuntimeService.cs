@@ -182,6 +182,7 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
                 _gatewayRouteRequiresResolution)
                 throw new InvalidOperationException("Stop Local AI successfully before releasing its Gateway ownership.");
             await _options.EndpointLifecycle.ReleaseOwnershipAsync(cancellationToken).ConfigureAwait(false);
+            _explicitStopRequested = false;
             return Snapshot;
         }
         finally { _operationGate.Release(); }
@@ -304,8 +305,12 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
                     LocalAiQuiesceReason.Teardown,
                     cancellationToken)
                 .ConfigureAwait(false);
-            _explicitStopRequested = stopped.State == LocalAiRuntimeState.Failed &&
-                (_gatewayRouteRequiresResolution || _managedProcess is { HasExited: false });
+            // Keep a confirmed receiptless withdrawal releasable across read-only refresh.
+            _explicitStopRequested =
+                (_install is null && stopped.State == LocalAiRuntimeState.Stopped &&
+                    _options.EndpointLifecycle.HasReleasableOwnership) ||
+                (stopped.State == LocalAiRuntimeState.Failed &&
+                    (_gatewayRouteRequiresResolution || _managedProcess is { HasExited: false }));
             return stopped;
         }
         catch (Exception ex)
@@ -639,15 +644,25 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
 
     private async Task<LocalAiRuntimeSnapshot> RefreshCoreAsync(CancellationToken cancellationToken)
     {
+        bool installLoaded = false;
         if (_explicitStopRequested)
-            return Snapshot;
+        {
+            if (_install is not null || Snapshot.State != LocalAiRuntimeState.Stopped ||
+                _gatewayRouteRequiresResolution || !_options.EndpointLifecycle.HasReleasableOwnership)
+                return Snapshot;
+            installLoaded = await TryLoadInstallAsync(cancellationToken, preserveUnavailableSnapshot: true)
+                .ConfigureAwait(false);
+            if (!installLoaded)
+                return Snapshot;
+            _explicitStopRequested = false;
+        }
         if (_gatewayRouteRequiresResolution && _install is not null &&
             (_managedProcess is null || _managedProcess.HasExited))
         {
             return Snapshot;
         }
 
-        if (!await TryLoadInstallAsync(cancellationToken).ConfigureAwait(false))
+        if (!installLoaded && !await TryLoadInstallAsync(cancellationToken).ConfigureAwait(false))
             return Snapshot;
 
         try
@@ -967,7 +982,7 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
         return _install;
     }
 
-    private async Task<bool> TryLoadInstallAsync(CancellationToken cancellationToken)
+    private async Task<bool> TryLoadInstallAsync(CancellationToken cancellationToken, bool preserveUnavailableSnapshot = false)
     {
         try
         {
@@ -976,13 +991,15 @@ public sealed class LlamaServerRuntimeService : ILocalAiRuntime
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
         {
             _logger.Error("Could not load the local AI installation manifest.", ex);
-            Publish(LocalAiRuntimeState.Failed, LocalAiOwnership.None, Sanitize(ex.Message));
+            if (!preserveUnavailableSnapshot)
+                Publish(LocalAiRuntimeState.Failed, LocalAiOwnership.None, Sanitize(ex.Message));
             return false;
         }
 
         if (_install is not null)
             return true;
-        Publish(LocalAiRuntimeState.NotInstalled, LocalAiOwnership.None, "Local AI is not installed.");
+        if (!preserveUnavailableSnapshot)
+            Publish(LocalAiRuntimeState.NotInstalled, LocalAiOwnership.None, "Local AI is not installed.");
         return false;
     }
 

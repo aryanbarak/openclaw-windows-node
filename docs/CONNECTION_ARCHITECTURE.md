@@ -104,10 +104,17 @@ until explicit release. If those checks fail, restore the installation receipt o
 withdraw the route using the original Gateway's configuration tools, then retry
 Stop. Offline, mismatched and still-published routes remain blocked; artifact Repair
 is not a way to bypass their ownership.
+Successful receiptless Stop preserves its stopped intent across page refresh until
+explicit Start or Release, or observation loads a repaired installation receipt.
+Loading that receipt resumes read-only status checks, not automatic startup.
+Canceled or rejected Release retains the ownership and stopped intent; successful
+Release lets observation report the missing installation.
 This receiptless confirmation also blocks if an originally Companion-added allowlist
-entry now contains user customizations. Restore the installation receipt and use the
-normal Stop path, which can preserve the edited entry; do not delete user metadata to
-force receiptless settlement.
+entry now contains user customizations. Restore the original installation receipt
+from an external backup and use the normal Stop path, which can preserve the edited
+entry; do not delete user metadata to force receiptless settlement. Companion does
+not keep a restorable backup or reconstruct this receipt. Without one, this case
+remains blocked rather than adopting or deleting the customized entry.
 Explicit Use publishes the authenticated endpoint, and the existing setup verifier
 performs real inference with the exact primary, without fallback. A changed
 revision is not silently adopted: explicit reconciliation requires the same

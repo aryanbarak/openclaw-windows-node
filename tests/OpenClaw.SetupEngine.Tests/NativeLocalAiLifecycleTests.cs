@@ -178,6 +178,7 @@ public sealed class NativeLocalAiLifecycleTests
         Assert.Equal(LocalAiRuntimeState.Stopped, stopped.State);
         Assert.False(stopped.GatewayRouteRequiresResolution);
         Assert.Equal(LocalAiOwnership.None, stopped.Ownership);
+        Assert.Equal(LocalAiRuntimeState.Stopped, (await runtime.RefreshAsync()).State);
         Assert.True(fixture.Store.Exists);
         Assert.False(fixture.Store.Load()!.Pending);
         Assert.False(fixture.Store.Load()!.AutomaticRecoveryEnabled);
@@ -200,6 +201,7 @@ public sealed class NativeLocalAiLifecycleTests
     [InlineData("provider")]
     [InlineData("primary")]
     [InlineData("allowlist")]
+    [InlineData("customized-allowlist")]
     [InlineData("identity")]
     [InlineData("offline")]
     public async Task MissingInstallNeverClearsOwnershipWithoutExactWithdrawalProof(string conflict)
@@ -210,12 +212,20 @@ public sealed class NativeLocalAiLifecycleTests
         if (conflict == "provider") fixture.Rpc.Config["models"]!["providers"]!["llamacpp"] = new JsonObject();
         if (conflict == "primary") fixture.Rpc.Config["agents"]!["defaults"]!["model"]!["primary"] = "changed/model";
         if (conflict == "allowlist") fixture.Rpc.Config["agents"]!["defaults"]!["models"]![fixture.Model] = new JsonObject();
+        if (conflict == "customized-allowlist")
+            fixture.Rpc.Config["agents"]!["defaults"]!["models"]![fixture.Model] = new JsonObject { ["alias"] = "user label" };
         if (conflict == "identity") fixture.Rpc.Route = fixture.Rpc.Route with { IdentityBinding = new string('B', 64) };
         if (conflict == "offline") fixture.Rpc.IsConnected = false;
         var config = fixture.Rpc.Config.ToJsonString();
         await using var runtime = new LlamaServerRuntimeService(new()
         { Paths = fixture.Paths, EndpointLifecycle = fixture.Lifecycle }, NullLogger.Instance);
-        await Assert.ThrowsAnyAsync<InvalidOperationException>(() => runtime.StopAsync());
+        var error = await Assert.ThrowsAnyAsync<InvalidOperationException>(() => runtime.StopAsync());
+        if (conflict == "customized-allowlist")
+        {
+            Assert.Contains("Do not delete", error.Message);
+            Assert.Contains("original installation receipt", error.Message);
+            Assert.DoesNotContain("remove its Companion-added allowlist entry", error.Message);
+        }
         Assert.True(runtime.Snapshot.GatewayRouteRequiresResolution);
         Assert.True(fixture.Store.Load()!.Pending);
         Assert.False(fixture.Store.Load()!.AutomaticRecoveryEnabled);
