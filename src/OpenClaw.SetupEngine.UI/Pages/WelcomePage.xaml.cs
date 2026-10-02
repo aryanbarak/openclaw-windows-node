@@ -26,9 +26,7 @@ public sealed partial class WelcomePage : Page
     public WelcomePage()
     {
         InitializeComponent();
-        AutomationProperties.SetName(NativeChoice,
-            SetupLocalization.GetString("Onboarding_Native_Title.Text") +
-            ", " + SetupLocalization.GetString("Onboarding_Native_Recommended.Text"));
+        AutomationProperties.SetName(NativeChoice, SetupLocalization.GetString("Onboarding_Native_Title.Text"));
         AutomationProperties.SetName(InstallChoice, SetupLocalization.GetString("Onboarding_Wsl_Title.Text"));
         Loaded += OnLoaded;
         Unloaded += (_, _) =>
@@ -87,7 +85,7 @@ public sealed partial class WelcomePage : Page
             return;
         var generation = ++_probeGeneration;
         _nativeEligibility = null;
-        NativeChoice.IsEnabled = false;
+        ApplyNativeChoicePresentation(null);
         VisualStateManager.GoToState(this, "WslRecommendedState", false);
         WslRecommendedBadge.Visibility = Visibility.Visible;
         NativeSupportCard.Visibility = Visibility.Visible;
@@ -114,7 +112,7 @@ public sealed partial class WelcomePage : Page
 
         _nativeEligibility = eligibility;
         var available = eligibility == NativeGatewayEligibility.Available;
-        NativeChoice.IsEnabled = available;
+        ApplyNativeChoicePresentation(eligibility);
         WslRecommendedBadge.Visibility = available ? Visibility.Collapsed : Visibility.Visible;
         NativeSupportCard.Visibility = available ? Visibility.Collapsed : Visibility.Visible;
         VisualStateManager.GoToState(this, available ? "NativeRecommendedState" : "WslRecommendedState", false);
@@ -131,6 +129,21 @@ public sealed partial class WelcomePage : Page
                 ?? FrameworkElementAutomationPeer.CreatePeerForElement(NativeSupportStatus);
             peer.RaiseAutomationEvent(AutomationEvents.LiveRegionChanged);
         }
+    }
+
+    private void ApplyNativeChoicePresentation(NativeGatewayEligibility? eligibility)
+    {
+        bool available = eligibility == NativeGatewayEligibility.Available;
+        NativeChoice.IsEnabled = available;
+        NativeChoice.Visibility = eligibility is NativeGatewayEligibility.CapabilityUnavailable or
+            NativeGatewayEligibility.UnsupportedPlatform
+            ? Visibility.Collapsed
+            : Visibility.Visible;
+        NativeRecommendedBadge.Visibility = available ? Visibility.Visible : Visibility.Collapsed;
+        string accessibleName = SetupLocalization.GetString("Onboarding_Native_Title.Text");
+        if (available)
+            accessibleName += ", " + SetupLocalization.GetString("Onboarding_Native_Recommended.Text");
+        AutomationProperties.SetName(NativeChoice, accessibleName);
     }
 
     private void WindowsUpdate_Click(object sender, RoutedEventArgs e) =>

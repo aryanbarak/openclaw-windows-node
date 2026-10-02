@@ -524,6 +524,10 @@ public sealed class OnboardingSetupGalleryTests(UIThreadFixture ui, ITestOutputH
                                 // Render both production visual states without changing host capabilities.
                                 var available = scene.State == "available";
                                 Find<ListViewItem>(welcome, "NativeChoice").IsEnabled = available;
+                                Find<ListViewItem>(welcome, "NativeChoice").Visibility =
+                                    available ? Visibility.Visible : Visibility.Collapsed;
+                                Find<RecommendedBadge>(welcome, "NativeRecommendedBadge").Visibility =
+                                    available ? Visibility.Visible : Visibility.Collapsed;
                                 Find<RecommendedBadge>(welcome, "WslRecommendedBadge").Visibility =
                                     available ? Visibility.Collapsed : Visibility.Visible;
                                 Find<Border>(welcome, "NativeSupportCard").Visibility =

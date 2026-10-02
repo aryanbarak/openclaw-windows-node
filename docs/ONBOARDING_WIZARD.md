@@ -169,10 +169,12 @@ It does not suppress that exception or repair the upstream full-wizard finalizer
 See the [implementation results and limitations](GATEWAY_SETUP_RESPONSIBILITIES.md#package-aware-implementation-results)
 for launch, shutdown, verification details and the pre-assignment crash window.
 
-**Install a local native gateway** is the first Welcome choice and retains its
-**Recommended** badge even while disabled, with WinUI disabled brushes for the
-title, description, badge and icon instead of active accent colors. Only a successful native capability
-check enables it. The separate isolation warning and acknowledgment checkbox
+**Install a local native gateway** is the first Welcome choice while support is
+being checked, without a recommendation badge. A successful native capability
+check enables it and adds **Recommended**. A definitive unsupported result hides
+the choice so WSL becomes the first recommended option; a failed check leaves the
+disabled choice visible without a recommendation while the support card explains
+the failure. The separate isolation warning and acknowledgment checkbox
 remain removed; the general security notice and provider/onboarding consent
 remain explicit. With an isolated-session Gateway package, the package provisions
 and runs the agent account; the known legacy proof package retains its original
