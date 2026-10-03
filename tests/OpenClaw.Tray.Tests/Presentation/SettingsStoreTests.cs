@@ -114,11 +114,15 @@ public sealed class SettingsStoreTests
         {
             settings.GlobalHotkeyEnabled = true;
             settings.NotificationSound = "Subtle";
+            settings.SystemRunSandboxEnabled = true;
+            settings.SystemRunBlockHostFallbackWhenMxcUnavailable = true;
 
             var snapshot = store.Current;
 
             Assert.True(snapshot.GlobalHotkeyEnabled);
             Assert.Equal("Subtle", snapshot.NotificationSound);
+            Assert.True(snapshot.SystemRunSandboxEnabled);
+            Assert.True(snapshot.SystemRunBlockHostFallbackWhenMxcUnavailable);
             Assert.Equal(0, snapshot.Version);
         }
     }

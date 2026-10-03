@@ -87,6 +87,7 @@ internal sealed class ChatComposerViewModel : INotifyPropertyChanged, IDisposabl
     private bool _awaitingCatalog;
     private ChatComposerInputs? _inputs;
     private long _latestInputsRevision;
+    private long _sandboxSettingsVersion = -1;
 
     public ChatComposerViewModel(IUiDispatcher dispatcher, bool initialSpeakerMuted)
     {
@@ -113,6 +114,26 @@ internal sealed class ChatComposerViewModel : INotifyPropertyChanged, IDisposabl
     public ReactorSlashMenuState SlashMenuState => _slashMenuState;
     public ReactorSlashDisplayState SlashDisplay { get; private set; }
     public ChatComposerInputs? Inputs => _inputs;
+    public bool SandboxEnabled { get; private set; }
+    public bool SandboxBlocksHostFallback { get; private set; }
+
+    public void ApplySandboxSettings(SettingsSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(snapshot);
+        MutateIfChanged(() =>
+        {
+            if (snapshot.Version <= _sandboxSettingsVersion)
+                return false;
+            _sandboxSettingsVersion = snapshot.Version;
+            if (SandboxEnabled == snapshot.SystemRunSandboxEnabled
+                && SandboxBlocksHostFallback == snapshot.SystemRunBlockHostFallbackWhenMxcUnavailable)
+                return false;
+
+            SandboxEnabled = snapshot.SystemRunSandboxEnabled;
+            SandboxBlocksHostFallback = snapshot.SystemRunBlockHostFallbackWhenMxcUnavailable;
+            return true;
+        });
+    }
 
     /// <summary>Exposed for disposal characterization tests.</summary>
     internal bool IsDisposed => _disposed;

@@ -6550,6 +6550,33 @@ Make sure the gateway is running.</value>
   <data name="SandboxPage_StatusUnavailableTitle" xml:space="preserve">
     <value>Node Sandbox unavailable: host fallback</value>
   </data>
+  <data name="Chat_Composer_Sandbox_On" xml:space="preserve">
+    <value>Node Sandbox setting: On</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_Off" xml:space="preserve">
+    <value>Node Sandbox setting: Off</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_OffDescription" xml:space="preserve">
+    <value>Windows commands run without sandbox protection.</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_FallbackDescription" xml:space="preserve">
+    <value>Windows commands use sandboxing when available. Otherwise, they can run unprotected.</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_BlockedDescription" xml:space="preserve">
+    <value>Windows commands are blocked if sandboxing is unavailable.</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_Title" xml:space="preserve">
+    <value>Node Sandbox</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_StateOn" xml:space="preserve">
+    <value>On</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_StateOff" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_OpenSettings" xml:space="preserve">
+    <value>Sandbox settings</value>
+  </data>
   <data name="SandboxPage_StatusUnavailableSubtext" xml:space="preserve">
     <value>Containment isn't available on this PC, so agent-started commands run on the host without sandbox protection.</value>
   </data>

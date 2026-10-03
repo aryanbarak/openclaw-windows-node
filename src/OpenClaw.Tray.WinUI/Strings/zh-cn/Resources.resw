@@ -7896,4 +7896,31 @@
   <data name="Onboarding_AiSetup_LocalOwnershipInvalid" xml:space="preserve"><value>已保存的本地 AI 所有权、模型或网关配置不再匹配。请在原始 Companion 配置文件中检查原始网关及其模型设置，包括已修改的模型允许列表条目。保留所有权凭据，不要复制身份验证凭据或替换提供程序。</value></data>
   <data name="Onboarding_AiSetup_LocalOwnershipUnavailable" xml:space="preserve"><value>无法检查原始网关的所有权或配置。请重新连接原始网关并再次检查。未进行任何更改。</value></data>
   <data name="Onboarding_AiSetup_LocalOwnershipFiles" xml:space="preserve"><value>受管理的本地 AI 安装需要修复文件。请先在本地 AI 设置中停止运行时并解决原始网关路由问题，再修复文件。保留所有权凭据。</value></data>
+  <data name="Chat_Composer_Sandbox_On" xml:space="preserve">
+    <value>节点沙盒设置：开启</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_Off" xml:space="preserve">
+    <value>节点沙盒设置：关闭</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_OffDescription" xml:space="preserve">
+    <value>Windows 命令在没有沙盒保护的情况下运行。</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_FallbackDescription" xml:space="preserve">
+    <value>Windows 命令会在沙盒可用时使用沙盒，否则可能会在没有保护的情况下运行。</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_BlockedDescription" xml:space="preserve">
+    <value>沙盒不可用时，Windows 命令将被阻止。</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_Title" xml:space="preserve">
+    <value>节点沙盒</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_StateOn" xml:space="preserve">
+    <value>开启</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_StateOff" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="Chat_Composer_Sandbox_OpenSettings" xml:space="preserve">
+    <value>沙盒设置</value>
+  </data>
 </root>
