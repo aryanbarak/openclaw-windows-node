@@ -174,7 +174,6 @@ internal sealed class SettingsStore : ISettingsStore
         LocationConsentGiven = _settings.LocationConsentGiven,
         ShowChatToolCalls = _settings.ShowChatToolCalls,
         SystemRunSandboxEnabled = _settings.SystemRunSandboxEnabled,
-        SystemRunBlockHostFallbackWhenMxcUnavailable = _settings.SystemRunBlockHostFallbackWhenMxcUnavailable,
     };
 
     private void ThrowIfDisposed()

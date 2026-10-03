@@ -3256,7 +3256,7 @@ Commands will run on the host without sandbox protection while sandboxing is una
   <data name="AppNotification_SandboxUnavailableBlocked_MessageFormat" xml:space="preserve">
     <value>{0}
 
-Commands are blocked while sandboxing is unavailable because strict fallback blocking is enabled.</value>
+Node Sandbox is on. Commands are blocked until containment is available.</value>
   </data>
   <data name="AppNotification_SandboxUnavailable_DefaultReason" xml:space="preserve">
     <value>MXC sandboxing primitives are not available on this machine.</value>
@@ -6557,13 +6557,10 @@ Make sure the gateway is running.</value>
     <value>Node Sandbox setting: Off</value>
   </data>
   <data name="Chat_Composer_Sandbox_OffDescription" xml:space="preserve">
-    <value>Windows commands run without sandbox protection.</value>
+    <value>Commands on this Windows node run without a sandbox.</value>
   </data>
-  <data name="Chat_Composer_Sandbox_FallbackDescription" xml:space="preserve">
-    <value>Windows commands use sandboxing when available. Otherwise, they can run unprotected.</value>
-  </data>
-  <data name="Chat_Composer_Sandbox_BlockedDescription" xml:space="preserve">
-    <value>Windows commands are blocked if sandboxing is unavailable.</value>
+  <data name="Chat_Composer_Sandbox_OnDescription" xml:space="preserve">
+    <value>Commands on this Windows node run in a sandbox.</value>
   </data>
   <data name="Chat_Composer_Sandbox_Title" xml:space="preserve">
     <value>Node Sandbox</value>
@@ -6584,7 +6581,7 @@ Make sure the gateway is running.</value>
     <value>Node Sandbox unavailable: commands blocked</value>
   </data>
   <data name="SandboxPage_StatusUnavailableBlockedSubtext" xml:space="preserve">
-    <value>Containment isn't available on this PC, and strict fallback blocking is on, so agent-started commands are blocked.</value>
+    <value>Node Sandbox is on. Containment isn't available on this PC, so agent-started commands are blocked.</value>
   </data>
   <data name="SandboxPage_StatusUnavailableOffTitle" xml:space="preserve">
     <value>Node Sandbox is off: host execution</value>
@@ -6614,7 +6611,7 @@ Make sure the gateway is running.</value>
     <value>Commands will run on the host without sandbox protection while sandboxing is unavailable.</value>
   </data>
   <data name="SandboxPage_UnavailableBehaviorBlocked" xml:space="preserve">
-    <value>Commands are blocked while sandboxing is unavailable because strict fallback blocking is enabled.</value>
+    <value>Node Sandbox is on. Commands are blocked until containment is available.</value>
   </data>
   <data name="SandboxPage_ProbeErrorTitle" xml:space="preserve">
     <value>Couldn't verify sandbox availability</value>

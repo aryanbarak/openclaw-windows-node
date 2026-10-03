@@ -151,5 +151,4 @@ public sealed record SettingsSnapshot
 
     public bool ShowChatToolCalls { get; init; }
     public bool SystemRunSandboxEnabled { get; init; }
-    public bool SystemRunBlockHostFallbackWhenMxcUnavailable { get; init; }
 }

@@ -672,14 +672,11 @@ internal sealed class ReactorChatComposer : Component<ReactorChatComposerViewPro
         var sandboxTitle = vm.SandboxEnabled
             ? Localized("Chat_Composer_Sandbox_On", "Node Sandbox setting: On")
             : Localized("Chat_Composer_Sandbox_Off", "Node Sandbox setting: Off");
-        var sandboxDescription = !vm.SandboxEnabled
-            ? Localized("Chat_Composer_Sandbox_OffDescription",
-                "Windows commands run without sandbox protection.")
-            : vm.SandboxBlocksHostFallback
-                ? Localized("Chat_Composer_Sandbox_BlockedDescription",
-                    "Windows commands are blocked if sandboxing is unavailable.")
-                : Localized("Chat_Composer_Sandbox_FallbackDescription",
-                    "Windows commands use sandboxing when available. Otherwise, they can run unprotected.");
+        var sandboxDescription = vm.SandboxEnabled
+            ? Localized("Chat_Composer_Sandbox_OnDescription",
+                "Commands on this Windows node run in a sandbox.")
+            : Localized("Chat_Composer_Sandbox_OffDescription",
+                "Commands on this Windows node run without a sandbox.");
         var sandboxState = vm.SandboxEnabled
             ? Localized("Chat_Composer_Sandbox_StateOn", "On")
             : Localized("Chat_Composer_Sandbox_StateOff", "Off");

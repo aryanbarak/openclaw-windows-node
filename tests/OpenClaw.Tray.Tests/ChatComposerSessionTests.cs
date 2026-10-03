@@ -140,12 +140,10 @@ public sealed class ChatComposerSessionTests
         first.Dispose();
         var disposedRevision = first.ViewModel.RenderRevision;
         settings.SystemRunSandboxEnabled = true;
-        settings.SystemRunBlockHostFallbackWhenMxcUnavailable = true;
         settings.Save();
 
         Assert.Equal(disposedRevision, first.ViewModel.RenderRevision);
         Assert.False(first.ViewModel.SandboxEnabled);
         Assert.True(second.ViewModel.SandboxEnabled);
-        Assert.True(second.ViewModel.SandboxBlocksHostFallback);
     }
 }

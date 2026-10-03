@@ -21,14 +21,16 @@ It does not describe Gateway tools or prove that a particular command was contai
 
 The icon opens a native flyout, not a toggle. Its accessible name identifies the
 saved setting. The 280-pixel flyout uses a padded header, one short caption,
-and a separated settings action. When enabled, the caption distinguishes
-allowed host fallback from strict blocking. Opening the flyout
+and a separated settings action. On says "Commands on this Windows node run in a
+sandbox." Off says "Commands on this Windows node run without a sandbox."
+The enabled runtime always blocks if containment is unavailable; it never
+retries on the host or silently clears the enabled preference. Opening the flyout
 does not probe availability, save settings, or change execution policy.
 
 ## Owners
 
 `ISettingsStore` supplies persisted snapshots. `ChatComposerSession` owns the
-subscription; `ChatComposerViewModel` projects the two sandbox preferences.
+subscription; `ChatComposerViewModel` projects the sandbox preference.
 `ReactorChatComposer` renders both Workspace and compact native chat.
 Each host supplies the existing `sandbox` Companion Settings route.
 

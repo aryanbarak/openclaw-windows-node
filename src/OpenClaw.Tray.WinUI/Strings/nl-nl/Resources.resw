@@ -3186,7 +3186,7 @@ Opdrachten worden op de host uitgevoerd zonder sandboxbescherming zolang sandbox
   <data name="AppNotification_SandboxUnavailableBlocked_MessageFormat" xml:space="preserve">
     <value>{0}
 
-Opdrachten worden geblokkeerd zolang sandboxing niet beschikbaar is, omdat strikte fallbackblokkering is ingeschakeld.</value>
+Node-sandbox is ingeschakeld. Opdrachten worden geblokkeerd totdat isolatie beschikbaar is.</value>
   </data>
   <data name="AppNotification_SandboxUnavailable_DefaultReason" xml:space="preserve">
     <value>MXC-sandboxprimitieven zijn niet beschikbaar op deze machine.</value>
@@ -6554,7 +6554,7 @@ Controleer of de gateway actief is.</value>
     <value>Node-sandbox niet beschikbaar: opdrachten geblokkeerd</value>
   </data>
   <data name="SandboxPage_StatusUnavailableBlockedSubtext" xml:space="preserve">
-    <value>Containment is niet beschikbaar op deze pc en strikte fallbackblokkering staat aan, dus opdrachten die de agent start, worden geblokkeerd.</value>
+    <value>Node-sandbox is ingeschakeld. Isolatie is niet beschikbaar op deze pc, dus opdrachten die de agent start, worden geblokkeerd.</value>
   </data>
   <data name="SandboxPage_StatusUnavailableOffTitle" xml:space="preserve">
     <value>Node-sandbox is uitgeschakeld: hostuitvoering</value>
@@ -6584,7 +6584,7 @@ Controleer of de gateway actief is.</value>
     <value>Opdrachten worden op de host uitgevoerd zonder sandboxbescherming zolang sandboxing niet beschikbaar is.</value>
   </data>
   <data name="SandboxPage_UnavailableBehaviorBlocked" xml:space="preserve">
-    <value>Opdrachten worden geblokkeerd zolang sandboxing niet beschikbaar is, omdat strikte fallbackblokkering is ingeschakeld.</value>
+    <value>Node-sandbox is ingeschakeld. Opdrachten worden geblokkeerd totdat isolatie beschikbaar is.</value>
   </data>
   <data name="SandboxPage_ProbeErrorTitle" xml:space="preserve">
     <value>Kan de beschikbaarheid van de sandbox niet verifiëren</value>
@@ -7904,13 +7904,10 @@ Uw instellingen, gateway, bestanden en modellen blijven op hun plaats.</value>
     <value>Node-sandboxinstelling: uit</value>
   </data>
   <data name="Chat_Composer_Sandbox_OffDescription" xml:space="preserve">
-    <value>Windows-opdrachten worden zonder sandboxbeveiliging uitgevoerd.</value>
+    <value>Opdrachten op deze Windows-node worden zonder sandbox uitgevoerd.</value>
   </data>
-  <data name="Chat_Composer_Sandbox_FallbackDescription" xml:space="preserve">
-    <value>Windows-opdrachten gebruiken de sandbox wanneer beschikbaar. Anders kunnen ze onbeveiligd worden uitgevoerd.</value>
-  </data>
-  <data name="Chat_Composer_Sandbox_BlockedDescription" xml:space="preserve">
-    <value>Windows-opdrachten worden geblokkeerd als de sandbox niet beschikbaar is.</value>
+  <data name="Chat_Composer_Sandbox_OnDescription" xml:space="preserve">
+    <value>Opdrachten op deze Windows-node worden in een sandbox uitgevoerd.</value>
   </data>
   <data name="Chat_Composer_Sandbox_Title" xml:space="preserve">
     <value>Node-sandbox</value>

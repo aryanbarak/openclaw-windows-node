@@ -83,7 +83,7 @@ public sealed class ReactorChatLayoutProofTests(UIThreadFixture ui)
             {
                 var button = FindControl<Button>(surface, "ChatComposerSandbox");
                 var popup = Assert.IsAssignableFrom<FrameworkElement>(Assert.IsType<Flyout>(button.Flyout).Content);
-                Assert.Equal("Windows commands use sandboxing when available. Otherwise, they can run unprotected.",
+                Assert.Equal("Commands on this Windows node run in a sandbox.",
                     FindControl<TextBlock>(popup, "ChatSandboxDescription").Text);
                 Assert.InRange(popup.ActualWidth, 1, 280);
                 Assert.InRange(popup.ActualHeight, 1, 220);
@@ -103,6 +103,8 @@ public sealed class ReactorChatLayoutProofTests(UIThreadFixture ui)
                 if (Environment.GetEnvironmentVariable("OPENCLAW_PROOF_THEME") != "HighContrast")
                     Assert.NotEqual(onColor, offColor);
                 Assert.Equal("Off", FindControl<TextBlock>(popup, "ChatSandboxStatus").Text);
+                Assert.Equal("Commands on this Windows node run without a sandbox.",
+                    FindControl<TextBlock>(popup, "ChatSandboxDescription").Text);
                 Assert.Same(originalInput, FindControl<TextBox>(surface, "ChatComposerInput"));
                 Assert.Equal(Draft, session.ViewModel.Draft);
                 popupContent = popup;
@@ -117,7 +119,6 @@ public sealed class ReactorChatLayoutProofTests(UIThreadFixture ui)
             await ui.RunOnUIAsync(() =>
             {
                 settings.SystemRunSandboxEnabled = true;
-                settings.SystemRunBlockHostFallbackWhenMxcUnavailable = true;
                 settings.Save();
             });
             await SettleAsync();
@@ -131,7 +132,7 @@ public sealed class ReactorChatLayoutProofTests(UIThreadFixture ui)
             {
                 var popup = Assert.IsAssignableFrom<FrameworkElement>(
                     Assert.IsType<Flyout>(FindControl<Button>(surface, "ChatComposerSandbox").Flyout).Content);
-                Assert.Equal("Windows commands are blocked if sandboxing is unavailable.",
+                Assert.Equal("Commands on this Windows node run in a sandbox.",
                     FindControl<TextBlock>(popup, "ChatSandboxDescription").Text);
                 AssertComposerBounds(surface, showSessionPicker);
                 popupContent = popup;

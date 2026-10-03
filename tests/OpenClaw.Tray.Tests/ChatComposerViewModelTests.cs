@@ -33,8 +33,8 @@ public sealed class ChatComposerViewModelTests
 
         Assert.True(vm.SandboxEnabled);
         Assert.Equal(revision, vm.RenderRevision);
-        vm.ApplySandboxSettings(snapshot with { Version = 4, SystemRunBlockHostFallbackWhenMxcUnavailable = true });
-        Assert.True(vm.SandboxBlocksHostFallback);
+        vm.ApplySandboxSettings(snapshot with { Version = 4, SystemRunSandboxEnabled = false });
+        Assert.False(vm.SandboxEnabled);
         Assert.Equal(revision + 1, vm.RenderRevision);
     }
 

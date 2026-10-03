@@ -115,7 +115,6 @@ internal sealed class ChatComposerViewModel : INotifyPropertyChanged, IDisposabl
     public ReactorSlashDisplayState SlashDisplay { get; private set; }
     public ChatComposerInputs? Inputs => _inputs;
     public bool SandboxEnabled { get; private set; }
-    public bool SandboxBlocksHostFallback { get; private set; }
 
     public void ApplySandboxSettings(SettingsSnapshot snapshot)
     {
@@ -125,12 +124,10 @@ internal sealed class ChatComposerViewModel : INotifyPropertyChanged, IDisposabl
             if (snapshot.Version <= _sandboxSettingsVersion)
                 return false;
             _sandboxSettingsVersion = snapshot.Version;
-            if (SandboxEnabled == snapshot.SystemRunSandboxEnabled
-                && SandboxBlocksHostFallback == snapshot.SystemRunBlockHostFallbackWhenMxcUnavailable)
+            if (SandboxEnabled == snapshot.SystemRunSandboxEnabled)
                 return false;
 
             SandboxEnabled = snapshot.SystemRunSandboxEnabled;
-            SandboxBlocksHostFallback = snapshot.SystemRunBlockHostFallbackWhenMxcUnavailable;
             return true;
         });
     }
