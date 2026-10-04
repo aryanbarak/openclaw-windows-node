@@ -1302,7 +1302,7 @@ public sealed class AppRefactorContractTests
         var root = TestRepositoryPaths.GetRepositoryRoot();
         var source = File.ReadAllText(Path.Combine(root, "src", "OpenClaw.SetupEngine.UI", "SetupWindow.xaml.cs"));
         var trayProject = File.ReadAllText(Path.Combine(root, "src", "OpenClaw.Tray.WinUI", "OpenClaw.Tray.WinUI.csproj"));
-        var iconPath = Path.Combine(root, "src", "OpenClaw.Tray.WinUI", "Assets", "openclaw.ico");
+        var iconPath = Path.Combine(root, "src", "OpenClaw.Tray.WinUI", "Assets", "smart-agent.ico");
         var applyWindowIcon = ExtractMethod(source, "ApplyWindowIcon");
 
         Assert.True(File.Exists(iconPath), $"Expected setup window icon at '{iconPath}'.");
@@ -1417,7 +1417,7 @@ public sealed class AppRefactorContractTests
 
         Assert.Contains("restartRequired: result.RequiresRestart", progress);
         Assert.Contains("if (args.RequiresRestart)", complete);
-        Assert.Contains("OpenClaw needs to restart Windows to continue the installation. Would you like to restart now?", complete);
+        Assert.Contains("Smart-Agent needs to restart Windows to continue the installation. Would you like to restart now?", complete);
         Assert.Contains("Content=\"Yes, restart now\"", xaml);
         Assert.Contains("Content=\"No, I'm not ready yet\"", xaml);
         Assert.Contains("Path.Combine(Environment.SystemDirectory, \"shutdown.exe\")", restartLauncher);
@@ -1932,12 +1932,12 @@ public sealed class AppRefactorContractTests
     }
 
     [Fact]
-    public void TrayCoordinator_UsesStatusBadgedLobsterIcon()
+    public void TrayCoordinator_UsesStatusBadgedSmartAgentIcon()
     {
         var method = ExtractMethod(ReadCoordinatorSource(), "UpdateTrayIcon");
 
-        // The tray lobster mirrors the companion-app status dot instead of the
-        // static openclaw.ico, so it must resolve the accent and the badged icon.
+        // The tray icon mirrors the companion-app status dot instead of the
+        // static Smart-Agent icon, so it must resolve the accent and the badged icon.
         Assert.Contains("ConnectionStatusPresenter.Accent(", method);
         Assert.Contains("StatusBadgeIconFactory.GetBadgedIconPath(", method);
         Assert.DoesNotContain("\"openclaw.ico\"", method);

@@ -11,6 +11,22 @@ namespace OpenClaw.SetupEngine.Tests;
 
 public sealed class NativeGatewaySetupTests
 {
+    [Fact]
+    public async Task ProductPolicy_RejectsNativeSetupBeforePackageResolution()
+    {
+        using var fixture = new Fixture();
+        var service = new NativeGatewaySetupService(
+            fixture.Registry, fixture.Resolver, fixture.Host, () => fixture.Runtime,
+            managedRuntimeEnabled: false);
+
+        var error = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => service.CreateDraftAsync(default));
+
+        Assert.Equal(OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage, error.Message);
+        Assert.Equal(0, fixture.Resolver.ResolveCalls);
+        Assert.Empty(fixture.Events);
+    }
+
     private const string Family = "OpenClaw.Gateway_123456789abcd";
 
     [Theory]
@@ -638,7 +654,7 @@ public sealed class NativeGatewaySetupTests
         await using (var session = await fixture.Service.PrepareAsync(draft, CancellationToken.None))
             token = session.Record.SharedGatewayToken;
         var reopened = new NativeGatewaySetupService(new GatewayRegistry(fixture.Temp.Path),
-            fixture.Resolver, fixture.Host, () => fixture.Runtime);
+            fixture.Resolver, fixture.Host, () => fixture.Runtime, managedRuntimeEnabled: true);
         Assert.Equal(draft, await reopened.CreateDraftAsync(CancellationToken.None));
         await using var resumed = await reopened.PrepareAsync(draft, CancellationToken.None);
         Assert.Equal(token, resumed.Record.SharedGatewayToken);
@@ -1063,7 +1079,8 @@ public sealed class NativeGatewaySetupTests
             Registry = new GatewayRegistry(Temp.Path);
             Host = new Host(Events) { Contract = contract };
             Runtime = new Runtime(Events);
-            Service = new NativeGatewaySetupService(Registry, Resolver, Host, () => Runtime);
+            Service = new NativeGatewaySetupService(
+                Registry, Resolver, Host, () => Runtime, managedRuntimeEnabled: true);
         }
         public Task<NativeGatewaySetupSession> PrepareAsync() => Service.PrepareAsync(Draft, CancellationToken.None);
         public void Dispose() => Temp.Dispose();
@@ -1073,8 +1090,13 @@ public sealed class NativeGatewaySetupTests
     {
         public string FamilyName { get; set; } = Family;
         public Func<string, string> Map { get; set; } = path => path;
-        public Task<NativeGatewayPackage> ResolveAsync(CancellationToken cancellationToken) =>
-            Task.FromResult(new NativeGatewayPackage(FamilyName, "0.0.0.1", @"C:\package\openclaw.exe", @"C:\package\clawctl.exe"));
+        public int ResolveCalls { get; private set; }
+        public Task<NativeGatewayPackage> ResolveAsync(CancellationToken cancellationToken)
+        {
+            ResolveCalls++;
+            return Task.FromResult(new NativeGatewayPackage(
+                FamilyName, "0.0.0.1", @"C:\package\openclaw.exe", @"C:\package\clawctl.exe"));
+        }
         public string ResolveDataPath(string path) => Map(path);
     }
 

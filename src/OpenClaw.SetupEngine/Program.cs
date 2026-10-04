@@ -83,7 +83,7 @@ public static class Program
         var validateGatewayCandidate = parsedArguments.HasFlag("--validate-gateway-candidate");
         var tailscaleAuth = parsedArguments.GetValue("--tailscale-auth");
         var tailscaleHostname = parsedArguments.GetValue("--tailscale-hostname");
-        var autoStartName = parsedArguments.GetValue("--autostart-name") ?? "OpenClawTray";
+        var autoStartName = parsedArguments.GetValue("--autostart-name") ?? OpenClawAppIdentity.ReleaseAutoStartName;
         var startupTaskName = parsedArguments.GetValue("--startup-task-name") ?? WindowsStartupTaskRegistration.TaskName;
 
         // Load config

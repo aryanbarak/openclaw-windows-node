@@ -240,13 +240,13 @@ public sealed partial class CanvasWindow : WindowEx
     public CanvasWindow()
     {
         this.InitializeComponent();
-        Title = AppIdentity.DecorateWindowTitle("OpenClaw Canvas");
+        Title = AppIdentity.DecorateWindowTitle("Smart-Agent Canvas");
         AutomationProperties.SetName(
             CanvasTitlebarReloadButton,
             LocalizationHelper.GetString("CanvasReloadButton_AutomationName"));
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
-        this.SetIcon("Assets\\openclaw.ico");
+        this.SetIcon("Assets\\smart-agent.ico");
         _dispatcherQueue = DispatcherQueue;
         this.Closed += OnWindowClosed;
 

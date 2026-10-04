@@ -229,7 +229,7 @@ identity, publishes the .NET runtime self-contained, advances the installed
 development package revision, and prints the generated package path. The
 development certificate has a distinct local-only publisher and a
 non-exportable private key; only its thumbprint is stored under
-`%LOCALAPPDATA%\OpenClawDevelopment\MSIX`. Future Microsoft Store submissions
+`%LOCALAPPDATA%\SmartAgentDevelopment\MSIX`. Future Microsoft Store submissions
 use the Partner Center identity and signing process instead.
 
 The development machine must also have
@@ -272,7 +272,7 @@ is what lets a packaged smoke test run without disturbing a working install:
 
 | | `-Msix Dev` | `-Msix Store` |
 | --- | --- | --- |
-| Identity | `OpenClawFoundation.OpenClaw.Dev` | `OpenClawFoundation.OpenClaw` |
+| Identity | `SmartAgent.Companion.Dev` | **Pending Partner Center assignment** |
 | Publisher | local development certificate | Partner Center |
 | Protocol | `openclaw-dev` | `openclaw` |
 | Signing | signed locally | unsigned; the Store signs |

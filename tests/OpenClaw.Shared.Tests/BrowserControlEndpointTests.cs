@@ -18,6 +18,17 @@ public class BrowserControlEndpointTests
         Assert.Equal(18791, port);
     }
 
+    [Theory]
+    [InlineData(18889, 18891)]
+    [InlineData(18890, 18892)]
+    public void SmartAgentManagedGateway_DerivesBrowserPort(int gatewayPort, int expected)
+    {
+        Assert.True(BrowserControlEndpoint.TryResolveControlPort(
+            gatewayPort, useSshTunnel: false, sshTunnelLocalPort: null,
+            controlPortOverride: null, out var port, out _));
+        Assert.Equal(expected, port);
+    }
+
     [Fact]
     public void Tunnel_NoOverride_UsesTunnelLocalPortPlusTwo()
     {

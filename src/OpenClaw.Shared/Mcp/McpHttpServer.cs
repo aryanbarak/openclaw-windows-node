@@ -19,7 +19,7 @@ namespace OpenClaw.Shared.Mcp;
 ///   1. Loopback bind (127.0.0.1). Unreachable from another machine, regardless
 ///      of firewall configuration.
 ///   2. Defensive IsLoopback check on every request.
-///   3. Browser/CSRF gate: a browser tab fetching http://127.0.0.1:8765/ is
+///   3. Browser/CSRF gate: a browser tab fetching the configured loopback MCP endpoint is
 ///      *also* on the loopback interface, so loopback alone does not protect
 ///      against a malicious page. We reject any request that:
 ///        - presents an Origin header (real MCP clients do not send Origin),

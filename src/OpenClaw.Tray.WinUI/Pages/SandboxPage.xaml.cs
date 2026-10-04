@@ -659,7 +659,7 @@ public sealed partial class SandboxPage : Page
             var dialog = new ContentDialog
             {
                 Title = "Turn off Node Sandbox?",
-                Content = "Agent-started Windows commands will run as you and may access your files, network, clipboard, and OpenClaw settings.\n\nThis is the high-risk mode. Only do this if you trust the agent and need it for debugging or performance.",
+                Content = "Agent-started Windows commands will run as you and may access your files, network, clipboard, and Smart-Agent settings.\n\nThis is the high-risk mode. Only do this if you trust the agent and need it for debugging or performance.",
                 PrimaryButtonText = "Turn off",
                 CloseButtonText = "Cancel",
                 DefaultButton = ContentDialogButton.Close,

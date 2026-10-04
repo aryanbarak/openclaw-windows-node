@@ -331,7 +331,7 @@ internal static class Program
         Console.WriteLine();
         Console.WriteLine("Options:");
         Console.WriteLine("  --settings <path>            Settings file (default: selected identity profile)");
-        Console.WriteLine("  --identity <release|dev>     Select tray profile (default: %OPENCLAW_APP_IDENTITY% or release)");
+        Console.WriteLine("  --identity <release|dev>     Select Smart-Agent profile (default: %OPENCLAW_APP_IDENTITY% or release)");
         Console.WriteLine("  --url <ws://...>             Override gateway URL");
         Console.WriteLine("  --token <token>              Override token");
         Console.WriteLine("  --message <text>             Message to send");

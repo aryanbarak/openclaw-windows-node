@@ -11,7 +11,7 @@ public sealed class MigrationBuildConfigurationTests
     [InlineData("win-x64", true)]
     [InlineData("win-arm64", false)]
     [InlineData("win-arm64", true)]
-    public async Task Production_InnoAndStoreShareThePinnedReleasePolicy(string runtime, bool packaged)
+    public async Task SmartAgent_RejectsOpenClawProductionMigration(string runtime, bool packaged)
     {
         var result = await EvaluateAsync(
             ("MigrationProductionEnabled", "true"),
@@ -19,62 +19,43 @@ public sealed class MigrationBuildConfigurationTests
             ("RuntimeIdentifier", runtime),
             ("PackageMsix", packaged.ToString()));
 
-        Assert.Equal(0, result.ExitCode);
-        Assert.Contains("PRODUCTION_MIGRATION", result.Output);
-        Assert.Contains("MigrationStoreProductId=9NFPR3BGDRR5", result.Output);
-        Assert.Contains("MigrationMinimumSourceVersion=2026.9.5.0", result.Output);
-        Assert.DoesNotContain("MigrationMinimumSourceVersion=2027", result.Output);
-        Assert.DoesNotContain("MIGRATION_PREVIEW", result.Output);
+        Assert.NotEqual(0, result.ExitCode);
+        Assert.Contains("Smart-Agent builds cannot enable OpenClaw production state migration", result.Output);
     }
 
     [Fact]
-    public async Task PinnedRelease_DefaultsEnableTheShippingPolicy()
+    public async Task SmartAgent_DefaultsDisableOpenClawMigration()
     {
         var result = await EvaluateAsync(("Version", "2027.1.1"));
 
         Assert.Equal(0, result.ExitCode);
-        Assert.Contains("PRODUCTION_MIGRATION", result.Output);
-        Assert.Contains("MigrationStoreProductId=9NFPR3BGDRR5", result.Output);
-        Assert.Contains("MigrationMinimumSourceVersion=2026.9.5.0", result.Output);
-        Assert.DoesNotContain("MigrationMinimumSourceVersion=2027", result.Output);
+        Assert.DoesNotContain("PRODUCTION_MIGRATION", result.Output);
+        Assert.DoesNotContain("MigrationStoreProductId=", result.Output);
+        Assert.DoesNotContain("MigrationMinimumSourceVersion=", result.Output);
         Assert.DoesNotContain("MIGRATION_PREVIEW", result.Output);
     }
 
     [Theory]
-    [InlineData("MigrationMinimumSourceVersion", "", "MigrationMinimumSourceVersion")]
-    [InlineData("MigrationMinimumSourceVersion", "2026.9", "MigrationMinimumSourceVersion")]
-    [InlineData("MigrationMinimumSourceVersion", "2026.9.5-alpha.1", "MigrationMinimumSourceVersion")]
-    [InlineData("MigrationMinimumSourceVersion", "0.0.0", "zero version")]
-    [InlineData("MigrationMinimumSourceVersion", "0.0.0.0", "zero version")]
-    [InlineData("MigrationMinimumSourceVersion", "2147483648.1.1", "Version")]
-    [InlineData("MigrationStoreProductId", "not-a-product", "MigrationStoreProductId")]
-    [InlineData("RuntimeIdentifier", "win-x86", "win-x64 or win-arm64")]
-    [InlineData("MigrationProductionEnabled", "yes", "true or false")]
-    public async Task Production_RejectsIncompleteOrInvalidPolicy(string key, string value, string error)
+    [InlineData("yes")]
+    [InlineData("1")]
+    public async Task MigrationSwitch_RejectsInvalidValues(string value)
     {
-        var properties = new Dictionary<string, string>
-        {
-            ["MigrationProductionEnabled"] = "true",
-            ["MigrationMinimumSourceVersion"] = "2026.9.5.0",
-            [key] = value
-        };
-        var result = await EvaluateAsync(properties.Select(pair => (pair.Key, pair.Value)).ToArray());
+        var result = await EvaluateAsync(("MigrationProductionEnabled", value));
 
         Assert.NotEqual(0, result.ExitCode);
-        Assert.Contains(error, result.Output);
+        Assert.Contains("true or false", result.Output);
     }
 
     [Theory]
-    [InlineData("Debug", "false", "true")]
-    [InlineData("Debug", "true", "true")]
-    [InlineData("Release", "true", "true")]
-    [InlineData("Release", "false", "false")]
-    public async Task Production_ExcludesDebugDevAndDisabledBuilds(
-        string configuration, string devBuild, string enabled)
+    [InlineData("Debug", "false")]
+    [InlineData("Debug", "true")]
+    [InlineData("Release", "true")]
+    [InlineData("Release", "false")]
+    public async Task ProductionMigration_IsExcludedFromAllSmartAgentBuilds(
+        string configuration, string devBuild)
     {
         var result = await EvaluateAsync(
-            ("Configuration", configuration), ("DevBuild", devBuild),
-            ("MigrationProductionEnabled", enabled));
+            ("Configuration", configuration), ("DevBuild", devBuild));
 
         Assert.Equal(0, result.ExitCode);
         Assert.DoesNotContain("PRODUCTION_MIGRATION", result.Output);
@@ -124,7 +105,7 @@ public sealed class MigrationBuildConfigurationTests
         Assert.Equal("2026.9.5.0", minimum);
         Assert.DoesNotContain("$(Version)", minimum);
         Assert.DoesNotContain("GitVersion", minimum);
-        Assert.Equal("true", policy.Descendants("MigrationProductionEnabled").Single().Value);
+        Assert.Equal("false", policy.Descendants("MigrationProductionEnabled").Single().Value);
         Assert.Equal("CoreCompile", policy.Descendants("Target")
             .Single(element => (string?)element.Attribute("Name") == "ValidateMigrationBuild")
             .Attribute("BeforeTargets")!.Value);

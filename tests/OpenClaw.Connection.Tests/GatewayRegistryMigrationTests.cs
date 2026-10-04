@@ -53,11 +53,11 @@ public class GatewayRegistryMigrationTests : IDisposable
     public void MigrateFromSettings_LocalhostWithSetupState_BackfillsManagedDistro()
     {
         var localRoot = Path.Combine(_tempDir, "local-root");
-        var stateDir = Path.Combine(localRoot, "OpenClawTray");
+        var stateDir = Path.Combine(localRoot, "SmartAgent");
         Directory.CreateDirectory(stateDir);
         File.WriteAllText(
             Path.Combine(stateDir, "setup-state.json"),
-            """{"DistroName":"OpenClawGateway","GatewayUrl":"ws://127.0.0.1:18789"}""");
+            """{"DistroName":"SmartAgentGateway","GatewayUrl":"ws://127.0.0.1:18789"}""");
         var previous = Environment.GetEnvironmentVariable("OPENCLAW_TRAY_LOCALAPPDATA_DIR");
         try
         {
@@ -75,8 +75,8 @@ public class GatewayRegistryMigrationTests : IDisposable
                 _tempDir));
 
             var record = _registry.GetActive()!;
-            Assert.Equal("OpenClawGateway", record.SetupManagedDistroName);
-            Assert.Equal("Local (OpenClawGateway)", record.FriendlyName);
+            Assert.Equal("SmartAgentGateway", record.SetupManagedDistroName);
+            Assert.Equal("Local (SmartAgentGateway)", record.FriendlyName);
         }
         finally
         {
@@ -91,7 +91,7 @@ public class GatewayRegistryMigrationTests : IDisposable
         Directory.CreateDirectory(direct);
         File.WriteAllText(
             Path.Combine(direct, "setup-state.json"),
-            """{"DistroName":"OpenClawGateway-Dev","GatewayUrl":"ws://localhost:18789"}""");
+            """{"DistroName":"SmartAgentGateway-Dev","GatewayUrl":"ws://localhost:18789"}""");
         var previous = Environment.GetEnvironmentVariable("OPENCLAW_TRAY_LOCAL_DATA_DIR");
         try
         {
@@ -107,7 +107,7 @@ public class GatewayRegistryMigrationTests : IDisposable
                 0,
                 _tempDir));
             Assert.Equal(
-                "OpenClawGateway-Dev",
+                "SmartAgentGateway-Dev",
                 _registry.GetActive()!.SetupManagedDistroName);
         }
         finally
@@ -219,11 +219,16 @@ public class GatewayRegistryMigrationTests : IDisposable
     public void MigrateFromSettings_DevSettingsPreferDevSetupState()
     {
         var localRoot = Path.Combine(_tempDir, "side-by-side-local");
+        Directory.CreateDirectory(Path.Combine(localRoot, "SmartAgent"));
+        Directory.CreateDirectory(Path.Combine(localRoot, "SmartAgent-Dev"));
         Directory.CreateDirectory(Path.Combine(localRoot, "OpenClawTray"));
         Directory.CreateDirectory(Path.Combine(localRoot, "OpenClawTray-Dev"));
         File.WriteAllText(
-            Path.Combine(localRoot, "OpenClawTray", "setup-state.json"),
-            """{"DistroName":"OpenClawGateway","GatewayUrl":"ws://localhost:18789"}""");
+            Path.Combine(localRoot, "SmartAgent", "setup-state.json"),
+            """{"DistroName":"SmartAgentGateway","GatewayUrl":"ws://localhost:18789"}""");
+        File.WriteAllText(
+            Path.Combine(localRoot, "SmartAgent-Dev", "setup-state.json"),
+            """{"DistroName":"SmartAgentGateway-Dev","GatewayUrl":"ws://localhost:18790"}""");
         File.WriteAllText(
             Path.Combine(localRoot, "OpenClawTray-Dev", "setup-state.json"),
             """{"DistroName":"OpenClawGateway-Dev","GatewayUrl":"ws://localhost:18790"}""");
@@ -231,7 +236,7 @@ public class GatewayRegistryMigrationTests : IDisposable
         try
         {
             Environment.SetEnvironmentVariable("OPENCLAW_TRAY_LOCALAPPDATA_DIR", localRoot);
-            var devSettingsDir = Path.Combine(_tempDir, "OpenClawTray-Dev");
+            var devSettingsDir = Path.Combine(_tempDir, "SmartAgent-Dev");
             Directory.CreateDirectory(devSettingsDir);
             Assert.True(_registry.MigrateFromSettings(
                 "ws://localhost:18790",
@@ -244,7 +249,7 @@ public class GatewayRegistryMigrationTests : IDisposable
                 0,
                 devSettingsDir));
             Assert.Equal(
-                "OpenClawGateway-Dev",
+                "SmartAgentGateway-Dev",
                 _registry.GetActive()!.SetupManagedDistroName);
         }
         finally

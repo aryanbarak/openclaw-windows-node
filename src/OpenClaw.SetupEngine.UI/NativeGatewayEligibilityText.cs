@@ -9,6 +9,7 @@ internal static class NativeGatewayEligibilityText
             "Onboarding_Native_SupportUnavailable", NativeGatewaySetupEligibility.InsiderBuild),
         NativeGatewayEligibility.UnsupportedPlatform => SetupLocalization.GetString("Onboarding_Native_UnsupportedPlatform"),
         NativeGatewayEligibility.CheckFailed => SetupLocalization.GetString("Onboarding_Native_SupportCheckFailed"),
+        NativeGatewayEligibility.Deferred => OpenClaw.Shared.OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage,
         _ => throw new ArgumentOutOfRangeException(nameof(eligibility)),
     };
 }

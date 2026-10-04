@@ -301,25 +301,25 @@
   <!-- ==================== Runtime strings (C# code) ==================== -->
   <!-- Window titles -->
   <data name="WindowTitle_Settings" xml:space="preserve">
-    <value>Settings: OpenClaw Tray</value>
+    <value>Settings: Smart-Agent Tray</value>
   </data>
   <data name="WindowTitle_Status" xml:space="preserve">
-    <value>Status: OpenClaw Tray</value>
+    <value>Status: Smart-Agent Tray</value>
   </data>
   <data name="WindowTitle_ActivityStream" xml:space="preserve">
-    <value>Activity Stream: OpenClaw Tray</value>
+    <value>Activity Stream: Smart-Agent Tray</value>
   </data>
   <data name="WindowTitle_NotificationHistory" xml:space="preserve">
-    <value>Notification History: OpenClaw Tray</value>
+    <value>Notification History: Smart-Agent Tray</value>
   </data>
   <data name="WindowTitle_WebChat" xml:space="preserve">
-    <value>OpenClaw Chat</value>
+    <value>Smart-Agent Chat</value>
   </data>
   <data name="WindowTitle_Welcome" xml:space="preserve">
-    <value>Welcome to OpenClaw</value>
+    <value>Welcome to Smart-Agent</value>
   </data>
   <data name="WindowTitle_Update" xml:space="preserve">
-    <value>OpenClaw Update</value>
+    <value>Smart-Agent Update</value>
   </data>
   <!-- Settings runtime status -->
   <data name="Status_Testing" xml:space="preserve">
@@ -333,16 +333,16 @@
   </data>
   <!-- WelcomeDialog -->
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Welcome to OpenClaw!</value>
+    <value>Welcome to Smart-Agent!</value>
   </data>
   <data name="Welcome_Description" xml:space="preserve">
-    <value>OpenClaw Tray is your Windows companion for OpenClaw, the AI-powered personal assistant.</value>
+    <value>Smart-Agent Tray is your Windows companion for Smart-Agent, the AI-powered personal assistant.</value>
   </data>
   <data name="Welcome_GettingStarted" xml:space="preserve">
     <value>To get started, you'll need:</value>
   </data>
   <data name="Welcome_NeedGateway" xml:space="preserve">
-    <value>• A running OpenClaw gateway</value>
+    <value>• A running Smart-Agent gateway</value>
   </data>
   <data name="Welcome_NeedToken" xml:space="preserve">
     <value>• Your API token from the dashboard</value>
@@ -540,7 +540,7 @@
     <value>Test Notification</value>
   </data>
   <data name="TestNotification_Body" xml:space="preserve">
-    <value>This is a test notification from OpenClaw Tray.</value>
+    <value>This is a test notification from Smart-Agent Tray.</value>
   </data>
   <!-- Status detail runtime -->
   <data name="Status_LastCheckFormat" xml:space="preserve">
@@ -624,13 +624,13 @@
     <value>Open in Browser Instead</value>
   </data>
   <data name="WebChat_ConnectionError" xml:space="preserve">
-    <value>Can't reach OpenClaw Gateway</value>
+    <value>Can't reach Smart-Agent Gateway</value>
   </data>
   <data name="WebChat_ConnectionErrorDetail" xml:space="preserve">
     <value>The gateway at {0} is not responding.
 
 To connect:
-• Make sure your OpenClaw gateway is running
+• Make sure your Smart-Agent gateway is running
 • If remote, connect via VPN to your home network
 • Or use SSH tunnel: ssh -N -L 18789:localhost:18789 your-server</value>
   </data>
@@ -657,7 +657,7 @@ Use one of these options:
   </data>
   <!-- ==================== TrayMenuWindow.xaml ==================== -->
   <data name="WindowTitle_TrayMenu" xml:space="preserve">
-    <value>OpenClaw Menu</value>
+    <value>Smart-Agent Menu</value>
   </data>
   <!-- ==================== Toast: Device / Node ==================== -->
   <data name="Toast_DeviceIdCopied" xml:space="preserve">
@@ -833,32 +833,32 @@ Use one of these options:
     <value>📸 Capturing screen</value>
   </data>
   <data name="Toast_ScreenCapturedDetail" xml:space="preserve">
-    <value>OpenClaw agent is capturing your screen</value>
+    <value>Smart-Agent is capturing your screen</value>
   </data>
   <data name="Toast_CameraCaptured" xml:space="preserve">
     <value>📷 Capturing webcam photo</value>
   </data>
   <data name="Toast_CameraCapturedDetail" xml:space="preserve">
-    <value>OpenClaw agent is capturing a photo from your camera</value>
+    <value>Smart-Agent is capturing a photo from your camera</value>
   </data>
   <data name="Toast_LocationRead" xml:space="preserve">
     <value>📍 Accessing location</value>
   </data>
   <data name="Toast_LocationReadDetail" xml:space="preserve">
-    <value>OpenClaw agent is accessing your device location</value>
+    <value>Smart-Agent is accessing your device location</value>
   </data>
   <data name="Toast_CameraBlocked" xml:space="preserve">
     <value>📷 Camera access blocked</value>
   </data>
   <data name="Toast_CameraBlockedDetail" xml:space="preserve">
-    <value>Enable camera access in Windows Privacy settings for OpenClaw Tray</value>
+    <value>Enable camera access in Windows Privacy settings for Smart-Agent Tray</value>
   </data>
   <!-- ==================== Toast: Recording ==================== -->
   <data name="Toast_ScreenRecordingStarted" xml:space="preserve">
     <value>🔴 Screen Recording Started</value>
   </data>
   <data name="Toast_ScreenRecordingStartedDetail" xml:space="preserve">
-    <value>OpenClaw agent is recording your screen</value>
+    <value>Smart-Agent is recording your screen</value>
   </data>
   <data name="Toast_ScreenRecordingComplete" xml:space="preserve">
     <value>✅ Screen Recording Complete</value>
@@ -876,7 +876,7 @@ Use one of these options:
     <value>🔴 Camera Recording Started</value>
   </data>
   <data name="Toast_CameraRecordingStartedDetail" xml:space="preserve">
-    <value>OpenClaw agent is recording from your camera</value>
+    <value>Smart-Agent is recording from your camera</value>
   </data>
   <data name="Toast_CameraRecordingComplete" xml:space="preserve">
     <value>✅ Camera Recording Complete</value>
@@ -932,7 +932,7 @@ Use one of these options:
     <value>Privacy</value>
   </data>
   <data name="SettingsPrivacyDescription.Text" xml:space="preserve">
-    <value>Allow sensitive capture without prompting every time. OpenClaw still notifies you before each access and shows a countdown before recordings.</value>
+    <value>Allow sensitive capture without prompting every time. Smart-Agent still notifies you before each access and shows a countdown before recordings.</value>
   </data>
   <data name="ScreenRecordingToggle.Header" xml:space="preserve">
     <value>Allow screen recording</value>
@@ -1042,7 +1042,7 @@ Use one of these options:
   </data>
   <!-- ==================== UrlNavigationApprovalService prompt ==================== -->
   <data name="UrlApproval_Caption" xml:space="preserve">
-    <value>OpenClaw: Approve URL</value>
+    <value>Smart-Agent: Approve URL</value>
   </data>
   <data name="UrlApproval_Body" xml:space="preserve">
     <value>An agent wants to open a high-risk destination in your browser.</value>
@@ -1069,7 +1069,7 @@ Use one of these options:
     <value>No: block it.</value>
   </data>
   <data name="Onboarding_Title" xml:space="preserve">
-    <value>OpenClaw Setup</value>
+    <value>Smart-Agent Setup</value>
   </data>
   <data name="Onboarding_Back" xml:space="preserve">
     <value>Back</value>
@@ -1084,7 +1084,7 @@ Use one of these options:
     <value>Setup isn't complete</value>
   </data>
   <data name="Onboarding_IncompleteSetup_Body" xml:space="preserve">
-    <value>OpenClaw still needs setup before it can open the Hub. Use Back to return to the wizard or connection steps, fix the missing setup, and then try Finish again.</value>
+    <value>Smart-Agent still needs setup before it can open the Hub. Use Back to return to the wizard or connection steps, fix the missing setup, and then try Finish again.</value>
   </data>
   <data name="Onboarding_IncompleteSetup_Close" xml:space="preserve">
     <value>OK</value>
@@ -1093,7 +1093,7 @@ Use one of these options:
     <value>Choose your Gateway</value>
   </data>
   <data name="Onboarding_Connection_Subtitle" xml:space="preserve">
-    <value>Select how you want to connect to the OpenClaw gateway</value>
+    <value>Select how you want to connect to the Smart-Agent gateway</value>
   </data>
   <data name="Onboarding_Connection_Local" xml:space="preserve">
     <value>This PC (Local)</value>
@@ -1111,7 +1111,7 @@ Use one of these options:
     <value>All set!</value>
   </data>
   <data name="Onboarding_Ready_Subtitle" xml:space="preserve">
-    <value>OpenClaw is ready to go. Here are some things to try:</value>
+    <value>Smart-Agent is ready to go. Here are some things to try:</value>
   </data>
   <data name="Onboarding_Ready_Feature_TrayMenu" xml:space="preserve">
     <value>Open menu bar panel</value>
@@ -1129,7 +1129,7 @@ Use one of these options:
     <value>Enable Skills</value>
   </data>
   <data name="Onboarding_Ready_LaunchAtLogin" xml:space="preserve">
-    <value>Launch OpenClaw at startup</value>
+    <value>Launch Smart-Agent at startup</value>
   </data>
   <data name="Onboarding_Ready_ConfigureLater" xml:space="preserve">
     <value>You can configure your gateway connection anytime from the tray menu.</value>
@@ -1189,7 +1189,7 @@ Use one of these options:
     <value>Grant Permissions</value>
   </data>
   <data name="Onboarding_Permissions_Description" xml:space="preserve">
-    <value>OpenClaw works best when it can send notifications, access your camera and microphone, capture your screen, and know your location. Grant permissions below.</value>
+    <value>Smart-Agent works best when it can send notifications, access your camera and microphone, capture your screen, and know your location. Grant permissions below.</value>
   </data>
   <data name="Onboarding_Permissions_Refresh" xml:space="preserve">
     <value>Refresh Status</value>
@@ -1360,7 +1360,7 @@ Use one of these options:
     <value>Could not decode setup code from this image</value>
   </data>
   <data name="Onboarding_Connection_SshHint" xml:space="preserve">
-    <value>OpenClaw will create a managed SSH tunnel to forward the gateway port from the remote host to this PC.</value>
+    <value>Smart-Agent will create a managed SSH tunnel to forward the gateway port from the remote host to this PC.</value>
   </data>
   <data name="Onboarding_Connection_SshUser" xml:space="preserve">
     <value>SSH User</value>
@@ -1390,12 +1390,12 @@ Use one of these options:
     <value>You can configure the gateway later in Settings.</value>
   </data>
   <data name="Onboarding_SetupWarning_Title" xml:space="preserve">
-    <value>Set up OpenClaw</value>
+    <value>Set up Smart-Agent</value>
   </data>
   <data name="Onboarding_SetupWarning_Body" xml:space="preserve">
-    <value>OpenClaw lets agents run commands, read and write files, and capture screenshots on this PC. Only set it up on a computer you trust.
+    <value>Smart-Agent lets agents run commands, read and write files, and capture screenshots on this PC. Only set it up on a computer you trust.
 
-⚠️ The local setup installs a small WSL Linux instance dedicated to OpenClaw. If you'd rather connect to an existing or remote gateway, choose Advanced setup.</value>
+⚠️ The local setup installs a small WSL Linux instance dedicated to Smart-Agent. If you'd rather connect to an existing or remote gateway, choose Advanced setup.</value>
   </data>
   <data name="Onboarding_SetupWarning_SetupLocally" xml:space="preserve">
     <value>Set up locally</value>
@@ -1419,7 +1419,7 @@ Use one of these options:
     <value>Setting up locally</value>
   </data>
   <data name="Onboarding_LocalSetup_SubtitleIdle" xml:space="preserve">
-    <value>Setting up your local OpenClaw gateway.</value>
+    <value>Setting up your local Smart-Agent gateway.</value>
   </data>
   <data name="Onboarding_LocalSetup_SubtitleSuccess" xml:space="preserve">
     <value>Local gateway is ready.</value>
@@ -1443,7 +1443,7 @@ Use one of these options:
     <value>Configuring instance</value>
   </data>
   <data name="Onboarding_LocalSetup_Phase_InstallCli" xml:space="preserve">
-    <value>Installing OpenClaw</value>
+    <value>Installing Smart-Agent</value>
   </data>
   <data name="Onboarding_LocalSetup_Phase_PrepareConfig" xml:space="preserve">
     <value>Preparing gateway</value>
@@ -1455,7 +1455,7 @@ Use one of these options:
     <value>Generating setup code</value>
   </data>
   <data name="Onboarding_Welcome_Title" xml:space="preserve">
-    <value>Welcome to OpenClaw</value>
+    <value>Welcome to Smart-Agent</value>
   </data>
   <data name="Onboarding_Welcome_Subtitle" xml:space="preserve">
     <value>Your AI assistant, in the system tray</value>
@@ -1464,7 +1464,7 @@ Use one of these options:
     <value>Security notice</value>
   </data>
   <data name="Onboarding_Welcome_SecurityBody" xml:space="preserve">
-    <value>OpenClaw runs an AI agent that can execute commands, read and write files, and interact with your system on your behalf.</value>
+    <value>Smart-Agent runs an AI agent that can execute commands, read and write files, and interact with your system on your behalf.</value>
   </data>
   <data name="Onboarding_Welcome_TrustTitle" xml:space="preserve">
     <value>Your agent can:</value>
@@ -1659,7 +1659,7 @@ Use one of these options:
     <value>Saving configuration</value>
   </data>
   <data name="ConfigPage_ReconnectDialogBody" xml:space="preserve">
-    <value>OpenClaw is applying your edits. The gateway may restart briefly and reconnect automatically.</value>
+    <value>Smart-Agent is applying your edits. The gateway may restart briefly and reconnect automatically.</value>
   </data>
   <data name="ConfigPage_ReconnectDialogAccepted" xml:space="preserve">
     <value>Gateway is restarting...</value>
@@ -2271,7 +2271,7 @@ Use one of these options:
     <value>Connect to gateway to start chatting</value>
   </data>
   <data name="TitleText.Text" xml:space="preserve">
-    <value>OpenClaw Windows Companion</value>
+    <value>Smart-Agent Windows Companion</value>
   </data>
   <data name="NavPaneToggleButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Toggle navigation pane</value>
@@ -2478,28 +2478,28 @@ Use one of these options:
     <value>Cron API not yet wired</value>
   </data>
   <data name="NotWiredInfoBar.Message" xml:space="preserve">
-    <value>Showing sample data. Cron management methods are not yet available in OpenClawGatewayClient.</value>
+    <value>Showing sample data. Cron management methods are not yet available in the Smart-Agent Windows client.</value>
   </data>
   <data name="FallbackInfoBar.Title" xml:space="preserve">
     <value>Workspace files</value>
   </data>
   <data name="ChatWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Chat</value>
+    <value>Smart-Agent Chat</value>
   </data>
   <data name="SearchBox.PlaceholderText" xml:space="preserve">
     <value>Type a command...</value>
   </data>
   <data name="HubWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Settings</value>
+    <value>Smart-Agent Settings</value>
   </data>
   <data name="TitleSearchBox.PlaceholderText" xml:space="preserve">
     <value>Search… (Ctrl+E)</value>
   </data>
   <data name="CanvasWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Canvas</value>
+    <value>Smart-Agent Canvas</value>
   </data>
   <data name="CanvasWindow_TextBlock_31.Text" xml:space="preserve">
-    <value>OpenClaw Canvas</value>
+    <value>Smart-Agent Canvas</value>
   </data>
   <data name="CanvasWindowReloadToolTip.Content" xml:space="preserve">
     <value>Reload</value>
@@ -2508,7 +2508,7 @@ Use one of these options:
     <value>Reload Canvas</value>
   </data>
   <data name="TrayMenuWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Menu</value>
+    <value>Smart-Agent Menu</value>
   </data>
   <data name="UsagePage_TextBlock_10.Text" xml:space="preserve">
     <value>Usage &amp; Cost</value>
@@ -2943,7 +2943,7 @@ Use one of these options:
     <value>Force Companion Chat UI</value>
   </data>
   <data name="Chat_ZeroState_WelcomeTitle" xml:space="preserve">
-    <value>Welcome to OpenClaw</value>
+    <value>Welcome to Smart-Agent</value>
   </data>
   <data name="Chat_ZeroState_WelcomeSubtitle" xml:space="preserve">
     <value>How can I help you today?</value>
@@ -3207,7 +3207,7 @@ Use one of these options:
     <value>Gateway connection failed</value>
   </data>
   <data name="AppNotification_GatewayConnectionFailed_DefaultMessage" xml:space="preserve">
-    <value>OpenClaw could not connect to the active gateway.</value>
+    <value>Smart-Agent could not connect to the active gateway.</value>
   </data>
   <data name="AppNotification_GatewayPairingRequired_Title" xml:space="preserve">
     <value>Gateway pairing approval required</value>
@@ -3277,7 +3277,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Notifications</value>
   </data>
   <data name="NotificationsPage_Subtitle.Text" xml:space="preserve">
-    <value>Review and clear active OpenClaw notifications.</value>
+    <value>Review and clear active Smart-Agent notifications.</value>
   </data>
   <data name="NotificationsPage_ClearButton.Content" xml:space="preserve">
     <value>Clear</value>
@@ -3394,7 +3394,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Gateway timeline event dropped</value>
   </data>
   <data name="Chat_Notification_KeylessEventDroppedMessage" xml:space="preserve">
-    <value>The gateway sent a chat timeline event without a session key, so OpenClaw ignored it to avoid mixing timelines. Update or restart the gateway if this continues.</value>
+    <value>The gateway sent a chat timeline event without a session key, so Smart-Agent ignored it to avoid mixing timelines. Update or restart the gateway if this continues.</value>
   </data>
   <data name="VoiceSettingsPage_TestVoiceButtonText.Text" xml:space="preserve">
     <value>Test Voice Input</value>
@@ -3532,7 +3532,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Instances</value>
   </data>
   <data name="InstancesPage_Subtitle.Text" xml:space="preserve">
-    <value>Latest presence beacons from OpenClaw nodes.</value>
+    <value>Latest presence beacons from Smart-Agent nodes.</value>
   </data>
   <data name="InstancesPage_ConnectionWarning.Title" xml:space="preserve">
     <value>Not connected</value>
@@ -3640,7 +3640,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>{0}d ago</value>
   </data>
   <data name="V2_Window_Title" xml:space="preserve">
-    <value>OpenClaw Setup</value>
+    <value>Smart-Agent Setup</value>
   </data>
   <data name="V2_Nav_Back" xml:space="preserve">
     <value>Back</value>
@@ -3652,13 +3652,13 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Finish</value>
   </data>
   <data name="V2_Welcome_Title" xml:space="preserve">
-    <value>Get started with OpenClaw</value>
+    <value>Get started with Smart-Agent</value>
   </data>
   <data name="V2_Welcome_Body" xml:space="preserve">
-    <value>OpenClaw lets agents run commands, read and write files, and capture screenshots on this PC. Only set it up on a computer you trust.</value>
+    <value>Smart-Agent lets agents run commands, read and write files, and capture screenshots on this PC. Only set it up on a computer you trust.</value>
   </data>
   <data name="V2_Welcome_InfoCard" xml:space="preserve">
-    <value>This local setup installs a small WSL Linux instance dedicated to OpenClaw. If you'd rather connect to an existing or remote gateway, choose Advanced setup.</value>
+    <value>This local setup installs a small WSL Linux instance dedicated to Smart-Agent. If you'd rather connect to an existing or remote gateway, choose Advanced setup.</value>
   </data>
   <data name="V2_Welcome_PrimaryButton" xml:space="preserve">
     <value>Set up locally</value>
@@ -3673,7 +3673,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Install a new WSL gateway?</value>
   </data>
   <data name="V2_Welcome_LocalReplaceDialog_Body" xml:space="preserve">
-    <value>Your current OpenClaw WSL gateway and its OpenClawGateway distro will be deleted. Setup will then install and connect to a new local WSL gateway.</value>
+    <value>Your current Smart-Agent WSL gateway and its SmartAgentGateway distro will be deleted. Setup will then install and connect to a new local WSL gateway.</value>
   </data>
   <data name="V2_Welcome_ExternalDialog_Title" xml:space="preserve">
     <value>Install a local WSL gateway?</value>
@@ -3691,7 +3691,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Setting up locally</value>
   </data>
   <data name="V2_Progress_Subtitle" xml:space="preserve">
-    <value>Creating OpenClaw Gateway WSL instance</value>
+    <value>Creating Smart-Agent Gateway WSL instance</value>
   </data>
   <data name="V2_Progress_Stage_RemovingExistingGateway" xml:space="preserve">
     <value>Removing existing gateway</value>
@@ -3706,7 +3706,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Configuring instance</value>
   </data>
   <data name="V2_Progress_Stage_InstallingOpenClaw" xml:space="preserve">
-    <value>Installing OpenClaw</value>
+    <value>Installing Smart-Agent</value>
   </data>
   <data name="V2_Progress_Stage_PreparingGateway" xml:space="preserve">
     <value>Preparing gateway</value>
@@ -3724,22 +3724,22 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Configuring gateway</value>
   </data>
   <data name="V2_Gateway_CardHeader" xml:space="preserve">
-    <value>Welcome to OpenClaw gateway</value>
+    <value>Welcome to Smart-Agent gateway</value>
   </data>
   <data name="V2_Gateway_CardBody1" xml:space="preserve">
-    <value>Your local OpenClaw gateway is running at http://localhost:18789. Visit it to add your first AI provider and configure your agent.</value>
+    <value>Your local Smart-Agent gateway is running at http://localhost:18889. Visit it to add your first AI provider and configure your agent.</value>
   </data>
   <data name="V2_Gateway_CardBody2" xml:space="preserve">
     <value>All requests are processed on this PC. Your data stays local.</value>
   </data>
   <data name="V2_Gateway_OpenInBrowser" xml:space="preserve">
-    <value>Open http://localhost:18789 in browser</value>
+    <value>Open http://localhost:18889 in browser</value>
   </data>
   <data name="V2_Permissions_Title" xml:space="preserve">
     <value>Grant permissions</value>
   </data>
   <data name="V2_Permissions_Body" xml:space="preserve">
-    <value>OpenClaw works best when it can send notifications, access your camera and microphone, capture your screen, and know your location. Grant permissions below.</value>
+    <value>Smart-Agent works best when it can send notifications, access your camera and microphone, capture your screen, and know your location. Grant permissions below.</value>
   </data>
   <data name="V2_Permissions_Row_Notifications" xml:space="preserve">
     <value>Notifications</value>
@@ -3772,7 +3772,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>All set!</value>
   </data>
   <data name="V2_AllSet_Subtitle" xml:space="preserve">
-    <value>OpenClaw is ready to go</value>
+    <value>Smart-Agent is ready to go</value>
   </data>
   <data name="V2_AllSet_NodeMode_Title" xml:space="preserve">
     <value>Node Mode Active</value>
@@ -3781,7 +3781,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>This PC will operate as a remote compute node. The gateway can invoke screen capture, camera, and system commands on this machine.</value>
   </data>
   <data name="V2_AllSet_StartupQuestion" xml:space="preserve">
-    <value>Launch OpenClaw at startup?</value>
+    <value>Launch Smart-Agent at startup?</value>
   </data>
   <data name="V2_AllSet_On" xml:space="preserve">
     <value>On</value>
@@ -3793,7 +3793,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Existing setup detected</value>
   </data>
   <data name="V2_Welcome_Replace_Body" xml:space="preserve">
-    <value>Setting up locally will overwrite your existing OpenClaw configuration.</value>
+    <value>Setting up locally will overwrite your existing Smart-Agent configuration.</value>
   </data>
   <data name="V2_Welcome_Replace_Confirm" xml:space="preserve">
     <value>Replace my setup</value>
@@ -3880,7 +3880,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Diagnostics</value>
   </data>
   <data name="DiagnosticsPage_Subtitle.Text" xml:space="preserve">
-    <value>Inspect, export, and troubleshoot your OpenClaw installation.</value>
+    <value>Inspect, export, and troubleshoot your Smart-Agent installation.</value>
   </data>
   <data name="DiagnosticsPage_ManageOnConnection.Content" xml:space="preserve">
     <value>Manage on Connection page</value>
@@ -3985,7 +3985,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>OTel endpoint</value>
   </data>
   <data name="DiagnosticsPage_Card_OpenTelemetryEndpoint.Description" xml:space="preserve">
-    <value>Collector URL used by OpenClaw telemetry.</value>
+    <value>Collector URL used by Smart-Agent telemetry.</value>
   </data>
   <data name="DiagnosticsPage_OpenTelemetrySummary.Text" xml:space="preserve">
     <value>Not configured</value>
@@ -4066,7 +4066,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Chat surface overrides</value>
   </data>
   <data name="DiagnosticsPage_Expander_ChatOverrides.Description" xml:space="preserve">
-    <value>Per-surface override of the chat UI. Resets when OpenClaw restarts.</value>
+    <value>Per-surface override of the chat UI. Resets when Smart-Agent restarts.</value>
   </data>
   <data name="DiagnosticsPage_Card_HubChat.Header" xml:space="preserve">
     <value>Hub chat tab</value>
@@ -4078,7 +4078,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Back to Diagnostics</value>
   </data>
   <data name="SettingsRow_AutoStart_Description.Text" xml:space="preserve">
-    <value>Launch OpenClaw automatically when you sign in.</value>
+    <value>Launch Smart-Agent automatically when you sign in.</value>
   </data>
   <data name="SettingsRow_GlobalHotkey_Description.Text" xml:space="preserve">
     <value>Enable global hotkeys (Ctrl+Alt+Shift+V for voice, Ctrl+Alt+; for settings).</value>
@@ -4594,7 +4594,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Camera, microphone &amp; screen access</value>
   </data>
   <data name="PermissionsPage_SystemLevelPrivacyPermissions.Text" xml:space="preserve">
-    <value>System-level privacy permissions are managed by Windows. Open Windows Privacy Settings to grant or revoke OpenClaw access.</value>
+    <value>System-level privacy permissions are managed by Windows. Open Windows Privacy Settings to grant or revoke Smart-Agent access.</value>
   </data>
   <data name="SandboxPage_NodeSandboxIsOn.Text" xml:space="preserve">
     <value>Node sandbox is on</value>
@@ -4657,7 +4657,7 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>📁 Files</value>
   </data>
   <data name="SandboxPage_ByDefaultTheAgent.Text" xml:space="preserve">
-    <value>By default the agent only has a temporary workspace folder it can read and write. Grant access to user folders below. SSH keys, browser profiles, and OpenClaw's own settings are always blocked.</value>
+    <value>By default the agent only has a temporary workspace folder it can read and write. Grant access to user folders below. SSH keys, browser profiles, and Smart-Agent's own settings are always blocked.</value>
   </data>
   <data name="SandboxPage_Documents.Text" xml:space="preserve">
     <value>Documents</value>
@@ -4973,16 +4973,16 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>Set up or reconfigure Local Gateway</value>
   </data>
   <data name="SettingsPage_LocalGatewaySetup_Description.Text" xml:space="preserve">
-    <value>Launches setup to install an app-owned OpenClawGateway WSL distro or re-run provider and model setup for an existing one. Existing local gateways are only replaced after confirmation.</value>
+    <value>Launches setup to install an app-owned SmartAgentGateway WSL distro or re-run provider and model setup for an existing one. Existing local gateways are only replaced after confirmation.</value>
   </data>
   <data name="SettingsPage_OpenLocalGatewaySetup.Content" xml:space="preserve">
     <value>Open setup</value>
   </data>
   <data name="SettingsPage_OnboardWizard_Header.Text" xml:space="preserve">
-    <value>OpenClaw Onboard</value>
+    <value>Smart-Agent Onboard</value>
   </data>
   <data name="SettingsPage_OnboardWizard_Description.Text" xml:space="preserve">
-    <value>Open the OpenClaw onboarding on an installed Local Gateway. Skips WSL installation and jumps straight to configuration.</value>
+    <value>Open the Smart-Agent onboarding on an installed Local Gateway. Skips WSL installation and jumps straight to configuration.</value>
   </data>
   <data name="SettingsPage_OpenOnboardWizard.Content" xml:space="preserve">
     <value>Open onboarding</value>
@@ -4991,10 +4991,10 @@ Commands are blocked while sandboxing is unavailable because strict fallback blo
     <value>MSIX installation detected</value>
   </data>
   <data name="SettingsPage_MSIXInstallationDetected.Message" xml:space="preserve">
-    <value>Removing OpenClaw from Windows Settings → Apps will NOT clean up the Local Gateway (WSL distro, disk image). Use Remove Local Gateway below FIRST, then uninstall OpenClaw.</value>
+    <value>Removing Smart-Agent from Windows Settings → Apps will NOT clean up the Local Gateway (WSL distro, disk image). Use Remove Local Gateway below FIRST, then uninstall Smart-Agent.</value>
   </data>
   <data name="SettingsPage_RemovesTheWSLDistro.Text" xml:space="preserve">
-    <value>Removes the WSL distro (OpenClawGateway), its disk image, autostart entry, and clears gateway credentials. Your MCP token is preserved. Onboarding will reset.</value>
+    <value>Removes the WSL distro (SmartAgentGateway), its disk image, autostart entry, and clears gateway credentials. Your MCP token is preserved. Onboarding will reset.</value>
   </data>
   <data name="SettingsPage_RemoveLocalGateway.Content" xml:space="preserve">
     <value>Remove Local Gateway</value>
@@ -5960,7 +5960,7 @@ Make sure the gateway is running.</value>
     <value>iMessage reads the local Messages.app database, which only exists on macOS.</value>
   </data>
   <data name="ChannelsPage_GuideIMessageStep2" xml:space="preserve">
-    <value>To use iMessage with OpenClaw, run the gateway on a Mac instead of this Windows host.</value>
+    <value>To use iMessage with Smart-Agent, run the gateway on a Mac instead of this Windows host.</value>
   </data>
   <data name="ChannelsPage_GuideIMessageStep3" xml:space="preserve">
     <value>All other channels in this list work fine from a Windows-hosted gateway.</value>
@@ -5975,7 +5975,7 @@ Make sure the gateway is running.</value>
     <value>Use &quot;Open Config page&quot; in the Configuration section below to add settings under channels.{0}.</value>
   </data>
   <data name="ChannelsPage_GuideGenericStep3" xml:space="preserve">
-    <value>Save the config; OpenClaw will start the channel automatically.</value>
+    <value>Save the config; Smart-Agent will start the channel automatically.</value>
   </data>
   <data name="ChannelsPage_FieldBotToken" xml:space="preserve">
     <value>Bot token</value>
@@ -6524,7 +6524,7 @@ Make sure the gateway is running.</value>
     <value>no gateway configured</value>
   </data>
   <data name="DebugPage_StatusConnectedFormat" xml:space="preserve">
-    <value>OpenClaw is connected to {0}.</value>
+    <value>Smart-Agent is connected to {0}.</value>
   </data>
   <data name="DebugPage_StatusConnectingFormat" xml:space="preserve">
     <value>Connecting to {0}…</value>
@@ -7119,7 +7119,7 @@ Make sure the gateway is running.</value>
   <data name="LocalAiPage_UnavailableDetailsTip.Title" xml:space="preserve"><value>Why Local AI is unavailable</value></data>
   <data name="LocalAiPage_RecheckAvailabilityButton.Content" xml:space="preserve"><value>Recheck</value></data>
   <data name="LocalAiPage_UnavailableRequirementsMessage" xml:space="preserve"><value>This device does not meet one or more Local AI requirements.</value></data>
-  <data name="LocalAiPage_UnavailableProbeMessage" xml:space="preserve"><value>OpenClaw could not verify Local AI requirements right now. Recheck after confirming the NVIDIA driver is available.</value></data>
+  <data name="LocalAiPage_UnavailableProbeMessage" xml:space="preserve"><value>Smart-Agent could not verify Local AI requirements right now. Recheck after confirming the NVIDIA driver is available.</value></data>
   <data name="LocalAiPage_EngineHeading.Text" xml:space="preserve"><value>llama-server</value></data>
   <data name="LocalAiPage_VersionLabel.Text" xml:space="preserve"><value>Version</value></data>
   <data name="LocalAiPage_EndpointLabel.Text" xml:space="preserve"><value>Endpoint</value></data>
@@ -7139,7 +7139,7 @@ Make sure the gateway is running.</value>
   <data name="LocalAiPage_Engine_Starting" xml:space="preserve"><value>Starting</value></data>
   <data name="LocalAiPage_Engine_Stopped" xml:space="preserve"><value>Stopped</value></data>
   <data name="LocalAiPage_Engine_Error" xml:space="preserve"><value>Error</value></data>
-  <data name="LocalAiPage_Engine_Managed" xml:space="preserve"><value>Managed by OpenClaw</value></data>
+  <data name="LocalAiPage_Engine_Managed" xml:space="preserve"><value>Managed by Smart-Agent</value></data>
   <data name="LocalAiPage_Engine_NotInstalled" xml:space="preserve"><value>Not installed</value></data>
   <data name="LocalAiPage_Model_NotInstalled" xml:space="preserve"><value>Not installed</value></data>
   <data name="LocalAiPage_Model_Unknown" xml:space="preserve"><value>Unknown</value></data>
@@ -7157,35 +7157,35 @@ Make sure the gateway is running.</value>
   <data name="Command_GoToLocalAi_Subtitle" xml:space="preserve"><value>View llama-server, model, and gateway status</value></data>
   <data name="Onboarding_LocalAi_UnavailableDetailsButton.Content" xml:space="preserve"><value>See why</value></data>
   <data name="Onboarding_LocalAi_CheckingTitle" xml:space="preserve"><value>Checking Local AI requirements</value></data>
-  <data name="Onboarding_LocalAi_CheckingMessage" xml:space="preserve"><value>OpenClaw is checking the NVIDIA GPU, driver, CUDA, memory, and WSL requirements.</value></data>
-  <data name="Onboarding_LocalAi_CheckingHelpText" xml:space="preserve"><value>OpenClaw is checking Local AI requirements.</value></data>
+  <data name="Onboarding_LocalAi_CheckingMessage" xml:space="preserve"><value>Smart-Agent is checking the NVIDIA GPU, driver, CUDA, memory, and WSL requirements.</value></data>
+  <data name="Onboarding_LocalAi_CheckingHelpText" xml:space="preserve"><value>Smart-Agent is checking Local AI requirements.</value></data>
   <data name="Onboarding_LocalAi_ProbeUnknownTitle" xml:space="preserve"><value>Local AI availability could not be verified</value></data>
-  <data name="Onboarding_LocalAi_ProbeUnknownMessage" xml:space="preserve"><value>OpenClaw could not verify Local AI requirements right now. Recheck after confirming the NVIDIA driver is available.</value></data>
-  <data name="Onboarding_LocalAi_ProbeUnknownHelpText" xml:space="preserve"><value>OpenClaw could not verify Local AI requirements. Recheck availability to try again.</value></data>
+  <data name="Onboarding_LocalAi_ProbeUnknownMessage" xml:space="preserve"><value>Smart-Agent could not verify Local AI requirements right now. Recheck after confirming the NVIDIA driver is available.</value></data>
+  <data name="Onboarding_LocalAi_ProbeUnknownHelpText" xml:space="preserve"><value>Smart-Agent could not verify Local AI requirements. Recheck availability to try again.</value></data>
   <data name="Onboarding_LocalAi_UnavailableTitle" xml:space="preserve"><value>Local AI is not available</value></data>
   <data name="Onboarding_LocalAi_UnavailableMessage" xml:space="preserve"><value>This PC does not meet one or more Local AI requirements.</value></data>
   <data name="Onboarding_LocalAi_UnavailableHelpText" xml:space="preserve"><value>Unavailable because this PC does not meet the Local AI requirements.</value></data>
-  <data name="Onboarding_LocalAi_ProbeFailureReason" xml:space="preserve"><value>OpenClaw could not read the NVIDIA GPU, driver, CUDA, or memory information. Confirm the NVIDIA driver is available, then recheck Local AI requirements.</value></data>
+  <data name="Onboarding_LocalAi_ProbeFailureReason" xml:space="preserve"><value>Smart-Agent could not read the NVIDIA GPU, driver, CUDA, or memory information. Confirm the NVIDIA driver is available, then recheck Local AI requirements.</value></data>
   <data name="Onboarding_LocalAi_UnavailableDetailsDialogTitle" xml:space="preserve"><value>Why Local AI is unavailable</value></data>
   <data name="Onboarding_LocalAi_UnavailableDetailsDialogClose" xml:space="preserve"><value>Close</value></data>
   <data name="LocalAi_Reason_RuntimeUnavailable" xml:space="preserve"><value>This Local AI release does not include a native llama-server runtime for the detected Windows architecture.</value></data>
   <data name="LocalAi_Reason_NoNvidiaGpu" xml:space="preserve"><value>No NVIDIA GPU was reported by the NVIDIA driver. Install or repair the NVIDIA driver, then try setup again.</value></data>
   <data name="LocalAi_Reason_UnknownModel" xml:space="preserve"><value>The selected model is not available in this Local AI release.</value></data>
-  <data name="LocalAi_Reason_HardwareFactsIncomplete" xml:space="preserve"><value>OpenClaw could not read a stable NVIDIA GPU identifier, memory, driver, or CUDA capability.</value></data>
-  <data name="LocalAi_Reason_InsufficientGpuMemory" xml:space="preserve"><value>{0} requires {1} of GPU memory for model weights, KV cache, and runtime workspace. OpenClaw detected {2}.</value></data>
+  <data name="LocalAi_Reason_HardwareFactsIncomplete" xml:space="preserve"><value>Smart-Agent could not read a stable NVIDIA GPU identifier, memory, driver, or CUDA capability.</value></data>
+  <data name="LocalAi_Reason_InsufficientGpuMemory" xml:space="preserve"><value>{0} requires {1} of GPU memory for model weights, KV cache, and runtime workspace. Smart-Agent detected {2}.</value></data>
   <data name="LocalAi_Reason_DriverTooOld" xml:space="preserve"><value>NVIDIA driver {0} was detected. Local AI requires version {1} or newer.</value></data>
   <data name="LocalAi_Reason_CudaCapabilityTooLow" xml:space="preserve"><value>The NVIDIA driver does not provide CUDA 13 support. A separate CUDA Toolkit is not required.</value></data>
-  <data name="LocalAi_Reason_Generic" xml:space="preserve"><value>OpenClaw could not verify the Local AI requirements on this system.</value></data>
+  <data name="LocalAi_Reason_Generic" xml:space="preserve"><value>Smart-Agent could not verify the Local AI requirements on this system.</value></data>
   <data name="LocalAi_Reason_UnknownModelName" xml:space="preserve"><value>The selected model</value></data>
   <data name="LocalAi_Reason_UnknownDriverVersion" xml:space="preserve"><value>unknown</value></data>
   <data name="LocalAi_Reason_UnknownMemoryAmount" xml:space="preserve"><value>an unknown amount</value></data>
   <data name="LocalAi_Reason_GigabytesFormat" xml:space="preserve"><value>{0:0.#} GiB</value></data>
   <data name="Onboarding_Welcome_LocalAiAvailableBadge.Text" xml:space="preserve"><value>Your PC supports Local AI</value></data>
   <data name="Onboarding_Welcome_LocalAiAvailabilityDetail" xml:space="preserve"><value>Run a model locally using your {0}.</value></data>
-  <data name="Onboarding_LocalAi_WslConfigReadFailureReason" xml:space="preserve"><value>OpenClaw cannot safely read the global .wslconfig file. Check that the file is valid and readable, then try setup again.</value></data>
+  <data name="Onboarding_LocalAi_WslConfigReadFailureReason" xml:space="preserve"><value>Smart-Agent cannot safely read the global .wslconfig file. Check that the file is valid and readable, then try setup again.</value></data>
   <data name="LocalAiPage_UnavailableProbeTitle" xml:space="preserve"><value>Local AI availability could not be verified</value></data>
   <data name="LocalAiPage_CheckingTitle" xml:space="preserve"><value>Checking Local AI availability</value></data>
-  <data name="LocalAiPage_CheckingMessage" xml:space="preserve"><value>OpenClaw is verifying whether this device can run Local AI. This only takes a moment.</value></data>
+  <data name="LocalAiPage_CheckingMessage" xml:space="preserve"><value>Smart-Agent is verifying whether this device can run Local AI. This only takes a moment.</value></data>
   <data name="Chat_Code_Copy" xml:space="preserve"><value>Copy code</value></data>
   <data name="Chat_Code_Label" xml:space="preserve"><value>Code block</value></data>
   <data name="Chat_Model_Current" xml:space="preserve"><value>Current model</value></data>
@@ -7201,17 +7201,17 @@ Make sure the gateway is running.</value>
   <data name="Chat_Composer_Effort_Faster" xml:space="preserve"><value>Faster</value></data>
   <data name="Chat_Composer_Effort_Smarter" xml:space="preserve"><value>Smarter</value></data>
   <data name="Onboarding_Flow_Position" xml:space="preserve"><value>Step {0} of {1}</value></data>
-  <data name="Onboarding_Flow_CompletionUnavailable" xml:space="preserve"><value>Setup could not open Chat. Close setup and reopen OpenClaw.</value></data>
+  <data name="Onboarding_Flow_CompletionUnavailable" xml:space="preserve"><value>Setup could not open Chat. Close setup and reopen Smart-Agent.</value></data>
   <data name="Onboarding_Flow_AiNavigationFailed" xml:space="preserve"><value>The gateway is installed, but AI setup could not open. Reopen setup to continue without reinstalling.</value></data>
   <data name="Onboarding_Flow_AccessTitle" xml:space="preserve"><value>Your PC, your permissions</value></data>
   <data name="Onboarding_Flow_InstallAction" xml:space="preserve"><value>Install and set up</value></data>
   <data name="Onboarding_Flow_Permissions.Header" xml:space="preserve"><value>Windows permissions</value></data>
   <data name="Onboarding_Flow_InstallReview.Text" xml:space="preserve"><value>What setup will install</value></data>
-  <data name="Onboarding_Flow_AutoStart.Text" xml:space="preserve"><value>Launch OpenClaw at sign-in</value></data>
-  <data name="Onboarding_Flow_AutoStartToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Launch OpenClaw at sign-in</value></data>
+  <data name="Onboarding_Flow_AutoStart.Text" xml:space="preserve"><value>Launch Smart-Agent at sign-in</value></data>
+  <data name="Onboarding_Flow_AutoStartToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Launch Smart-Agent at sign-in</value></data>
   <data name="ChatDashboardButton.Content" xml:space="preserve"><value>Dashboard</value></data>
   <data name="ChatDashboardHint.Text" xml:space="preserve"><value>Channels, integrations and gateway settings</value></data>
-  <data name="Onboarding_Flow_WelcomeDescription.Text" xml:space="preserve"><value>OpenClaw is your AI assistant for getting things done on your PC.</value></data>
+  <data name="Onboarding_Flow_WelcomeDescription.Text" xml:space="preserve"><value>Smart-Agent is your AI assistant for getting things done on your PC.</value></data>
   <data name="Onboarding_AiSetup_Title.Text" xml:space="preserve"><value>Connect your AI</value></data>
   <data name="Onboarding_AiSetup_CatalogOptIn" xml:space="preserve"><value>Discover existing provider conversations (optional)</value></data>
   <data name="Onboarding_AiSetup_Starting" xml:space="preserve"><value>Starting provider setup…</value></data>
@@ -7336,17 +7336,17 @@ Make sure the gateway is running.</value>
   <data name="Onboarding_V2_ReturnToReview.Content" xml:space="preserve"><value>Return to review</value></data>
   <data name="Onboarding_V2_ReviewTitle.Text" xml:space="preserve"><value>WSL Gateway setup</value></data>
   <data name="Onboarding_V2_ReviewIntro.Text" xml:space="preserve"><value>Review what will change before installation starts.</value></data>
-  <data name="Onboarding_V2_CliCard.Header" xml:space="preserve"><value>OpenClaw CLI</value></data>
+  <data name="Onboarding_V2_CliCard.Header" xml:space="preserve"><value>Gateway CLI (openclaw)</value></data>
   <data name="Onboarding_V2_GatewayCard.Header" xml:space="preserve"><value>Local Gateway service</value></data>
   <data name="Onboarding_V2_LocalAiReview.Header" xml:space="preserve"><value>Local AI</value></data>
   <data name="Onboarding_V2_TailscaleReview.Header" xml:space="preserve"><value>Tailscale Serve</value></data>
   <data name="Onboarding_V2_ReplacementCard.Header" xml:space="preserve"><value>Review WSL replacement</value></data>
-  <data name="Onboarding_V2_StartupCard.Header" xml:space="preserve"><value>Launch OpenClaw at sign-in</value></data>
+  <data name="Onboarding_V2_StartupCard.Header" xml:space="preserve"><value>Launch Smart-Agent at sign-in</value></data>
   <data name="Onboarding_V2_ExactCommands.Header" xml:space="preserve"><value>Exact commands and files</value></data>
   <data name="Onboarding_V2_ReviewRequired.Title" xml:space="preserve"><value>Review the required choices</value></data>
   <data name="Onboarding_V2_ReviewRequired.Message" xml:space="preserve"><value>Review selected Local AI and Tailscale prerequisites, and confirm any WSL replacement before installing.</value></data>
   <data name="Onboarding_V2_Install.Content" xml:space="preserve"><value>Install</value></data>
-  <data name="Onboarding_V2_WelcomeTitle.Text" xml:space="preserve"><value>Welcome to OpenClaw</value></data>
+  <data name="Onboarding_V2_WelcomeTitle.Text" xml:space="preserve"><value>Welcome to Smart-Agent</value></data>
   <data name="Onboarding_V2_WelcomeChat.Header" xml:space="preserve"><value>Chat with your AI</value></data>
   <data name="Onboarding_V2_WelcomeChat.Description" xml:space="preserve"><value>Use native Chat with an AI provider you choose.</value></data>
   <data name="Onboarding_V2_WelcomePc.Header" xml:space="preserve"><value>Let agents help on this PC</value></data>
@@ -7354,7 +7354,7 @@ Make sure the gateway is running.</value>
   <data name="Onboarding_V2_WelcomeGateway.Header" xml:space="preserve"><value>Keep your Gateway under your control</value></data>
   <data name="Onboarding_V2_WelcomeGateway.Description" xml:space="preserve"><value>Run a private WSL Gateway here or connect to an existing one.</value></data>
   <data name="Onboarding_V2_WelcomeTrust.Title" xml:space="preserve"><value>Before you get started</value></data>
-  <data name="Onboarding_V2_WelcomeTrust.Message" xml:space="preserve"><value>AI agents are powerful and giving them access to your PC carries risks. They can make mistakes, change or delete files, or expose private information.&#x0a;&#x0a;You can control and limit OpenClaw’s access to your PC.</value></data>
+  <data name="Onboarding_V2_WelcomeTrust.Message" xml:space="preserve"><value>AI agents are powerful and giving them access to your PC carries risks. They can make mistakes, change or delete files, or expose private information.&#x0a;&#x0a;You can control and limit Smart-Agent’s access to your PC.</value></data>
   <data name="Onboarding_V2_Continue.Content" xml:space="preserve"><value>Continue</value></data>
   <data name="Onboarding_V2_Retry.Content" xml:space="preserve"><value>Try again</value></data>
   <data name="Onboarding_V2_AlternativeRoutes.Content" xml:space="preserve"><value>Remote, local MCP or set up later</value></data>
@@ -7376,7 +7376,7 @@ Make sure the gateway is running.</value>
   <data name="Onboarding_V2_TailscaleTrust.Header" xml:space="preserve"><value>Trust Tailscale identities for Gateway authentication</value></data>
   <data name="Onboarding_V2_TailscaleTrust.Description" xml:space="preserve"><value>Off by default. Enable only if your tailnet ACLs should participate in Gateway access control.</value></data>
   <data name="Onboarding_V2_TailscaleTrustToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Trust Tailscale identities</value></data>
-  <data name="Onboarding_V2_WindowTitle.Text" xml:space="preserve"><value>OpenClaw Setup</value></data>
+  <data name="Onboarding_V2_WindowTitle.Text" xml:space="preserve"><value>Smart-Agent Setup</value></data>
   <data name="Onboarding_V2_NetworkConsentRecorded" xml:space="preserve"><value>WSL networking consent recorded</value></data>
   <data name="Onboarding_V2_ReviewNetworking" xml:space="preserve"><value>Review WSL networking changes</value></data>
   <data name="Onboarding_V2_TailscaleChecking" xml:space="preserve"><value>Checking Windows Tailscale...</value></data>
@@ -7532,25 +7532,25 @@ Make sure the gateway is running.</value>
   <data name="Onboarding_Ready_ChannelUnavailable" xml:space="preserve"><value>This Gateway did not offer the selected channel. Review its available channels or refresh after updating the Gateway.</value></data>
   <data name="Onboarding_Ready_ChannelUnconfirmed" xml:space="preserve"><value>Channel availability could not be confirmed. Refresh to retry. No channel sign-in or configuration was started.</value></data>
   <data name="Onboarding_Copy_SafetyLink.Content" xml:space="preserve"><value>Learn more about risks and safety</value></data>
-  <data name="Onboarding_Copy_GatewayTitle.Text" xml:space="preserve"><value>Set up OpenClaw</value></data>
+  <data name="Onboarding_Copy_GatewayTitle.Text" xml:space="preserve"><value>Set up Smart-Agent</value></data>
   <data name="Onboarding_Copy_GatewayIntro.Text" xml:space="preserve"><value>The Gateway connects your AI assistant to your apps and tools. Choose where it runs. You can change this later.</value></data>
   <data name="Onboarding_Copy_GatewaySelector.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Gateway setup method</value></data>
   <data name="Onboarding_Copy_GatewaySelector.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve"><value>Choose one Gateway setup method.</value></data>
   <data name="Onboarding_Copy_GatewayLocalChoice.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Install a local Gateway (WSL), recommended</value></data>
   <data name="Onboarding_Copy_GatewayLocalTitle.Text" xml:space="preserve"><value>Install a local Gateway (WSL)</value></data>
-  <data name="Onboarding_Copy_GatewayLocalDescription.Text" xml:space="preserve"><value>Install a private OpenClaw Gateway in WSL.</value></data>
+  <data name="Onboarding_Copy_GatewayLocalDescription.Text" xml:space="preserve"><value>Install a private Smart-Agent Gateway in WSL.</value></data>
   <data name="Onboarding_Copy_Recommended.Text" xml:space="preserve"><value>Recommended</value></data>
   <data name="Onboarding_Copy_GatewayExistingChoice.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Connect to an existing Gateway</value></data>
   <data name="Onboarding_Copy_GatewayExistingTitle.Text" xml:space="preserve"><value>Connect to an existing Gateway</value></data>
   <data name="Onboarding_Copy_GatewayExistingDescription.Text" xml:space="preserve"><value>Connect without installing a Gateway or Local AI on this PC.</value></data>
   <data name="Onboarding_StartupWarning_Title" xml:space="preserve"><value>Windows startup</value></data>
-  <data name="Onboarding_StartupWarning_Message" xml:space="preserve"><value>Setup is complete, but the Windows startup preference could not be fully applied. OpenClaw will finish restarting. You can retry this preference in Companion Settings.</value></data>
+  <data name="Onboarding_StartupWarning_Message" xml:space="preserve"><value>Setup is complete, but the Windows startup preference could not be fully applied. Smart-Agent will finish restarting. You can retry this preference in Companion Settings.</value></data>
   <data name="Onboarding_RegistryRecovery_Title" xml:space="preserve"><value>Gateway recovery needs attention</value></data>
-  <data name="Onboarding_RegistryRecovery_Message" xml:space="preserve"><value>Setup could not reconcile saved gateway changes. Unsaved edits were not committed. Close and reopen OpenClaw to reload saved gateways before retrying.</value></data>
-  <data name="Onboarding_RestartRecovery_Title" xml:space="preserve"><value>Finish opening OpenClaw</value></data>
-  <data name="Onboarding_RestartRecovery_Waiting" xml:space="preserve"><value>Another OpenClaw instance is still finishing setup. Retry waits for it to release ownership. Your selected page is retained. Cancel lets you close the other instance and reopen OpenClaw to resume.</value></data>
-  <data name="Onboarding_RestartRecovery_Storage" xml:space="preserve"><value>OpenClaw could not securely retain the selected setup page. Retry to try again. Cancel stops this launch; you may need to reopen setup and choose again.</value></data>
-  <data name="Onboarding_RestartRecovery_Invalid" xml:space="preserve"><value>The saved setup launch could not be read. OpenClaw will open normally. Reopen setup to select a destination.</value></data>
+  <data name="Onboarding_RegistryRecovery_Message" xml:space="preserve"><value>Setup could not reconcile saved gateway changes. Unsaved edits were not committed. Close and reopen Smart-Agent to reload saved gateways before retrying.</value></data>
+  <data name="Onboarding_RestartRecovery_Title" xml:space="preserve"><value>Finish opening Smart-Agent</value></data>
+  <data name="Onboarding_RestartRecovery_Waiting" xml:space="preserve"><value>Another Smart-Agent instance is still finishing setup. Retry waits for it to release ownership. Your selected page is retained. Cancel lets you close the other instance and reopen Smart-Agent to resume.</value></data>
+  <data name="Onboarding_RestartRecovery_Storage" xml:space="preserve"><value>Smart-Agent could not securely retain the selected setup page. Retry to try again. Cancel stops this launch; you may need to reopen setup and choose again.</value></data>
+  <data name="Onboarding_RestartRecovery_Invalid" xml:space="preserve"><value>The saved setup launch could not be read. Smart-Agent will open normally. Reopen setup to select a destination.</value></data>
   <data name="PermissionsPage_ExecRuleScope_Main" xml:space="preserve">
     <value>this agent</value>
   </data>
@@ -7768,7 +7768,7 @@ Your settings, gateway, files, and models stay where they are.</value>
     <value>Please wait for this step to finish.</value>
   </data>
   <data name="Onboarding_Native_Title.Text" xml:space="preserve"><value>Install a local native gateway</value></data>
-  <data name="Onboarding_Native_Description.Text" xml:space="preserve"><value>Install and set up an OpenClaw gateway on this device</value></data>
+  <data name="Onboarding_Native_Description.Text" xml:space="preserve"><value>Install and set up an Smart-Agent gateway on this device</value></data>
   <data name="Onboarding_Wsl_Title.Text" xml:space="preserve"><value>Install a local WSL gateway</value></data>
   <data name="Onboarding_Native_CheckingSupport" xml:space="preserve"><value>Checking native gateway support...</value></data>
   <data name="Onboarding_Native_SupportAvailable" xml:space="preserve"><value>Native gateway support is available on this device.</value></data>
@@ -7779,7 +7779,7 @@ Your settings, gateway, files, and models stay where they are.</value>
   <data name="Onboarding_Native_Recommended.Text" xml:space="preserve"><value>Recommended</value></data>
   <data name="Onboarding_Native_Alternatives.Header" xml:space="preserve"><value>Other gateway options</value></data>
   <data name="Onboarding_Native_UpdateLaunchFailed" xml:space="preserve"><value>Could not open Windows Update. Open Windows Settings, then Windows Update.</value></data>
-  <data name="Onboarding_Native_Lifecycle.Text" xml:space="preserve"><value>Continue with the same Gateway setup wizard used for WSL, here in Companion. Companion validates configuration and health before connecting. Existing WSL gateways and your default OpenClaw profile are not replaced.</value></data>
+  <data name="Onboarding_Native_Lifecycle.Text" xml:space="preserve"><value>Continue with the same Gateway setup wizard used for WSL, here in Companion. Companion validates configuration and health before connecting. Existing WSL gateways and your default Smart-Agent profile are not replaced.</value></data>
   <data name="Onboarding_Native_Acquisition.Text" xml:space="preserve"><value>If the Gateway is not installed, setup installs it from Microsoft Store using WinGet, then verifies the package before continuing automatically.</value></data>
   <data name="Onboarding_Native_InstallingPackage" xml:space="preserve"><value>Installing the Gateway from Microsoft Store using WinGet...</value></data>
   <data name="Onboarding_Native_VerifyingPackage" xml:space="preserve"><value>WinGet completed. Verifying Gateway registration and execution aliases before continuing...</value></data>
@@ -7812,7 +7812,7 @@ Your settings, gateway, files, and models stay where they are.</value>
   <data name="Onboarding_Native_ReplaceDraftPrimary" xml:space="preserve"><value>Discard and set up again</value></data>
   <data name="Onboarding_Native_ReplaceDraftClose" xml:space="preserve"><value>Keep draft</value></data>
   <data name="Settings_PersistenceConflict_Title" xml:space="preserve"><value>Settings could not be saved</value></data>
-  <data name="Settings_PersistenceConflict_Message" xml:space="preserve"><value>Another process changed your settings. Your latest changes were not saved. Exit OpenClaw from the tray menu and reopen it, then retry your changes. The other process's saved settings have been preserved.</value></data>
+  <data name="Settings_PersistenceConflict_Message" xml:space="preserve"><value>Another process changed your settings. Your latest changes were not saved. Exit Smart-Agent from the tray menu and reopen it, then retry your changes. The other process's saved settings have been preserved.</value></data>
   <!-- Native Workspace shell. Other cultures use the default-language fallback. -->
   <data name="WorkspaceShell_AutomationMissing" xml:space="preserve"><value>This automation is no longer available. Return to Automations and refresh.</value></data>
   <data name="WorkspaceShell_Connected" xml:space="preserve"><value>Gateway connected</value></data>
@@ -7858,7 +7858,7 @@ Your settings, gateway, files, and models stay where they are.</value>
   <data name="WorkspaceShell_Sandbox" xml:space="preserve"><value>Sandbox</value></data>
   <data name="WorkspaceShell_Debug" xml:space="preserve"><value>Diagnostics</value></data>
   <data name="WorkspaceShell_Settings" xml:space="preserve"><value>Settings</value></data>
-  <data name="WorkspaceShell_About" xml:space="preserve"><value>About OpenClaw</value></data>
+  <data name="WorkspaceShell_About" xml:space="preserve"><value>About Smart-Agent</value></data>
   <data name="WorkspaceShell_AgentsDescription" xml:space="preserve"><value>Your gateway agents and their recent conversations.</value></data>
   <data name="WorkspaceShell_AgentDetailDescription" xml:space="preserve"><value>Agent workspace and recent work.</value></data>
   <data name="WorkspaceShell_WriterDetailDescription" xml:space="preserve"><value>Agent workspace and recent work.</value></data>
@@ -7870,7 +7870,7 @@ Your settings, gateway, files, and models stay where they are.</value>
   <data name="WorkspaceShell_PluginsDescription" xml:space="preserve"><value>Extensions and tools available to your gateway.</value></data>
   <data name="WorkspaceShell_ActivityDescription" xml:space="preserve"><value>Live events from the current gateway connection.</value></data>
   <data name="WorkspaceShell_MoreDescription" xml:space="preserve"><value>Explore your workspace and companion tools.</value></data>
-  <data name="WorkspaceShell_AppsDescription" xml:space="preserve"><value>Manage this companion or learn about other OpenClaw apps.</value></data>
+  <data name="WorkspaceShell_AppsDescription" xml:space="preserve"><value>Manage this companion or learn about other Smart-Agent apps.</value></data>
   <data name="WorkspaceShell_PortalsDescription" xml:space="preserve"><value>Open your configured gateway dashboard or documentation.</value></data>
   <data name="WorkspaceShell_TasksDescription" xml:space="preserve"><value>Task workflows provided by your gateway.</value></data>
   <data name="WorkspaceShell_MeetingsDescription" xml:space="preserve"><value>Meeting workflows provided by your gateway.</value></data>
@@ -7906,7 +7906,7 @@ Your settings, gateway, files, and models stay where they are.</value>
   <data name="WorkspaceShell_NoNativeWorkflow" xml:space="preserve"><value>The current gateway client does not expose this workflow. Check your gateway dashboard for supported extensions.</value></data>
   <data name="WorkspaceShell_NoActivity" xml:space="preserve"><value>No recent activity</value></data>
   <data name="WorkspaceShell_ActivityEmpty" xml:space="preserve"><value>Agent events will appear here as the connected gateway sends them.</value></data>
-  <data name="WorkspaceShell_CompanionApp" xml:space="preserve"><value>OpenClaw Windows companion</value></data>
+  <data name="WorkspaceShell_CompanionApp" xml:space="preserve"><value>Smart-Agent Windows companion</value></data>
   <data name="WorkspaceShell_OpenChat" xml:space="preserve"><value>Open chat</value></data>
   <data name="WorkspaceShell_Details" xml:space="preserve"><value>View details</value></data>
   <data name="WorkspaceShell_AgentSettings" xml:space="preserve"><value>Agent settings</value></data>

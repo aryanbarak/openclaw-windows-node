@@ -122,7 +122,7 @@ try {
     Assert-Fails { & $exporter @arguments } 'not built with production migration enabled'
 
     foreach ($mismatch in @(
-        @{ Identity = 'OpenClawFoundation.OpenClaw.Dev'; Error = 'production Store identity' },
+        @{ Identity = 'SmartAgent.Companion.Dev'; Error = 'production Store identity' },
         @{ Publisher = 'CN=Wrong'; Error = 'production Store identity' },
         @{ Architecture = 'arm64'; Error = 'Expected a x64 package' }
     )) {

@@ -43,11 +43,16 @@ namespace OpenClawTray;
 
 public partial class App : Application, OpenClawTray.Services.IAppCommands, IPermissionsPageRuntimeHost
 {
-    internal static readonly UpdatumManager AppUpdater = new("openclaw", "openclaw-windows-node")
+    internal static readonly UpdatumManager? AppUpdater = CreateAppUpdater();
+
+    private static UpdatumManager? CreateAppUpdater()
     {
-        FetchOnlyLatestRelease = true,
-        InstallUpdateSingleFileExecutableName = "OpenClaw.Tray.WinUI",
-    };
+        if (!OpenClawAppIdentity.ManagedReleaseUpdaterEnabled)
+            return null;
+
+        throw new InvalidOperationException(
+            "Smart-Agent release updater is enabled without an approved Smart-Agent-owned release source.");
+    }
 
     private ITrayController? _trayController;
     private IWindowManager? _windowManager;
@@ -881,7 +886,7 @@ public partial class App : Application, OpenClawTray.Services.IAppCommands, IPer
         };
         // SshTunnelService implements ISshTunnelManager directly — no shim needed
         var managedLocalPortProvenance = _managedLocalPortProvenance =
-            new ManagedLocalGatewayPortProvenanceService(appLogger);
+            new ManagedLocalGatewayPortProvenanceService(appLogger, AppIdentity.DataDirectoryName);
         var nativeGatewayResolver = new OpenClaw.SetupEngine.UI.NativeGatewayPackageResolver();
         var nativeGatewayRuntime = OpenClaw.Connection.NativeGateway.NativeGatewayRuntimeRouter.Create(
             _gatewayRegistry, nativeGatewayResolver, appLogger);
@@ -3384,7 +3389,7 @@ public partial class App : Application, OpenClawTray.Services.IAppCommands, IPer
         // For now, use the app icon for all notifications
         // In the future, we could create category-specific icons
         var appDir = AppContext.BaseDirectory;
-        var iconPath = System.IO.Path.Combine(appDir, "Assets", "openclaw.ico");
+        var iconPath = System.IO.Path.Combine(appDir, "Assets", "smart-agent.ico");
         return System.IO.File.Exists(iconPath) ? iconPath : null;
     }
 
@@ -3832,7 +3837,7 @@ public partial class App : Application, OpenClawTray.Services.IAppCommands, IPer
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
         {
             if (nativeCompletion is not null) throw new InvalidOperationException("The tray executable is unavailable.");
-            await ShowSetupRestartErrorAsync("OpenClaw setup finished, but the tray executable could not be found for restart.");
+            await ShowSetupRestartErrorAsync("Smart-Agent setup finished, but the tray executable could not be found for restart.");
             return;
         }
 
@@ -3890,11 +3895,11 @@ public partial class App : Application, OpenClawTray.Services.IAppCommands, IPer
         {
             if (nativeCompletion is not null) throw;
             Logger.Error($"Failed to restart tray after setup: {ex}");
-            await ShowSetupRestartErrorAsync("OpenClaw setup finished, but restarting the tray failed. The current tray will keep running; please exit and reopen OpenClaw.");
+            await ShowSetupRestartErrorAsync("Smart-Agent setup finished, but restarting the tray failed. The current tray will keep running; please exit and reopen Smart-Agent.");
         }
     }
 
-    private async Task ShowSetupRestartErrorAsync(string message, string title = "Restart OpenClaw")
+    private async Task ShowSetupRestartErrorAsync(string message, string title = "Restart Smart-Agent")
     {
         var xamlRoot = _windowManager?.SetupXamlRoot;
         if (xamlRoot is null)

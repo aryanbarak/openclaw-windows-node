@@ -28,8 +28,8 @@ internal sealed class TrayMenuPresenter
         items.Add(new TrayMenuElement
         {
             Kind = TrayMenuElementKind.BrandHeader,
-            Text = "OpenClaw",
-            AutomationName = "OpenClaw",
+            Text = "Smart-Agent",
+            AutomationName = "Smart-Agent",
         });
         items.Add(BuildDashboardGlance());
 
@@ -435,7 +435,7 @@ internal sealed class TrayMenuPresenter
         [
             Header("Permissions"),
             Toggle("Windows node", TrayMenuIconIdentity.System,
-                "Run OpenClaw as a local node on this PC", settings.EnableNodeMode),
+                "Run Smart-Agent as a local node on this PC", settings.EnableNodeMode),
             Toggle("System tools", TrayMenuIconIdentity.Terminal,
                 "Let agents run shell commands and scripts on this PC", settings.NodeSystemRunEnabled),
             Toggle("Browser control", TrayMenuIconIdentity.Browser,

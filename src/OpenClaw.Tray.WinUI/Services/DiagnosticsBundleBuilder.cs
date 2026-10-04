@@ -59,7 +59,7 @@ internal static class DiagnosticsBundleBuilder
         paths ??= DiagnosticsBundlePaths.Default();
 
         var builder = new StringBuilder();
-        builder.AppendLine("OpenClaw Windows Tray Diagnostics Bundle");
+        builder.AppendLine("Smart-Agent Windows Diagnostics Bundle");
         builder.AppendLine($"Generated: {DateTimeOffset.Now:O}");
         builder.AppendLine();
         builder.AppendLine("## Manifest");

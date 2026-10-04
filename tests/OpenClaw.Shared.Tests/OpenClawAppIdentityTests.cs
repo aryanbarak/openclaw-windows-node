@@ -5,13 +5,77 @@ namespace OpenClaw.Shared.Tests;
 public sealed class OpenClawAppIdentityTests
 {
     [Fact]
+    public void ManagedLocalPorts_AreProfileAwareDerivedAndNonColliding()
+    {
+        Assert.Equal(18889, OpenClawAppIdentity.GetManagedGatewayPort(OpenClawAppIdentity.ReleaseIdentity));
+        Assert.Equal(18891, OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.ReleaseIdentity));
+        Assert.Equal(18893, OpenClawAppIdentity.GetLocalMcpPort(OpenClawAppIdentity.ReleaseIdentity));
+        Assert.Equal(18890, OpenClawAppIdentity.GetManagedGatewayPort(OpenClawAppIdentity.DevIdentity));
+        Assert.Equal(18892, OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.DevIdentity));
+        Assert.Equal(18894, OpenClawAppIdentity.GetLocalMcpPort(OpenClawAppIdentity.DevIdentity));
+
+        var ports = new[]
+        {
+            OpenClawAppIdentity.ReleaseManagedGatewayPort,
+            OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.ReleaseIdentity),
+            OpenClawAppIdentity.ReleaseLocalMcpPort,
+            OpenClawAppIdentity.DevManagedGatewayPort,
+            OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.DevIdentity),
+            OpenClawAppIdentity.DevLocalMcpPort,
+        };
+        Assert.Equal(ports.Length, ports.Distinct().Count());
+        Assert.True(OpenClawAppIdentity.IsManagedLocalGatewayPort(18889));
+        Assert.True(OpenClawAppIdentity.IsManagedLocalGatewayPort(18890));
+        Assert.False(OpenClawAppIdentity.IsManagedLocalGatewayPort(18789));
+    }
+
+    [Fact]
+    public void ManagedReleaseUpdater_IsDeferredUntilOwnershipSigningAndVerificationAreConfigured()
+    {
+        Assert.Equal("aryanbarak/smart-agent-windows", OpenClawAppIdentity.PlannedReleaseRepositorySlug);
+        Assert.Equal("https://github.com/aryanbarak/smart-agent-windows", OpenClawAppIdentity.PlannedReleaseRepositoryUrl);
+        Assert.Equal("https://github.com/aryanbarak/smart-agent-windows/issues", OpenClawAppIdentity.PlannedReleaseSupportUrl);
+        Assert.Equal("https://github.com/aryanbarak/smart-agent-windows/releases", OpenClawAppIdentity.PlannedReleaseUpdatesUrl);
+        Assert.Equal("SHA-256", OpenClawAppIdentity.ReleaseChecksumAlgorithm);
+        Assert.True(OpenClawAppIdentity.ReleaseAuthenticodeRequired);
+        Assert.True(OpenClawAppIdentity.ReleaseChecksumManifestRequired);
+        Assert.False(OpenClawAppIdentity.ReleaseRepositoryOwnershipConfigured);
+        Assert.False(OpenClawAppIdentity.ReleaseSigningIdentityConfigured);
+        Assert.False(OpenClawAppIdentity.ReleaseArtifactVerificationConfigured);
+        Assert.False(OpenClawAppIdentity.ManagedReleaseUpdaterEnabled);
+        Assert.Contains("repository ownership", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+        Assert.Contains("release signing", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+        Assert.Contains("artifact verification", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+    }
+    [Fact]
+    public void ResolveLocalDataDirectory_IsProfileAwareAndHonorsDirectOverride()
+    {
+        var direct = Path.Combine(Path.GetTempPath(), "smart-agent-local-override");
+        var overridden = OpenClawAppIdentity.ResolveLocalDataDirectory(
+            key => key switch
+            {
+                OpenClawAppIdentity.DataDirectoryOverrideEnvironmentVariable => direct,
+                OpenClawAppIdentity.IdentityEnvironmentVariable => OpenClawAppIdentity.DevIdentity,
+                _ => null
+            });
+        Assert.Equal(direct, overridden);
+
+        var devPath = OpenClawAppIdentity.ResolveLocalDataDirectory(
+            key => key == OpenClawAppIdentity.IdentityEnvironmentVariable
+                ? OpenClawAppIdentity.DevIdentity
+                : null);
+        Assert.Equal("SmartAgent-Dev", Path.GetFileName(devPath));
+        Assert.DoesNotContain("OpenClawTray", devPath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void ResolveRoamingDataDirectory_DefaultsToReleaseProfile()
     {
         var root = Path.Combine(Path.GetTempPath(), "openclaw-appdata");
         var path = OpenClawAppIdentity.ResolveRoamingDataDirectory(
             key => key == OpenClawAppIdentity.AppDataRootEnvironmentVariable ? root : null);
 
-        Assert.Equal(Path.Combine(root, "OpenClawTray"), path);
+        Assert.Equal(Path.Combine(root, "SmartAgent"), path);
     }
 
     [Fact]
@@ -26,7 +90,7 @@ public sealed class OpenClawAppIdentityTests
                 _ => null
             });
 
-        Assert.Equal(Path.Combine(root, "OpenClawTray-Dev"), path);
+        Assert.Equal(Path.Combine(root, "SmartAgent-Dev"), path);
     }
 
     [Fact]
@@ -42,7 +106,7 @@ public sealed class OpenClawAppIdentityTests
             },
             explicitIdentity: OpenClawAppIdentity.ReleaseIdentity);
 
-        Assert.Equal(Path.Combine(root, "OpenClawTray"), path);
+        Assert.Equal(Path.Combine(root, "SmartAgent"), path);
     }
 
     [Fact]
@@ -68,11 +132,47 @@ public sealed class OpenClawAppIdentityTests
             key == OpenClawAppIdentity.AppDataRootEnvironmentVariable ? root : null;
 
         Assert.Equal(
-            Path.Combine(root, "OpenClawTray-Dev", "settings.json"),
+            Path.Combine(root, "SmartAgent-Dev", "settings.json"),
             OpenClawAppIdentity.ResolveSettingsPath(env, OpenClawAppIdentity.DevIdentity));
         Assert.Equal(
-            Path.Combine(root, "OpenClawTray-Dev", "mcp-token.txt"),
+            Path.Combine(root, "SmartAgent-Dev", "mcp-token.txt"),
             OpenClawAppIdentity.ResolveMcpTokenPath(env, OpenClawAppIdentity.DevIdentity));
+    }
+
+    [Fact]
+    public void RuntimeIdentities_AreIsolatedFromOpenClawReleaseAndDevProfiles()
+    {
+        Assert.Equal("Smart-Agent", OpenClawAppIdentity.ReleaseDisplayName);
+        Assert.Equal("Smart-Agent (Dev)", OpenClawAppIdentity.DevDisplayName);
+        Assert.Equal("Smart Agent Companion", OpenClawAppIdentity.ReleaseFriendlyDescription);
+        Assert.Equal("Smart Agent Companion (Dev)", OpenClawAppIdentity.DevFriendlyDescription);
+        Assert.Equal("SmartAgent.Companion", OpenClawAppIdentity.ReleaseAppUserModelId);
+        Assert.Equal("SmartAgent.Companion.Dev", OpenClawAppIdentity.DevAppUserModelId);
+        Assert.Equal("smartagent", OpenClawAppIdentity.ReleaseProtocolScheme);
+        Assert.Equal("smartagent-dev", OpenClawAppIdentity.DevProtocolScheme);
+        Assert.Equal("SmartAgentGateway", OpenClawAppIdentity.ReleaseDistroName);
+        Assert.Equal("SmartAgentGateway-Dev", OpenClawAppIdentity.DevDistroName);
+        Assert.Equal("SmartAgent", OpenClawAppIdentity.ReleaseAutoStartName);
+        Assert.Equal("SmartAgent-Dev", OpenClawAppIdentity.DevAutoStartName);
+        Assert.Equal("Smart Agent Companion", OpenClawAppIdentity.ReleaseStartupTaskName);
+        Assert.Equal("Smart Agent Companion (Dev)", OpenClawAppIdentity.DevStartupTaskName);
+        Assert.Equal("SmartAgentStartup", OpenClawAppIdentity.ReleasePackageStartupTaskId);
+        Assert.Equal("SmartAgentStartupDev", OpenClawAppIdentity.DevPackageStartupTaskId);
+        Assert.Equal("SmartAgent", OpenClawAppIdentity.ReleaseMutexBaseName);
+        Assert.Equal("SmartAgent-Dev", OpenClawAppIdentity.DevMutexBaseName);
+
+        var downstreamValues = typeof(OpenClawAppIdentity)
+            .GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
+            .Where(field => field.IsLiteral && field.FieldType == typeof(string))
+            .Select(field => (string)field.GetRawConstantValue()!)
+            .ToArray();
+        Assert.DoesNotContain("OpenClaw.Companion", downstreamValues);
+        Assert.DoesNotContain("OpenClaw.Companion.Dev", downstreamValues);
+        Assert.DoesNotContain("openclaw-dev", downstreamValues);
+        Assert.DoesNotContain("OpenClawGateway", downstreamValues);
+        Assert.DoesNotContain("OpenClawGateway-Dev", downstreamValues);
+        Assert.DoesNotContain("OpenClawTray", downstreamValues);
+        Assert.DoesNotContain("OpenClawTray-Dev", downstreamValues);
     }
 
     [Fact]

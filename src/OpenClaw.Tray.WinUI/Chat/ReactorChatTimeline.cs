@@ -318,10 +318,10 @@ public sealed class ReactorChatTimeline : Component<ReactorChatTimelineProps>
         {
             Image("ms-appx:///Assets/Square44x44Logo.targetsize-256_altform-unplated.png")
                 .Size(40, 40)
-                .AutomationName("OpenClaw")
+                .AutomationName("Smart-Agent")
                 .HAlign(HorizontalAlignment.Center),
             Text(
-                    LocalizedOrDefault("Chat_ZeroState_WelcomeTitle", "Welcome to OpenClaw"),
+                    LocalizedOrDefault("Chat_ZeroState_WelcomeTitle", "Welcome to Smart-Agent"),
                     20,
                     FontWeights.SemiBold)
                 .TextAlignment(TextAlignment.Center)
@@ -338,7 +338,7 @@ public sealed class ReactorChatTimeline : Component<ReactorChatTimelineProps>
         {
             "Say hi 👋",
             "What can you do?",
-            "Give me a quick tour of OpenClaw",
+            "Give me a quick tour of Smart-Agent",
         })
         {
             children.Add(Button(TextBlock(suggestion).TextWrapping(TextWrapping.Wrap).TextAlignment(TextAlignment.Center),

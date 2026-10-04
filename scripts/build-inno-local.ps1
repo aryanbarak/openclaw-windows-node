@@ -212,7 +212,7 @@ foreach ($architecture in $architectures) {
 }
 
 Write-Step "Built installers"
-Get-ChildItem -Path (Join-Path $repoRoot "Output\OpenClawCompanion*-Setup-*.exe") |
+Get-ChildItem -Path (Join-Path $repoRoot "Output\SmartAgentCompanion*-Setup-*.exe") |
     Sort-Object Name |
     ForEach-Object {
         "{0}`t{1:N2} MB`t{2}" -f $_.FullName, ($_.Length / 1MB), $_.LastWriteTime

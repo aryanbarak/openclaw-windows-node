@@ -32,7 +32,7 @@ public sealed partial class SettingsPage : Page
     private DateTime _sampledGatewayUptimeUtc;
 
     private const string DocumentationUrl = "https://docs.openclaw.ai/platforms/windows";
-    private const string GitHubUrl = "https://github.com/openclaw/openclaw-windows-node";
+    private static string GitHubUrl => OpenClawAppIdentity.PlannedReleaseRepositoryUrl;
 
     private enum UninstallUiState { Idle, InProgress, Success, Failure }
 
@@ -43,6 +43,9 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         InitializeComponent();
+        GitHubLink.Visibility = OpenClawAppIdentity.ReleaseRepositoryOwnershipConfigured
+            ? Visibility.Visible
+            : Visibility.Collapsed;
         LocalGatewaySetupDescriptionText.Text =
             $"Launches setup to install the app-owned {AppIdentity.SetupDistroName} WSL distro or re-run provider and model setup for an existing one. Existing local gateways are only replaced after confirmation.";
         GatewayBodyText.Text = GatewayIdleBodyText;
@@ -349,7 +352,7 @@ public sealed partial class SettingsPage : Page
         {
             new ToastContentBuilder()
                 .AddText("Test Notification")
-                .AddText("This is a test notification from OpenClaw settings.")
+                .AddText("This is a test notification from Smart-Agent settings.")
                 .Show();
         }
         catch (Exception ex)
@@ -370,6 +373,9 @@ public sealed partial class SettingsPage : Page
 
     private void OnGitHubLink(object sender, RoutedEventArgs e)
     {
+        if (!OpenClawAppIdentity.ReleaseRepositoryOwnershipConfigured)
+            return;
+
         OpenShellTarget(GitHubUrl, "GitHub");
     }
 
@@ -467,7 +473,7 @@ public sealed partial class SettingsPage : Page
         try
         {
             var exePath = ResolveCurrentExecutablePath()
-                ?? throw new FileNotFoundException("OpenClaw tray executable could not be resolved for local gateway removal.");
+                ?? throw new FileNotFoundException("Smart-Agent tray executable could not be resolved for local gateway removal.");
 
             jsonOutput = Path.Combine(Path.GetTempPath(), $"openclaw-uninstall-{Guid.NewGuid():N}.json");
 
@@ -481,7 +487,7 @@ public sealed partial class SettingsPage : Page
             psi.ArgumentList.Add("--json-output");
             psi.ArgumentList.Add(jsonOutput);
 
-            proc = Process.Start(psi) ?? throw new InvalidOperationException("Failed to start OpenClaw uninstall process.");
+            proc = Process.Start(psi) ?? throw new InvalidOperationException("Failed to start Smart-Agent uninstall process.");
             await proc.WaitForExitAsync(_uninstallCts.Token);
 
             if (proc.ExitCode == 0)

@@ -258,6 +258,7 @@ public sealed class ManagedLocalGatewayPortProvenanceService
     private readonly IManagedLocalGatewayPortPlatform _platform;
     private readonly IOpenClawLogger _logger;
     private readonly Func<string> _getUserProfilePath;
+    private readonly string _dataDirectoryName;
     private readonly ConcurrentDictionary<ProvenanceCacheKey, GatewayEndpointProvenance>
         _lastProvenance = new();
     private readonly record struct ProvenanceCacheKey(string GatewayId, string Url);
@@ -265,16 +266,21 @@ public sealed class ManagedLocalGatewayPortProvenanceService
     internal ManagedLocalGatewayPortProvenanceService(
         IManagedLocalGatewayPortPlatform platform,
         IOpenClawLogger logger,
-        Func<string>? getUserProfilePath = null)
+        Func<string>? getUserProfilePath = null,
+        string dataDirectoryName = OpenClawAppIdentity.ReleaseDataDirectoryName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(dataDirectoryName);
         _platform = platform;
         _logger = logger;
+        _dataDirectoryName = dataDirectoryName;
         _getUserProfilePath = getUserProfilePath ??
             (() => Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
     }
 
-    public ManagedLocalGatewayPortProvenanceService(IOpenClawLogger logger)
-        : this(new WindowsManagedLocalGatewayPortPlatform(), logger)
+    public ManagedLocalGatewayPortProvenanceService(
+        IOpenClawLogger logger,
+        string dataDirectoryName = OpenClawAppIdentity.ReleaseDataDirectoryName)
+        : this(new WindowsManagedLocalGatewayPortPlatform(), logger, dataDirectoryName: dataDirectoryName)
     {
     }
 
@@ -626,8 +632,9 @@ public sealed class ManagedLocalGatewayPortProvenanceService
             return false;
 
         var commandLine = _platform.GetProcessCommandLine(listener.ProcessId);
+        var nativeCliPathSegment = $"{Path.DirectorySeparatorChar}{_dataDirectoryName}{Path.DirectorySeparatorChar}native-cli{Path.DirectorySeparatorChar}";
         if (string.IsNullOrWhiteSpace(commandLine) ||
-            !commandLine.Contains(@"\OpenClawTray\native-cli\", StringComparison.OrdinalIgnoreCase) ||
+            !commandLine.Contains(nativeCliPathSegment, StringComparison.OrdinalIgnoreCase) ||
             !commandLine.Contains(@"\openclaw\dist\index.js", StringComparison.OrdinalIgnoreCase) ||
             !commandLine.Contains(" gateway ", StringComparison.OrdinalIgnoreCase) ||
             !commandLine.Contains($"--port {port}", StringComparison.OrdinalIgnoreCase))
@@ -674,7 +681,7 @@ public sealed class ManagedLocalGatewayPortProvenanceService
                 cmd.Contains($"OPENCLAW_STATE_DIR={profileDir}", StringComparison.OrdinalIgnoreCase) &&
                 cmd.Contains($"OPENCLAW_WINDOWS_TASK_NAME={taskName}", StringComparison.OrdinalIgnoreCase) &&
                 cmd.Contains($"OPENCLAW_GATEWAY_PORT={port}", StringComparison.OrdinalIgnoreCase) &&
-                cmd.Contains(@"\OpenClawTray\native-cli\", StringComparison.OrdinalIgnoreCase) &&
+                cmd.Contains(nativeCliPathSegment, StringComparison.OrdinalIgnoreCase) &&
                 cmd.Contains(" gateway --port ", StringComparison.OrdinalIgnoreCase);
         }
         catch

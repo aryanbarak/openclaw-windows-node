@@ -16,7 +16,7 @@ $temporaryRoot = Join-Path ([IO.Path]::GetTempPath()) "openclaw-msix-ci-tests-$(
 New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
 $rsa = [Security.Cryptography.RSA]::Create(2048)
 $request = [Security.Cryptography.X509Certificates.CertificateRequest]::new(
-    'CN=OpenClaw Local Development', $rsa,
+    'CN=Smart-Agent Local Development', $rsa,
     [Security.Cryptography.HashAlgorithmName]::SHA256, [Security.Cryptography.RSASignaturePadding]::Pkcs1)
 $certificate = $request.CreateSelfSigned([DateTimeOffset]::UtcNow.AddMinutes(-1), [DateTimeOffset]::UtcNow.AddDays(1))
 $signatureStatus = 'Valid'
@@ -45,8 +45,8 @@ function New-Package {
     param(
         [string]$Directory,
         [string]$Name = 'Dev.msix',
-        [string]$Identity = 'OpenClawFoundation.OpenClaw.Dev',
-        [string]$Publisher = 'CN=OpenClaw Local Development',
+        [string]$Identity = 'SmartAgent.Companion.Dev',
+        [string]$Publisher = 'CN=Smart-Agent Local Development',
         [string]$Architecture = 'x64',
         [string]$Version = '2026.7.2.123',
         [string]$Omit = ''
@@ -135,7 +135,7 @@ try {
         $actualHash = (Get-FileHash (Join-Path $arguments.OutputDirectory $metadata.archive) -Algorithm SHA256).Hash
         if (-not $metadata.signed -or $metadata.signing -ne 'development-only' -or
             $metadata.archive -ne $packageName -or $metadata.architecture -ne $architecture -or
-            $metadata.identityName -ne 'OpenClawFoundation.OpenClaw.Dev' -or
+            $metadata.identityName -ne 'SmartAgent.Companion.Dev' -or
             $metadata.packageVersion -ne '2026.7.2.123' -or $metadata.sha256 -ne $actualHash -or
             $metadata.certificateThumbprint -ne $certificate.Thumbprint -or $metadata.sourceCommit -notmatch '^[0-9a-f]{40}$') {
             throw 'Dev package provenance did not match its inputs.'

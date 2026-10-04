@@ -26,7 +26,7 @@
         <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" Spacing="4">
             <controls:OnboardingMascot x:Name="MascotHero" Mood="Curious"
                                       HorizontalAlignment="Center" />
-            <TextBlock x:Uid="Onboarding_Copy_GatewayTitle" Text="Set up OpenClaw"
+            <TextBlock x:Uid="Onboarding_Copy_GatewayTitle" Text="Set up Smart-Agent"
                        Style="{StaticResource TitleTextBlockStyle}"
                        HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
             <TextBlock x:Uid="Onboarding_Copy_GatewayIntro" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="560"
@@ -69,7 +69,7 @@
                                 <controls:RecommendedBadge x:Name="NativeRecommendedBadge" />
                             </StackPanel>
                             <TextBlock x:Uid="Onboarding_Native_Description"
-                                       Text="Install and set up an OpenClaw gateway on this device"
+                                       Text="Install and set up a Smart-Agent gateway on this device"
                                        TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}" />
                         </StackPanel>
                     </Grid>
@@ -103,7 +103,7 @@
                             <TextBlock x:Uid="Onboarding_Copy_GatewayLocalDescription" TextWrapping="Wrap"
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                       Text="Install a private OpenClaw Gateway in WSL." />
+                                       Text="Install a private Smart-Agent Gateway in WSL." />
                         </StackPanel>
                     </Grid>
                 </ListViewItem>

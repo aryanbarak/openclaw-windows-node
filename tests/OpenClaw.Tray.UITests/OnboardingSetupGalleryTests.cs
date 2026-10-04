@@ -312,8 +312,8 @@ public sealed class OnboardingSetupGalleryTests(UIThreadFixture ui, ITestOutputH
                 var handle = WinRT.Interop.WindowNative.GetWindowHandle(ui.TestWindow);
                 OnboardingNativeProof.AssertProductDpi(ui.TestWindow);
                 using (await OnboardingNativeProof.CaptureAsync(ui.TestWindow, $"{_run}-shared-fixture-dpi",
-                    output, ["Welcome to OpenClaw", "Continue"])) { }
-                await OnboardingNativeProof.AssertNativeLabelAfterWpfLoadAsync(handle, "Welcome to OpenClaw");
+                    output, ["Welcome to Smart-Agent", "Continue"])) { }
+                await OnboardingNativeProof.AssertNativeLabelAfterWpfLoadAsync(handle, "Welcome to Smart-Agent");
                 await ui.YieldToRenderAsync();
                 await ui.RunOnUIAsync(async () =>
                 {
@@ -321,7 +321,7 @@ public sealed class OnboardingSetupGalleryTests(UIThreadFixture ui, ITestOutputH
                     OnboardingNativeProof.AssertProductDpi(ui.TestWindow);
                     OnboardingNativeProof.TraceDpiContext("Regression: same HWND after MTA WPF/UIA and next callback", ui.TestWindow);
                     using (await OnboardingNativeProof.CaptureAsync(ui.TestWindow, $"{_run}-shared-fixture-after-uia",
-                        output, ["Welcome to OpenClaw", "Continue"])) { }
+                        output, ["Welcome to Smart-Agent", "Continue"])) { }
                 });
             }
             finally

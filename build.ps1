@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Build script for OpenClaw Windows Hub
 
@@ -135,6 +135,7 @@ if ($buildDevMsix) {
 # Center, so they are incompatible with the dev identity and the local dev cert.
 $storeMsixRuntimeIdentifiers = @("win-x64", "win-arm64")
 if ($buildStoreMsix) {
+    throw "Smart-Agent Store MSIX packaging is not configured yet. Finalize the Partner Center package identity and publisher before using -Msix Store."
     if ($DevBuild) {
         throw "-Msix Store cannot be combined with -DevBuild. Store packages must use the release identity."
     }
@@ -414,7 +415,7 @@ if ($buildDevMsix) {
         $issues += "MSIX packaging requires the WinUI project"
     }
 
-    $devMsixCertificateDirectory = Join-Path $env:LOCALAPPDATA "OpenClawDevelopment\MSIX"
+    $devMsixCertificateDirectory = Join-Path $env:LOCALAPPDATA "SmartAgentDevelopment\MSIX"
     $devMsixThumbprintFile = Join-Path $devMsixCertificateDirectory "dev-msix-thumbprint.txt"
     $devMsixThumbprint = if (Test-Path $devMsixThumbprintFile) {
         (Get-Content -LiteralPath $devMsixThumbprintFile -Raw).Trim()
@@ -490,8 +491,8 @@ function Invoke-DotNetCaptured($arguments) {
 }
 
 function Get-InstalledDevMsixPackage {
-    Get-AppxPackage -Name "OpenClawFoundation.OpenClaw.Dev" -ErrorAction SilentlyContinue |
-        Where-Object Publisher -eq "CN=OpenClaw Local Development" |
+    Get-AppxPackage -Name "SmartAgent.Companion.Dev" -ErrorAction SilentlyContinue |
+        Where-Object Publisher -eq "CN=Smart-Agent Local Development" |
         Sort-Object { [version]$_.Version.ToString() } -Descending |
         Select-Object -First 1
 }
@@ -553,7 +554,7 @@ function Build-Project($name, $path, $useRid = $false, $packageMsix = $false) {
             }
         }
         if ($msixRevision -gt 65535) {
-            Write-Error "The installed development MSIX revision is already 65535. Remove the installed OpenClawFoundation.OpenClaw.Dev package before rebuilding."
+            Write-Error "The installed development MSIX revision is already 65535. Remove the installed SmartAgent.Companion.Dev package before rebuilding."
             return $false
         }
 

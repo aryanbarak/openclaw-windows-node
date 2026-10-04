@@ -91,7 +91,7 @@ public sealed partial class WizardPage : Page
 
         if (SetupPreview.RequestedPage == "wizard-error")
         {
-            TitleText.Text = "OpenClaw onboard hit a problem";
+            TitleText.Text = "Smart-Agent onboarding hit a problem";
             ShowError("The gateway restarted before the current wizard step finished. Your setup is still installed; choose Start wizard again, or use More options to restart onboard or skip and exit.");
             return;
         }
@@ -1743,7 +1743,7 @@ public sealed partial class WizardPage : Page
 
         if (!contextResult.IsSuccess)
         {
-            ShowFinalizationError($"OpenClaw onboard finished, but Windows node guidance could not be installed: {contextResult.Message}");
+            ShowFinalizationError($"Smart-Agent onboarding finished, but Windows node guidance could not be installed: {contextResult.Message}");
             return;
         }
 

@@ -1151,12 +1151,12 @@ public sealed partial class ConnectionPage : Page
             {
                 "Confirm Tailscale is running and signed in on this Windows PC.",
                 "Confirm this PC and the generated WSL gateway belong to the same tailnet.",
-                "Open the managed WSL gateway terminal as root and check tailscaled, Tailscale Serve, and the OpenClaw gateway service. Funnel is unsupported; remove any Funnel route. Companion keeps using WSS and never falls back to localhost.",
+                "Open the managed WSL gateway terminal as root and check tailscaled, Tailscale Serve, and the Smart-Agent gateway service. Funnel is unsupported; remove any Funnel route. Companion keeps using WSS and never falls back to localhost.",
             },
             RecoveryCategory.LocalPortConflict => new[]
             {
                 "Another process is listening on the managed WSL gateway's local address.",
-                "OpenClaw automatically removes only a fully verified obsolete OpenClaw gateway. Unknown processes are never stopped.",
+                "Smart-Agent automatically removes only a fully verified obsolete Smart-Agent gateway. Unknown processes are never stopped.",
                 "Stop the conflicting app or run Reconfigure… to choose a different gateway address, then retry.",
             },
             _ => new[]

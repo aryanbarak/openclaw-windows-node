@@ -548,6 +548,20 @@ public class ManagedLocalGatewayPortProvenanceServiceTests
             service.Inspect(ManagedRecord()).Kind);
     }
 
+    [Fact]
+    public void Inspect_OpenClawNativeCliPath_IsNotSmartAgentOwned()
+    {
+        var platform = FakePlatform.WithProvenNativeGateway();
+        platform.CommandLines[2144] = platform.CommandLines[2144]
+            .Replace(@"\SmartAgent\native-cli\", @"\OpenClawTray\native-cli\", StringComparison.Ordinal);
+        foreach (var path in platform.Files.Keys.ToArray())
+            platform.Files[path] = platform.Files[path]
+                .Replace(@"\SmartAgent\native-cli\", @"\OpenClawTray\native-cli\", StringComparison.Ordinal);
+        var service = new ManagedLocalGatewayPortProvenanceService(platform, NullLogger.Instance);
+
+        Assert.Equal(GatewayEndpointProvenanceKind.UnknownListener, service.Inspect(ManagedRecord()).Kind);
+    }
+
     private sealed class FakePlatform : IManagedLocalGatewayPortPlatform
     {
         public List<WindowsTcpListenerInfo> Listeners { get; } = [];
@@ -584,7 +598,7 @@ public class ManagedLocalGatewayPortProvenanceServiceTests
                 @"C:\Program Files\nodejs\node.exe",
                 new DateTime(2026, 7, 24, 0, 0, 0, DateTimeKind.Utc)));
             platform.CommandLines[2144] =
-                @"""C:\Program Files\nodejs\node.exe"" C:\Users\test\AppData\Local\OpenClawTray\native-cli\node_modules\openclaw\dist\index.js gateway --port 18789";
+                @"""C:\Program Files\nodejs\node.exe"" C:\Users\test\AppData\Local\SmartAgent\native-cli\node_modules\openclaw\dist\index.js gateway --port 18789";
             platform.TaskXml = new System.Xml.Linq.XDocument(
                 new System.Xml.Linq.XElement(
                     "Task",
@@ -599,7 +613,7 @@ public class ManagedLocalGatewayPortProvenanceServiceTests
                 set "OPENCLAW_STATE_DIR={profileDir}"
                 set "OPENCLAW_WINDOWS_TASK_NAME=OpenClaw Gateway (OpenClawGateway)"
                 set "OPENCLAW_GATEWAY_PORT=18789"
-                C:\Users\test\AppData\Local\OpenClawTray\native-cli\node_modules\openclaw\dist\index.js gateway --port 18789
+                C:\Users\test\AppData\Local\SmartAgent\native-cli\node_modules\openclaw\dist\index.js gateway --port 18789
                 """;
             return platform;
         }

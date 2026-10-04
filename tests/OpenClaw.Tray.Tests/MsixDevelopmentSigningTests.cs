@@ -11,15 +11,15 @@ public sealed class MsixDevelopmentSigningTests
         var script = File.ReadAllText(Path.Combine(
             root, "scripts", "setup-dev-msix-cert.ps1"));
 
-        Assert.Contains("CN=OpenClaw Local Development", project);
-        Assert.Contains(@"$(LOCALAPPDATA)\OpenClawDevelopment\MSIX", project);
+        Assert.Contains("CN=Smart-Agent Local Development", project);
+        Assert.Contains(@"$(LOCALAPPDATA)\SmartAgentDevelopment\MSIX", project);
         Assert.Contains("'$(DevBuild)' == 'true'", project);
         Assert.Contains("<PackageCertificateThumbprint", project);
         Assert.DoesNotContain("<PackageCertificateKeyFile", project);
         Assert.DoesNotContain("<PackageCertificatePassword", project);
         Assert.Contains("Partner Center", project);
 
-        Assert.Contains(@"%LOCALAPPDATA%\OpenClawDevelopment\MSIX", script);
+        Assert.Contains(@"%LOCALAPPDATA%\SmartAgentDevelopment\MSIX", script);
         Assert.Contains(@"Cert:\CurrentUser\My", script);
         Assert.Contains(@"Cert:\LocalMachine\TrustedPeople", script);
         Assert.Contains("-KeyExportPolicy NonExportable", script);
@@ -72,6 +72,7 @@ public sealed class MsixDevelopmentSigningTests
         var packagingScript = File.ReadAllText(Path.Combine(root, "scripts", "Build-StoreMsix.ps1"));
 
         Assert.Contains("$buildStoreMsix = ($Msix -eq \"Store\")", buildScript);
+        Assert.Contains("Smart-Agent Store MSIX packaging is not configured yet", buildScript);
         Assert.Contains("$storeMsixRuntimeIdentifiers = @(\"win-x64\", \"win-arm64\")", buildScript);
         Assert.Contains(@"scripts\Build-StoreMsix.ps1", buildScript);
 
@@ -159,7 +160,7 @@ public sealed class MsixDevelopmentSigningTests
         Assert.Contains("xmlns:com=", manifest);
         Assert.Contains("windows.toastNotificationActivation", manifest);
         Assert.Contains("windows.comServer", manifest);
-        Assert.Contains("EF9297B3-EEEB-4E50-8306-D1D118E04BC7", manifest);
+        Assert.Contains("4195C1A8-252F-46CD-9CC1-E9593CF15D17", manifest);
         Assert.Contains("Arguments=\"-ToastActivated\"", manifest);
         Assert.Contains("Microsoft.VCLibs.140.00.UWPDesktop", manifest);
         Assert.Contains("MinVersion=\"14.0.33728.0\"", manifest);
@@ -223,8 +224,10 @@ public sealed class MsixDevelopmentSigningTests
         Assert.Contains("<UpdateVersionProperties>true</UpdateVersionProperties>",
             File.ReadAllText(Path.Combine(root, "src", "Directory.Build.props")));
         Assert.Contains("$(GitVersion_CommitsSinceVersionSource)", project);
+        Assert.Contains("IdentityName=\"SmartAgent.Companion.Dev\"", project);
         Assert.Contains("Publisher=\"$(OpenClawDevMsixPublisher)\"", project);
-        Assert.Contains("ToastActivatorClsid=\"C536D4AD-19BE-4F7A-B227-AB97629BF299\"", project);
+        Assert.Contains("ProtocolName=\"smartagent-dev\"", project);
+        Assert.Contains("ToastActivatorClsid=\"A6E840A0-02A5-41EF-AC44-8B4B175B2F89\"", project);
         Assert.Contains("toastClsidRegex.Replace", project);
         Assert.Contains("comClassRegex.Replace", project);
     }
@@ -239,7 +242,7 @@ public sealed class MsixDevelopmentSigningTests
             root, "src", "OpenClaw.Tray.WinUI", "Services", "AutoStartManager.cs"));
 
         Assert.Contains("Category=\"windows.startupTask\"", manifest);
-        Assert.Contains("TaskId=\"OpenClawStartup\"", manifest);
+        Assert.Contains("TaskId=\"SmartAgentStartup\"", manifest);
         Assert.Contains("Enabled=\"false\"", manifest);
         Assert.Contains("EntryPoint=\"Windows.FullTrustApplication\"", manifest);
 
@@ -356,10 +359,12 @@ public sealed class MsixDevelopmentSigningTests
         Assert.Contains("startupTaskDisplayRegex", project);
         Assert.Contains("desktop:StartupTask", project);
         Assert.Contains("StartupTask/@DisplayName missing from", project);
+        Assert.Contains("startupTaskIdRegex", project);
+        Assert.Contains("StartupTaskId=\"SmartAgentStartupDev\"", project);
     }
 
     [Fact]
-    public void PackageDisplayNames_MatchThePartnerCenterReservation()
+    public void PackageDisplayNames_UseSmartAgentBranding()
     {
         var root = TestRepositoryPaths.GetRepositoryRoot();
         var manifest = File.ReadAllText(Path.Combine(
@@ -367,14 +372,12 @@ public sealed class MsixDevelopmentSigningTests
         var project = File.ReadAllText(Path.Combine(
             root, "src", "OpenClaw.Tray.WinUI", "OpenClaw.Tray.WinUI.csproj"));
 
-        // "OpenClaw" is the reserved Partner Center name, and these strings are what the
-        // Store listing, the Start menu tile, and Startup Apps display. Package identity is
-        // Identity/@Name plus @Publisher, so display names are labels only and changing them
-        // breaks nothing, which is precisely why a silent revert would otherwise go unnoticed.
-        Assert.Contains("<DisplayName>OpenClaw</DisplayName>", manifest);
-        Assert.Contains(@"DisplayName=""OpenClaw""", manifest);
+        // Smart-Agent owns the visible package labels. Production Store identity/publisher are
+        // deliberately separate and remain fail-closed until Partner Center values are approved.
+        Assert.Contains("<DisplayName>Smart-Agent</DisplayName>", manifest);
+        Assert.Contains(@"DisplayName=""Smart-Agent""", manifest);
         Assert.DoesNotContain("OpenClaw Companion", manifest);
-        Assert.Contains(@"DisplayName=""OpenClaw (Dev)""", project);
+        Assert.Contains(@"DisplayName=""Smart-Agent (Dev)""", project);
     }
 
     [Fact]

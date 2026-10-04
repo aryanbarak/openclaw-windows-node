@@ -70,7 +70,7 @@ public sealed partial class WorkspaceWindow : WindowEx
             UriSource = new Uri(BrandAssets.RedBotMarkUri),
             ShowAsMonochrome = false
         };
-        this.SetIcon("Assets\\openclaw.ico");
+        this.SetIcon("Assets\\smart-agent.ico");
         SetTitleBar(WorkspaceTitleBar);
         NewAgentLabel.Text = LocalizationHelper.GetString("AgentCreation_Title");
         AutomationProperties.SetName(NewAgentOption, NewAgentLabel.Text);
@@ -593,21 +593,28 @@ public sealed partial class WorkspaceWindow : WindowEx
         foreach (var (label, url) in new[]
         {
             ("Documentation", "https://docs.openclaw.ai"),
-            ("Support", "https://docs.openclaw.ai/help"),
-            ("Community", "https://discord.gg/clawd"),
-            ("ReleaseNotes", "https://docs.openclaw.ai/releases")
+            ("Community", "https://discord.gg/clawd")
         })
         {
             var item = new MenuFlyoutItem { Text = Text(label) };
             item.Click += async (_, _) => await OpenLinkAsync(url);
             help.Items.Add(item);
         }
-        var github = new MenuFlyoutItem
+        if (OpenClawAppIdentity.ReleaseRepositoryOwnershipConfigured)
         {
-            Text = LocalizationHelper.GetString("SettingsPage_AppInfoGitHub.Content")
-        };
-        github.Click += async (_, _) => await OpenLinkAsync("https://github.com/openclaw/openclaw-windows-node");
-        help.Items.Add(github);
+            var support = new MenuFlyoutItem { Text = Text("Support") };
+            support.Click += async (_, _) =>
+                await OpenLinkAsync(OpenClawAppIdentity.PlannedReleaseSupportUrl);
+            help.Items.Add(support);
+
+            var github = new MenuFlyoutItem
+            {
+                Text = LocalizationHelper.GetString("SettingsPage_AppInfoGitHub.Content")
+            };
+            github.Click += async (_, _) =>
+                await OpenLinkAsync(OpenClawAppIdentity.PlannedReleaseRepositoryUrl);
+            help.Items.Add(github);
+        }
         menu.Items.Add(help);
         Add("About", () => OpenCompanion(CompanionPageId.About), FluentIconCatalog.About);
         OwnerButton.Flyout = menu;

@@ -7,10 +7,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableMsixTooling>true</EnableMsixTooling>
-    <ApplicationIcon>Assets\openclaw.ico</ApplicationIcon>
-    <AssemblyTitle>OpenClaw Companion</AssemblyTitle>
-    <FileDescription>OpenClaw Companion</FileDescription>
-    <Product>OpenClaw Companion</Product>
+    <ApplicationIcon>Assets\smart-agent.ico</ApplicationIcon>
+    <AssemblyTitle>Smart Agent Companion</AssemblyTitle>
+    <FileDescription>Smart Agent Companion</FileDescription>
+    <Product>Smart Agent Companion</Product>
     <RootNamespace>OpenClawTray</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <Platforms>x64;ARM64</Platforms>
@@ -29,9 +29,9 @@
   <PropertyGroup Condition="'$(DevBuild)' == 'true'">
     <DefineConstants>$(DefineConstants);DEV_BUILD</DefineConstants>
     <AppIdentityMarker>dev</AppIdentityMarker>
-    <AssemblyTitle>OpenClaw Companion (Dev)</AssemblyTitle>
-    <FileDescription>OpenClaw Companion (Dev)</FileDescription>
-    <Product>OpenClaw Companion (Dev)</Product>
+    <AssemblyTitle>Smart Agent Companion (Dev)</AssemblyTitle>
+    <FileDescription>Smart Agent Companion (Dev)</FileDescription>
+    <Product>Smart Agent Companion (Dev)</Product>
   </PropertyGroup>
   <PropertyGroup Condition="'$(DevBuild)' != 'true'">
     <AppIdentityMarker>release</AppIdentityMarker>
@@ -70,8 +70,8 @@
   <PropertyGroup Condition="'$(PackageMsix)' == 'true'">
     <WindowsPackageType>MSIX</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <OpenClawDevMsixPublisher>CN=OpenClaw Local Development</OpenClawDevMsixPublisher>
-    <OpenClawDevMsixCertificateDirectory>$(LOCALAPPDATA)\OpenClawDevelopment\MSIX</OpenClawDevMsixCertificateDirectory>
+    <OpenClawDevMsixPublisher>CN=Smart-Agent Local Development</OpenClawDevMsixPublisher>
+    <OpenClawDevMsixCertificateDirectory>$(LOCALAPPDATA)\SmartAgentDevelopment\MSIX</OpenClawDevMsixCertificateDirectory>
     <OpenClawDevMsixThumbprintFile>$(OpenClawDevMsixCertificateDirectory)\dev-msix-thumbprint.txt</OpenClawDevMsixThumbprintFile>
     <OpenClawDevMsixCertificateThumbprint Condition="'$(DevBuild)' == 'true' and Exists('$(OpenClawDevMsixThumbprintFile)')">$([System.IO.File]::ReadAllText('$(OpenClawDevMsixThumbprintFile)').Trim())</OpenClawDevMsixCertificateThumbprint>
     <!-- Local DevBuild packages use a non-exportable self-signed certificate.
@@ -124,7 +124,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Remove="Assets\openclaw.ico;Assets\Setup\OpenClawMascot.png;Assets\Brand\README.md" />
+    <None Remove="Assets\openclaw.ico;Assets\Setup\OpenClawMascot.png;Assets\Brand\README.md" />
+    <Content Include="Assets\**\*" Exclude="Assets\openclaw.ico;Assets\Setup\OpenClawMascot.png;Assets\Brand\README.md" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <None Include="..\OpenClaw.SetupEngine\default-config.json"
              Link="default-config.json"
@@ -160,6 +162,7 @@
       <DisplayName ParameterType="System.String" Required="true" />
       <ProtocolName ParameterType="System.String" Required="true" />
       <ToastActivatorClsid ParameterType="System.String" Required="true" />
+      <StartupTaskId ParameterType="System.String" Required="true" />
     </ParameterGroup>
     <Task>
       <Code Type="Fragment" Language="cs">
@@ -241,6 +244,15 @@
             }
             text = startupTaskDisplayRegex.Replace(text, "${1}" + DisplayName + "$2", 1);
 
+            var startupTaskIdRegex = new System.Text.RegularExpressions.Regex(
+                "(<desktop:StartupTask\\b[^>]*?\\bTaskId\\s*=\\s*[\"'])[^\"']+([\"'])",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (!startupTaskIdRegex.IsMatch(text)) {
+                Log.LogError("GenerateOpenClawAppxManifest: StartupTask/@TaskId missing from " + SourceManifestPath);
+                return false;
+            }
+            text = startupTaskIdRegex.Replace(text, "${1}" + StartupTaskId + "$2", 1);
+
             var toastClsidRegex = new System.Text.RegularExpressions.Regex(
                 "(<desktop:ToastNotificationActivation\\b[^>]*?\\bToastActivatorCLSID\\s*=\\s*[\"'])[^\"']+([\"'])",
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase);
@@ -269,6 +281,7 @@
           DependsOnTargets="GetVersion"
           Condition="'$(WindowsPackageType)' == 'MSIX'">
     <Error Text="MSIX packaging requested but Version is empty. Pass /p:Version=X.Y[.Z]." Condition="'$(Version)' == ''" />
+    <Error Text="Smart-Agent Store MSIX identity/publisher are not configured yet. Store packaging is intentionally fail-closed until Partner Center identity is approved." Condition="'$(DevBuild)' != 'true'" />
     <PropertyGroup>
       <_StrippedVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(Version)', '[-+].*$', ''))</_StrippedVersion>
       <_VersionDotCount>$([System.Text.RegularExpressions.Regex]::Matches('$(_StrippedVersion)', '\.').Count)</_VersionDotCount>
@@ -292,11 +305,12 @@
       OutputManifestPath="$(_GeneratedAppxManifestPath)"
       FourPartVersion="$(_AppxManifestVersion)"
       DevBuild="$(DevBuild)"
-      IdentityName="OpenClawFoundation.OpenClaw.Dev"
+      IdentityName="SmartAgent.Companion.Dev"
       Publisher="$(OpenClawDevMsixPublisher)"
-      DisplayName="OpenClaw (Dev)"
-      ProtocolName="openclaw-dev"
-      ToastActivatorClsid="C536D4AD-19BE-4F7A-B227-AB97629BF299" />
+      DisplayName="Smart-Agent (Dev)"
+      ProtocolName="smartagent-dev"
+      ToastActivatorClsid="A6E840A0-02A5-41EF-AC44-8B4B175B2F89"
+      StartupTaskId="SmartAgentStartupDev" />
     <ItemGroup>
       <AppxManifest Remove="@(AppxManifest)" />
       <AppxManifest Include="$(_GeneratedAppxManifestPath)">

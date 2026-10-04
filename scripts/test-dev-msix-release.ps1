@@ -16,8 +16,8 @@ New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
 $sourceCommit = (& git -C $RepoRoot rev-parse HEAD) -join ''
 if ($LASTEXITCODE -ne 0) { throw 'Could not resolve fixture source commit.' }
 $scenario = 0
-$expectedIdentity = 'OpenClawFoundation.OpenClaw.Dev'
-$expectedPublisher = 'CN=OpenClaw Local Development'
+$expectedIdentity = 'SmartAgent.Companion.Dev'
+$expectedPublisher = 'CN=Smart-Agent Local Development'
 $expectedRunId = 456
 $expectedRevision = 123
 $rsa = [Security.Cryptography.RSA]::Create(2048)

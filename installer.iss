@@ -1,37 +1,39 @@
-; OpenClaw Companion Inno Setup Script (WinUI version)
+; Smart-Agent Companion Inno Setup Script (WinUI version)
 ; Pass /DDevBuild=1 to produce a side-by-side dev installer.
 #ifdef DevBuild
-  #define MyAppName "OpenClaw Companion (Dev)"
-  #define MyAppAumid "OpenClaw.Companion.Dev"
-  #define MyAppId "{{M0LTB0T-TRAY-4PP1-DEV}"
-  #define MyInstallDir "OpenClawTray-Dev"
-  #define MyMutex "OpenClawTray-Dev"
-  #define MyAutoStartName "OpenClawTray-Dev"
-  #define MyStartupTaskName "OpenClaw Companion (Dev)"
-  #define MyDistroName "OpenClawGateway-Dev"
-  #define MyProtocol "openclaw-dev"
+  #define MyAppName "Smart-Agent (Dev)"
+  #define MyAppAumid "SmartAgent.Companion.Dev"
+  #define MyAppId "{{1344D80D-ECF7-4E4B-BC17-236B3509661D}"
+  #define MyInstallDir "SmartAgent-Dev"
+  #define MyMutex "SmartAgent-Dev"
+  #define MyAutoStartName "SmartAgent-Dev"
+  #define MyStartupTaskName "Smart Agent Companion (Dev)"
+  #define MyDistroName "SmartAgentGateway-Dev"
+  #define MyProtocol "smartagent-dev"
   #define MyOutputSuffix "-Dev"
 #else
-  #define MyAppName "OpenClaw Companion"
-  #define MyAppAumid "OpenClaw.Companion"
-  #define MyAppId "{{M0LTB0T-TRAY-4PP1-D3N7}"
-  #define MyInstallDir "OpenClawTray"
-  #define MyMutex "OpenClawTray"
-  #define MyAutoStartName "OpenClawTray"
-  #define MyStartupTaskName "OpenClaw Companion"
-  #define MyDistroName "OpenClawGateway"
-  #define MyProtocol "openclaw"
+  #define MyAppName "Smart-Agent"
+  #define MyAppAumid "SmartAgent.Companion"
+  #define MyAppId "{{011A8C2B-1CC9-4F76-9B27-CA1DA1933DBA}"
+  #define MyInstallDir "SmartAgent"
+  #define MyMutex "SmartAgent"
+  #define MyAutoStartName "SmartAgent"
+  #define MyStartupTaskName "Smart Agent Companion"
+  #define MyDistroName "SmartAgentGateway"
+  #define MyProtocol "smartagent"
   #define MyOutputSuffix ""
 #endif
-#define MyAppPublisher "OpenClaw Foundation"
-#define MyAppURL "https://github.com/openclaw/openclaw-windows-node"
+#define MyAppPublisher "Smart-Agent"
 #define MyAppExeName "OpenClaw.Tray.WinUI.exe"
 
 ; Must stay equal to MigrationRecordCodec.PackageName. The uninstaller reads the
 ; packaged-app registration under this identity to decide whether the Store app is
 ; present, and a drift here would silently restore the destructive advice.
 ; Pinned by InnoMigrationContractTests.Installer_PinsTheStorePackageIdentity.
+; Smart-Agent never adopts the upstream OpenClaw Store migration contract.
+; Keep the upstream package identity/code for mergeability, but compile its runtime path out.
 #define MyStorePackageName "OpenClawFoundation.OpenClaw"
+#define MyStoreMigrationEnabled 0
 
 ; MyAppArch should be passed via /DMyAppArch=x64 or /DMyAppArch=arm64
 #ifndef MyAppArch
@@ -53,18 +55,18 @@ AppId={#MyAppId}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL=https://github.com/openclaw/openclaw-windows-node/issues
-AppUpdatesURL=https://github.com/openclaw/openclaw-windows-node/releases
+; Smart-Agent product/support/update URLs are intentionally omitted until the
+; planned release repository is actually owned and the release signing/verification
+; policy is configured. Do not fall back to upstream OpenClaw URLs.
 DefaultDirName={localappdata}\{#MyInstallDir}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-OutputBaseFilename=OpenClawCompanion{#MyOutputSuffix}-Setup-{#MyAppArch}
+OutputBaseFilename=SmartAgentCompanion{#MyOutputSuffix}-Setup-{#MyAppArch}
 Compression={#MyCompression}
 SolidCompression={#MySolidCompression}
 WizardStyle=modern
 PrivilegesRequired=lowest
-SetupIconFile=src\OpenClaw.Tray.WinUI\Assets\openclaw.ico
+SetupIconFile=src\OpenClaw.Tray.WinUI\Assets\smart-agent.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 ; Round 2 (Scott #5): block install/uninstall while the tray is running.
 ; Mutex name matches AppIdentity.MutexBaseName for this build variant.
@@ -119,16 +121,16 @@ Source: "{#vcRedist}"; DestDir: "{tmp}"; DestName: "vc_redist.exe"; Flags: delet
 #endif
 
 [Registry]
-Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}"; ValueType: string; ValueName: ""; ValueData: "URL:OpenClaw Protocol"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}"; ValueType: string; ValueName: ""; ValueData: "URL:Smart-Agent Protocol"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
 Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"",0"
 Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Gateway Setup"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://setup"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Companion Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://commandcenter"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Chat"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://chat"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Gateway Setup"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://setup"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://commandcenter"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Chat"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://chat"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
 Name: "{group}\Check for Updates"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://check-updates"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; AppUserModelID: "{#MyAppAumid}"
@@ -218,6 +220,7 @@ var
   LastError: LongWord;
 begin
   Result := True;
+#if MyStoreMigrationEnabled
 #ifndef DevBuild
   MigrationOperationUnavailable := True;
   Directory := ExpandConstant('{userappdata}\{#MyInstallDir}\store-migration');
@@ -255,6 +258,7 @@ begin
   end;
   if Result and MigrationOperationUnavailable then
     Log('Migration state could not be locked. Uninstall continues and preserves the local gateway.');
+#endif
 #endif
 end;
 
@@ -513,6 +517,7 @@ begin
 
   LocalGatewayCleanupChoiceInitialized := True;
 
+#if MyStoreMigrationEnabled
   // Cleanup runs a child process that must join the migration lock. Without it the
   // uninstall cannot prove the gateway is unowned, so preservation is the only safe answer.
   if MigrationOperationUnavailable then
@@ -536,6 +541,7 @@ begin
       WarnMigrationCheckUnavailable;
     Exit;
   end;
+#endif
 
   if UninstallSilent() then
   begin
@@ -549,7 +555,7 @@ begin
     // moving to the Store package) must not lose their gateway by pressing Enter.
     LocalGatewayCleanupRequested :=
       MsgBox(
-        'Do you also want to remove the OpenClaw local WSL gateway?' + #13#10#13#10 +
+        'Do you also want to remove the Smart-Agent local WSL gateway?' + #13#10#13#10 +
         'Choose Yes to unregister the {#MyDistroName} WSL distro and remove generated local gateway state.' + #13#10 +
         'Choose No to leave the local gateway and generated local state on this computer.',
         mbConfirmation,
@@ -631,6 +637,7 @@ begin
     UninstallProgressForm.StatusLabel.Caption := 'Removing local WSL gateway...';
     Started := RunLocalGatewayCleanupOnce(ResultCode);
 
+#if MyStoreMigrationEnabled
     if Started and (ResultCode = 10) then
     begin
       Log('Completed Store migration detected before cleanup. Generated state will be preserved.');
@@ -658,6 +665,7 @@ begin
       WarnMigrationCheckUnavailable;
       Exit;
     end;
+#endif
 
     if UninstallSilent() then
     begin
@@ -667,9 +675,9 @@ begin
 
     Retry :=
       MsgBox(
-        'OpenClaw could not remove the local WSL gateway.' + #13#10#13#10 +
+        'Smart-Agent could not remove the local WSL gateway.' + #13#10#13#10 +
         'Exit code: ' + IntToStr(ResultCode) + #13#10#13#10 +
-        'Select Retry to try again, or Cancel to continue uninstalling OpenClaw and leave local gateway state on disk.',
+        'Select Retry to try again, or Cancel to continue uninstalling Smart-Agent and leave local gateway state on disk.',
         mbError,
         MB_RETRYCANCEL) = IDRETRY;
   until not Retry;

@@ -1016,7 +1016,7 @@ jobs:
       shell: pwsh
       run: |
         $info = Get-Content -LiteralPath "$env:RUNNER_TEMP\openclaw-msix-version.json" -Raw | ConvertFrom-Json
-        $thumbprint = (Get-Content "$env:LOCALAPPDATA\OpenClawDevelopment\MSIX\dev-msix-thumbprint.txt" -Raw).Trim()
+        $thumbprint = (Get-Content "$env:LOCALAPPDATA\SmartAgentDevelopment\MSIX\dev-msix-thumbprint.txt" -Raw).Trim()
         .\scripts\Export-DevMsixArtifact.ps1 `
           -Architecture ${{ matrix.architecture }} `
           -PackageDirectory "$env:RUNNER_TEMP\openclaw-dev-appx" `
@@ -1158,11 +1158,12 @@ jobs:
           -MsixBundleResult $env:MSIX_BUNDLE_RESULT
         "CI Gate passed $validatedMode validation." >> $env:GITHUB_STEP_SUMMARY
 
-  # Sign and package after the early release-critical suites pass so this work can
-  # overlap the long UI and E2E tail. Publication remains gated by ci-gate below.
+  # Legacy upstream release preparation remains OpenClaw-owned. Smart-Agent release
+  # publication stays fail-closed until its repository, signing identity, and artifact
+  # verification policy are explicitly configured in a separate downstream lane.
   prepare-release-assets:
     needs: [change-classification, metadata, reserve-msix-version, proof-pool-contracts, core-tests, tray-tests, build-x64, build-arm64]
-    if: startsWith(github.ref, 'refs/tags/v') && needs.change-classification.outputs.full == 'true' && needs.metadata.result == 'success' && needs.reserve-msix-version.result == 'success' && needs.proof-pool-contracts.result == 'success' && needs.core-tests.result == 'success' && needs.tray-tests.result == 'success' && needs.build-x64.result == 'success' && needs.build-arm64.result == 'success' && !cancelled()
+    if: github.repository == 'openclaw/openclaw-windows-node' && startsWith(github.ref, 'refs/tags/v') && needs.change-classification.outputs.full == 'true' && needs.metadata.result == 'success' && needs.reserve-msix-version.result == 'success' && needs.proof-pool-contracts.result == 'success' && needs.core-tests.result == 'success' && needs.tray-tests.result == 'success' && needs.build-x64.result == 'success' && needs.build-arm64.result == 'success' && !cancelled()
     runs-on: windows-latest
     environment: release-signing
     permissions:
@@ -1368,7 +1369,7 @@ jobs:
 
   release:
     needs: [change-classification, metadata, reserve-msix-version, prepare-release-assets, build-msix-bundle, ci-gate]
-    if: startsWith(github.ref, 'refs/tags/v') && needs.ci-gate.result == 'success' && needs.change-classification.outputs.full == 'true' && needs.metadata.result == 'success' && needs.reserve-msix-version.result == 'success' && needs.prepare-release-assets.result == 'success' && needs.build-msix-bundle.result == 'success' && !cancelled()
+    if: github.repository == 'openclaw/openclaw-windows-node' && startsWith(github.ref, 'refs/tags/v') && needs.ci-gate.result == 'success' && needs.change-classification.outputs.full == 'true' && needs.metadata.result == 'success' && needs.reserve-msix-version.result == 'success' && needs.prepare-release-assets.result == 'success' && needs.build-msix-bundle.result == 'success' && !cancelled()
     runs-on: windows-latest
     environment: release-signing
     permissions:

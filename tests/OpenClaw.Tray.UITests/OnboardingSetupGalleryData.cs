@@ -15,8 +15,8 @@ internal static class OnboardingSetupGalleryData
 
     internal static HeaderContract HeaderFor(Scene scene) => scene.Family switch
     {
-        "security" => new(typeof(SecurityNoticePage), "Welcome to OpenClaw"),
-        "welcome" => new(typeof(WelcomePage), "Set up OpenClaw"),
+        "security" => new(typeof(SecurityNoticePage), "Welcome to Smart-Agent"),
+        "welcome" => new(typeof(WelcomePage), "Set up Smart-Agent"),
         "advanced" => new(typeof(AdvancedSetupPage), "Choose another setup route"),
         "connection" => new(typeof(SetupNativeConnectionPage), "Connect to a gateway", "TitleText"),
         "capabilities" or "branch" => new(typeof(CapabilitiesPage), "PC capabilities"),
@@ -26,7 +26,7 @@ internal static class OnboardingSetupGalleryData
         "networking" => new(typeof(GatewaySetupDetailPage), "WSL networking consent", "DetailTitle"),
         "ai" or "ai-return" or "dialog" => new(typeof(AiSetupPage), "Connect your AI", "TitleText"),
         "preview" when scene.State.StartsWith("wizard", StringComparison.Ordinal) =>
-            new(typeof(WizardPage), "OpenClaw onboard"),
+            new(typeof(WizardPage), "Smart-Agent onboarding"),
         "preview" when scene.State == "milestone" =>
             new(typeof(ProgressPage), "Gateway installed", ContainerName: "MilestonePanel"),
         "preview" => new(typeof(ProgressPage), "Making room for your agent", "TitleText"),

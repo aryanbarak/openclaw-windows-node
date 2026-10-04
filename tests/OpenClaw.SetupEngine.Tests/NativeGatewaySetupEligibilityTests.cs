@@ -4,6 +4,15 @@ namespace OpenClaw.SetupEngine.Tests;
 
 public sealed class NativeGatewaySetupEligibilityTests
 {
+    [Fact]
+    public void ProductPolicy_DefersManagedNativeGatewayBeforeCapabilityProbe()
+    {
+        Assert.False(OpenClaw.Shared.OpenClawAppIdentity.ManagedNativeGatewayEnabled);
+        Assert.Equal(NativeGatewayEligibility.Deferred, NativeGatewaySetupEligibility.Probe());
+        Assert.Null(NativeGatewaySetupEligibility.ResolveSelection(
+            GatewaySetupChoice.Native, NativeGatewayEligibility.Deferred));
+    }
+
     [Theory]
     [InlineData(true, NativeGatewayEligibility.Available)]
     [InlineData(false, NativeGatewayEligibility.CapabilityUnavailable)]
@@ -36,9 +45,11 @@ public sealed class NativeGatewaySetupEligibilityTests
     [InlineData(null, NativeGatewayEligibility.CapabilityUnavailable, null)]
     [InlineData(null, NativeGatewayEligibility.CheckFailed, null)]
     [InlineData(null, NativeGatewayEligibility.UnsupportedPlatform, null)]
+    [InlineData(null, NativeGatewayEligibility.Deferred, null)]
     [InlineData(GatewaySetupChoice.Native, NativeGatewayEligibility.Available, GatewaySetupChoice.Native)]
     [InlineData(GatewaySetupChoice.Native, NativeGatewayEligibility.CapabilityUnavailable, null)]
     [InlineData(GatewaySetupChoice.Native, NativeGatewayEligibility.CheckFailed, null)]
+    [InlineData(GatewaySetupChoice.Native, NativeGatewayEligibility.Deferred, null)]
     [InlineData(GatewaySetupChoice.Existing, NativeGatewayEligibility.Available, GatewaySetupChoice.Existing)]
     [InlineData(GatewaySetupChoice.Existing, NativeGatewayEligibility.CheckFailed, GatewaySetupChoice.Existing)]
     [InlineData(GatewaySetupChoice.Wsl, NativeGatewayEligibility.Available, GatewaySetupChoice.Wsl)]

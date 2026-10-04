@@ -32,7 +32,7 @@ public sealed class GatewayRegistry
     /// <summary>
     /// Create a GatewayRegistry backed by the given data directory.
     /// </summary>
-    /// <param name="dataDir">Root data directory (e.g. %APPDATA%/OpenClawTray).</param>
+    /// <param name="dataDir">Root data directory (e.g. %APPDATA%/SmartAgent).</param>
     /// <param name="fs">Filesystem abstraction for testability.</param>
     /// <param name="logger">Optional diagnostics sink for persistence problems.</param>
     public GatewayRegistry(string dataDir, IFileSystem? fs = null, IOpenClawLogger? logger = null)
@@ -636,11 +636,11 @@ public sealed class GatewayRegistry
             var preferredDataDirectory = settingsDirectoryName.EndsWith(
                 "-Dev",
                 StringComparison.OrdinalIgnoreCase)
-                    ? "OpenClawTray-Dev"
-                    : "OpenClawTray";
-            var alternateDataDirectory = preferredDataDirectory == "OpenClawTray"
-                ? "OpenClawTray-Dev"
-                : "OpenClawTray";
+                    ? OpenClawAppIdentity.DevDataDirectoryName
+                    : OpenClawAppIdentity.ReleaseDataDirectoryName;
+            var alternateDataDirectory = preferredDataDirectory == OpenClawAppIdentity.ReleaseDataDirectoryName
+                ? OpenClawAppIdentity.DevDataDirectoryName
+                : OpenClawAppIdentity.ReleaseDataDirectoryName;
             var candidates = string.IsNullOrWhiteSpace(direct)
                 ? new[]
                 {

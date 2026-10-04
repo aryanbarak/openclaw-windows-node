@@ -55,7 +55,7 @@ public sealed class RecordingConsentDialog : WindowEx
         Title = windowTitle;
         this.SetWindowSize(460, 340);
         this.CenterOnScreen();
-        this.SetIcon("Assets\\openclaw.ico");
+        this.SetIcon("Assets\\smart-agent.ico");
 
         SystemBackdrop = new MicaBackdrop();
         ExtendsContentIntoTitleBar = true;

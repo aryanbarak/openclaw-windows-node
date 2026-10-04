@@ -4,10 +4,10 @@
     <!-- Selected first coordinated Inno/Store release. Verify its artifacts before
          enabling migration; never derive this floor from the current Version. -->
     <MigrationMinimumSourceVersion Condition="'$(MigrationMinimumSourceVersion)' == ''">2026.9.5.0</MigrationMinimumSourceVersion>
-    <!-- Enabled for the coordinated 2026.9.5 Inno/Store release. Release non-Dev builds
-         ship both migration surfaces; Debug, Dev, and preview builds stay excluded below.
-         Set this to false to build a release without migration. -->
-    <MigrationProductionEnabled Condition="'$(MigrationProductionEnabled)' == ''">true</MigrationProductionEnabled>
+    <!-- Smart-Agent is a separate product and must never adopt an OpenClaw installation.
+         Keep the upstream migration implementation available for explicit fixture builds,
+         but exclude it from every normal downstream build. -->
+    <MigrationProductionEnabled Condition="'$(MigrationProductionEnabled)' == ''">false</MigrationProductionEnabled>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(MigrationProductionEnabled)' == 'true' and '$(Configuration)' == 'Release' and '$(DevBuild)' != 'true'">
@@ -49,6 +49,8 @@
   <Target Name="ValidateMigrationSwitch">
     <Error Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(MigrationProductionEnabled)', '^(?i:true|false)$'))"
            Text="MigrationProductionEnabled must be true or false." />
+    <Error Condition="'$(MigrationProductionEnabled)' == 'true'"
+           Text="Smart-Agent builds cannot enable OpenClaw production state migration." />
   </Target>
   <Target Name="ValidateProductionMigration"
           Condition="'$(MigrationProductionEnabled)' == 'true' and '$(Configuration)' == 'Release' and '$(DevBuild)' != 'true'">

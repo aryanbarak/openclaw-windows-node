@@ -79,10 +79,10 @@ public sealed partial class ChatWindow : WindowEx
         _token = token;
         _chatUrl = ChatSurfaceResolver.BuildChatUrl(gatewayUrl, token);
         InitializeComponent();
-        Title = AppIdentity.DecorateWindowTitle("OpenClaw Chat");
+        Title = AppIdentity.DecorateWindowTitle("Smart-Agent Chat");
 
         this.SetWindowSize(DefaultChatWidth, DefaultChatHeight);
-        this.SetIcon("Assets\\openclaw.ico");
+        this.SetIcon("Assets\\smart-agent.ico");
 
         // Set as tool window (hidden from taskbar) + remove system caption.
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);

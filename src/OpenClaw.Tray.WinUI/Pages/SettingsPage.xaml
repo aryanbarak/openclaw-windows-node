@@ -113,7 +113,7 @@
                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
                             <TextBlock x:Uid="SettingsRow_AutoStart_Header" Text="Start with Windows" Style="{StaticResource BodyTextBlockStyle}"/>
                             <TextBlock x:Uid="SettingsRow_AutoStart_Description"
-                                       Text="Launch OpenClaw automatically when you sign in."
+                                       Text="Launch Smart-Agent automatically when you sign in."
                                        Style="{StaticResource CaptionTextBlockStyle}"
                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                        TextWrapping="Wrap"/>
@@ -335,7 +335,7 @@
                 <TextBlock x:Uid="SettingsPage_Privacy" Text="Privacy" Style="{StaticResource BodyStrongTextBlockStyle}"
                            Margin="{StaticResource SectionHeaderMargin}"/>
                 <TextBlock x:Uid="SettingsPrivacyDescription"
-                           Text="Allow sensitive capture without prompting every time. OpenClaw still notifies you before each access and shows a countdown before recordings."
+                           Text="Allow sensitive capture without prompting every time. Smart-Agent still notifies you before each access and shows a countdown before recordings."
                            Style="{StaticResource CaptionTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            TextWrapping="Wrap" Margin="4,0,4,4"/>
@@ -456,10 +456,10 @@
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
                            <TextBlock x:Uid="SettingsPage_OnboardWizard_Header"
-                                      Text="OpenClaw Onboard"
+                                      Text="Smart-Agent Onboarding"
                                       Style="{StaticResource BodyTextBlockStyle}"/>
                            <TextBlock x:Uid="SettingsPage_OnboardWizard_Description"
-                                      Text="Open the OpenClaw onboarding on an installed Local Gateway. Skips WSL installation and jumps straight to configuration."
+                                      Text="Open the Smart-Agent onboarding on an installed Local Gateway. Skips WSL installation and jumps straight to configuration."
                                       Style="{StaticResource CaptionTextBlockStyle}"
                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                       TextWrapping="Wrap"/>
@@ -485,7 +485,7 @@
                                  IsOpen="False"
                                  IsClosable="False"
                                  Title="MSIX installation detected"
-                                 Message="Removing OpenClaw from Windows Settings → Apps will NOT clean up the Local Gateway (WSL distro, disk image). Use Remove Local Gateway below FIRST, then uninstall OpenClaw."/>
+                                 Message="Removing Smart-Agent from Windows Settings → Apps will NOT clean up the Local Gateway (WSL distro, disk image). Use Remove Local Gateway below FIRST, then uninstall Smart-Agent."/>
 
                         <TextBlock x:Uid="SettingsPage_RemovesTheWSLDistro" x:Name="GatewayBodyText"
                                    Text="Removes the app-owned WSL distro, its disk image, autostart entry, and clears gateway credentials. Your MCP token is preserved. Onboarding will reset."
@@ -578,7 +578,7 @@
                                            Style="{StaticResource CaptionTextBlockStyle}"
                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
                                 <TextBlock Grid.Row="0" Grid.Column="1"
-                                           Text="OpenClaw Windows Companion"
+                                           Text="Smart Agent Companion"
                                            Style="{StaticResource BodyTextBlockStyle}"
                                            IsTextSelectionEnabled="True"/>
 
@@ -672,6 +672,7 @@
                                                      Padding="0"
                                                      Click="OnDocumentationLink"/>
                                     <HyperlinkButton x:Uid="SettingsPage_AppInfoGitHub"
+                                                     x:Name="GitHubLink"
                                                      Content="GitHub"
                                                      Padding="0"
                                                      Click="OnGitHubLink"/>

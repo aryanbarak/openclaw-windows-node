@@ -3,6 +3,25 @@ namespace OpenClaw.SetupEngine.Tests;
 public sealed class SetupAccessDraftTests
 {
     [Fact]
+    public void ProductPolicy_RejectsAdoptingPersistedNativeGateway()
+    {
+        var draft = new SetupAccessDraft(new SetupConfig());
+        var record = new OpenClaw.Connection.GatewayRecord
+        {
+            Id = "native-owner",
+            Url = "ws://127.0.0.1:55123",
+            NativePackageFamilyName = "native-package",
+            NativeRuntimeContract = OpenClaw.Connection.NativeGateway.NativeGatewayPackageClient.IsolatedContract,
+        };
+
+        var error = Assert.Throws<InvalidOperationException>(() =>
+            draft.SelectExistingNativeGateway(record));
+
+        Assert.Equal(OpenClaw.Shared.OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage, error.Message);
+        Assert.Equal(SetupGatewayRoute.ManagedWsl, draft.Route);
+    }
+
+    [Fact]
     public void ExistingNativeLocalAi_BindsExactGatewayWithoutWslFinalizationOrSettingsReplacement()
     {
         var config = new SetupConfig();
@@ -17,7 +36,7 @@ public sealed class SetupAccessDraftTests
             NativePackageFamilyName = "native-package",
             NativeRuntimeContract = OpenClaw.Connection.NativeGateway.NativeGatewayPackageClient.IsolatedContract
         };
-        draft.SelectExistingNativeGateway(record);
+        draft.SelectExistingNativeGateway(record, managedRuntimeEnabled: true);
         Assert.Equal(SetupGatewayRoute.Existing, draft.Route);
         Assert.True(draft.IsExistingNativeLocalAi);
         Assert.True(draft.GatewayAvailable);
