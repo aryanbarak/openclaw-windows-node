@@ -1417,7 +1417,7 @@ public sealed class AppRefactorContractTests
 
         Assert.Contains("restartRequired: result.RequiresRestart", progress);
         Assert.Contains("if (args.RequiresRestart)", complete);
-        Assert.Contains("OpenClaw needs to restart Windows to continue the installation. Would you like to restart now?", complete);
+        Assert.Contains("Smart-Agent needs to restart Windows to continue the installation. Would you like to restart now?", complete);
         Assert.Contains("Content=\"Yes, restart now\"", xaml);
         Assert.Contains("Content=\"No, I'm not ready yet\"", xaml);
         Assert.Contains("Path.Combine(Environment.SystemDirectory, \"shutdown.exe\")", restartLauncher);

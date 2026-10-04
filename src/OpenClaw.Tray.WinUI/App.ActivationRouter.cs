@@ -91,7 +91,7 @@ public partial class App : IActivationPlanSink
 
                 dialog = new ContentDialog
                 {
-                    Title = "Confirm OpenClaw action",
+                    Title = "Confirm Smart-Agent action",
                     Content = $"A deep link wants to {confirmation.ActionDisplayName}.",
                     PrimaryButtonText = "Allow",
                     CloseButtonText = "Cancel",

@@ -12,7 +12,7 @@
         <StackPanel Grid.Row="0" HorizontalAlignment="Stretch" Spacing="4">
             <controls:OnboardingMascot x:Name="MascotHero" Mood="Idle"
                                       HorizontalAlignment="Center" />
-            <TextBlock x:Uid="Onboarding_V2_WelcomeTitle" Text="Welcome to OpenClaw"
+            <TextBlock x:Uid="Onboarding_V2_WelcomeTitle" Text="Welcome to Smart-Agent"
                        Style="{StaticResource TitleTextBlockStyle}"
                        HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
             <TextBlock x:Name="WelcomeDescription" x:Uid="Onboarding_Flow_WelcomeDescription"
@@ -20,7 +20,7 @@
                        Style="{StaticResource BodyTextBlockStyle}"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        HorizontalAlignment="Center"
-                       Text="OpenClaw is your AI assistant for getting things done on your PC." />
+                       Text="Smart-Agent is your AI assistant for getting things done on your PC." />
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" Margin="0,24,0,16" MaxWidth="640" HorizontalContentAlignment="Stretch">
@@ -42,7 +42,7 @@
                 <InfoBar x:Uid="Onboarding_V2_WelcomeTrust" Margin="0,8,0,0"
                          IsOpen="True" IsClosable="False" Severity="Warning"
                          Title="Before you get started"
-                         Message="AI agents are powerful and giving them access to your PC carries risks. They can make mistakes, change or delete files, or expose private information.&#x0a;&#x0a;You can control and limit OpenClaw’s access to your PC.">
+                         Message="AI agents are powerful and giving them access to your PC carries risks. They can make mistakes, change or delete files, or expose private information.&#x0a;&#x0a;You can control and limit Smart-Agent’s access to your PC.">
                     <InfoBar.ActionButton>
                         <HyperlinkButton x:Uid="Onboarding_Copy_SafetyLink" Content="Learn more about risks and safety"
                                          NavigateUri="https://trust.openclaw.ai">

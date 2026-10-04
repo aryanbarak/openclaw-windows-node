@@ -91,7 +91,7 @@ public sealed class OpenClawChatDataProvider : IChatDataProvider
     /// <summary>Whether any thread is in an aborted state (suppress TTS/notifications).</summary>
     public bool IsResponseSuppressed => _state.IsResponseSuppressed;
 
-    public string DisplayName => "OpenClaw gateway";
+    public string DisplayName => "Smart-Agent gateway";
 
     /// <summary>Last-known chat state from a previous session, used for pre-connection UI.</summary>
     internal LastChatState? CachedLastChatState => _state.CachedLastChatState;

@@ -186,7 +186,7 @@ public sealed class WorkspaceWindowProofTests
     {
         using var app = new AccessibilityAppFixture(initializeAxe: false, theme: theme, initialRoute: "settings");
         var root = AutomationElement.FromHandle(app.HubWindowHandle);
-        Assert.Equal("OpenClaw Settings", root.Current.Name);
+        Assert.Equal("Smart-Agent Settings", root.Current.Name);
         var title = Find(root, "SettingsTitleBar").Current.BoundingRectangle;
         var toggle = Find(root, "SettingsTogglePane").Current.BoundingRectangle;
         var search = Find(root, "SettingsSearch").Current.BoundingRectangle;

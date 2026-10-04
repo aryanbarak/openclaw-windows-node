@@ -681,7 +681,7 @@ internal sealed class WindowManager : IWindowManager
             {
                 Id = $"local-ai-setup-owner-{Guid.NewGuid():N}",
                 Title = "Local AI setup needs attention",
-                Message = "OpenClaw could not safely identify the managed WSL gateway. Review Connection settings before retrying setup.",
+                Message = "Smart-Agent could not safely identify the managed WSL gateway. Review Connection settings before retrying setup.",
                 Severity = AppNotificationSeverity.Warning,
                 Source = "local-ai",
                 DedupeKey = "local-ai-setup-owner",
@@ -881,7 +881,7 @@ internal sealed class WindowManager : IWindowManager
                     _callbacks.IsDeepLinkArg,
                     Environment.ProcessId))
             {
-                Title = AppIdentity.DecorateWindowTitle("OpenClaw Setup"),
+                Title = AppIdentity.DecorateWindowTitle("Smart-Agent Setup"),
             };
             _setupWindow = setupWindow;
             _callbacks.ApplyTheme(setupWindow);

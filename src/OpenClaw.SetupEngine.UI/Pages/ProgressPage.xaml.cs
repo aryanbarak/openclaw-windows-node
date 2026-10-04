@@ -99,10 +99,10 @@ public sealed partial class ProgressPage : Page, IAsyncDisposable
                 6_322_405_376, 16_464_440_224, SetupDetailProgressUnit.Bytes));
         LogText.Text =
             "[12:04:01] [info] Windows 11 26100 · WSL 2 present\n" +
-            "[12:04:03] [info] port 127.0.0.1:18789 available\n" +
-            "[12:04:05] [info] wsl --install -d Ubuntu-24.04 --name OpenClawGateway --no-launch\n" +
+            "[12:04:03] [info] port 127.0.0.1:18889 available\n" +
+            "[12:04:05] [info] wsl --install -d Ubuntu-24.04 --name SmartAgentGateway --no-launch\n" +
             "[12:04:38] [info] downloading distro image (disk use varies)\n" +
-            "[12:04:38] [changed] created %LOCALAPPDATA%\\OpenClawTray\\wsl\\OpenClawGateway\\\n" +
+            "[12:04:38] [changed] created %LOCALAPPDATA%\\SmartAgent\\wsl\\SmartAgentGateway\\\n" +
             "[12:04:38] [info] next: install CLI via HTTPS, configure loopback gateway\n";
     }
 
@@ -400,7 +400,7 @@ public sealed partial class ProgressPage : Page, IAsyncDisposable
         if (SetupWindow.Active?.TryNavigateToWizard() == true)
             return;
 
-        MilestoneStatusText.Text = "Another setup task is still active. Wait for it to finish, then start OpenClaw onboard.";
+        MilestoneStatusText.Text = "Another setup task is still active. Wait for it to finish, then start Smart-Agent onboarding.";
     }
 
     private static List<SetupStep> BuildSteps(SetupConfig config, bool localAiRecoveryOnly = false)

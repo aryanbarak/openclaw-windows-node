@@ -440,7 +440,7 @@ public sealed class ConnectEnvelopeBuilderTests
                     ["platform"] = isOperator ? "windows" : "WinDows",
                     ["deviceFamily"] = isOperator ? "Windows" : "DeskTop",
                     ["mode"] = isOperator ? "cli" : "node",
-                    ["displayName"] = isOperator ? "OpenClaw Windows Tray" : "Registered Windows Node",
+                    ["displayName"] = isOperator ? "Smart-Agent Windows Companion" : "Registered Windows Node",
                 },
                 ["role"] = testCase.Role,
                 ["scopes"] = ToJsonArray(testCase.Scopes),

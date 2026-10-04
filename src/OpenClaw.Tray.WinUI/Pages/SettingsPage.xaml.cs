@@ -349,7 +349,7 @@ public sealed partial class SettingsPage : Page
         {
             new ToastContentBuilder()
                 .AddText("Test Notification")
-                .AddText("This is a test notification from OpenClaw settings.")
+                .AddText("This is a test notification from Smart-Agent settings.")
                 .Show();
         }
         catch (Exception ex)
@@ -467,7 +467,7 @@ public sealed partial class SettingsPage : Page
         try
         {
             var exePath = ResolveCurrentExecutablePath()
-                ?? throw new FileNotFoundException("OpenClaw tray executable could not be resolved for local gateway removal.");
+                ?? throw new FileNotFoundException("Smart-Agent tray executable could not be resolved for local gateway removal.");
 
             jsonOutput = Path.Combine(Path.GetTempPath(), $"openclaw-uninstall-{Guid.NewGuid():N}.json");
 
@@ -481,7 +481,7 @@ public sealed partial class SettingsPage : Page
             psi.ArgumentList.Add("--json-output");
             psi.ArgumentList.Add(jsonOutput);
 
-            proc = Process.Start(psi) ?? throw new InvalidOperationException("Failed to start OpenClaw uninstall process.");
+            proc = Process.Start(psi) ?? throw new InvalidOperationException("Failed to start Smart-Agent uninstall process.");
             await proc.WaitForExitAsync(_uninstallCts.Token);
 
             if (proc.ExitCode == 0)

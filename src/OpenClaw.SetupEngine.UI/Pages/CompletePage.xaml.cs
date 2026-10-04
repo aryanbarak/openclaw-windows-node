@@ -37,7 +37,7 @@ public sealed partial class CompletePage : Page
                 SetupReviewSummary review = args.ReviewSummary ?? SetupReviewSummaryBuilder.Build(new SetupConfig());
                 GatewaySummaryText.Text = review.CompletionGatewaySummary;
                 TitleText.Text = "All set!";
-                SubtitleText.Text = "OpenClaw is ready to go";
+                SubtitleText.Text = "Smart-Agent is ready to go";
                 SubtitleText.Visibility = Visibility.Visible;
                 ErrorCard.Visibility = Visibility.Collapsed;
                 HelpLink.Visibility = Visibility.Collapsed;
@@ -49,7 +49,7 @@ public sealed partial class CompletePage : Page
                     LocalAiSummaryTitle.Text = review.LocalAiTitle ?? "Local AI installed";
                     LocalAiSummaryDescription.Text = review.LocalAiDescription ??
                         "The native llama-server router is ready. The model loads on the first request.";
-                    SubtitleText.Text = "OpenClaw and Local AI are ready";
+                    SubtitleText.Text = "Smart-Agent and Local AI are ready";
                     LaunchButton.Content = "Open chat";
                 }
                 if (args.NativeGatewayUrl is { } nativeUrl)
@@ -80,7 +80,7 @@ public sealed partial class CompletePage : Page
                     FailureIcon.Visibility = Visibility.Collapsed;
                     RestartIcon.Visibility = Visibility.Visible;
                     TitleText.Text = "Restart required";
-                    SubtitleText.Text = "OpenClaw needs to restart Windows to continue the installation. Would you like to restart now?";
+                    SubtitleText.Text = "Smart-Agent needs to restart Windows to continue the installation. Would you like to restart now?";
                     SubtitleText.TextWrapping = TextWrapping.Wrap;
                     SubtitleText.TextAlignment = TextAlignment.Center;
                     SubtitleText.Visibility = Visibility.Visible;
@@ -262,7 +262,7 @@ public sealed partial class CompletePage : Page
         ViewLogLink.Visibility = Visibility.Collapsed;
         RestartNowButton.IsEnabled = true;
         RestartLaterButton.IsEnabled = true;
-        SubtitleText.Text = "OpenClaw needs to restart Windows to continue the installation. Would you like to restart now?";
+        SubtitleText.Text = "Smart-Agent needs to restart Windows to continue the installation. Would you like to restart now?";
     }
 
 }

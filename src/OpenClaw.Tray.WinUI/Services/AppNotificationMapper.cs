@@ -101,7 +101,7 @@ internal static class AppNotificationMapper
     private static string NormalizeTitle(string? title)
     {
         string plainText = NotificationPlainTextFormatter.Format(title);
-        return string.IsNullOrWhiteSpace(plainText) ? "OpenClaw" : plainText;
+        return string.IsNullOrWhiteSpace(plainText) ? "Smart-Agent" : plainText;
     }
 
     private static string NormalizeMessage(

@@ -30,7 +30,7 @@ public static class OnboardingChatBootstrapper
     }
 
     public const string Message =
-        "Hi! I just installed OpenClaw and you're my brand-new agent. " +
+        "Hi! I just installed Smart-Agent and you're my brand-new agent. " +
         "Please start the first-run ritual from BOOTSTRAP.md, ask one question at a time, " +
         "and before we talk about WhatsApp/Telegram, visit soul.md with me to craft SOUL.md: " +
         "ask what matters to me and how you should be. Then guide me through choosing " +

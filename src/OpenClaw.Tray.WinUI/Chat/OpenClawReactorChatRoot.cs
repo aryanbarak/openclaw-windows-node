@@ -246,7 +246,7 @@ public sealed class OpenClawReactorChatRoot : Component<OpenClawReactorChatRootP
             null,
             entryMetadata,
             timelineGeneration,
-            "OpenClaw Windows Tray",
+            "Smart-Agent",
             "Assistant",
             effectiveThread?.Model,
             showToolCalls
@@ -363,7 +363,7 @@ public sealed class OpenClawReactorChatRoot : Component<OpenClawReactorChatRootP
             Id = composeKey,
             AgentId = snapshot.ComposeTarget.AgentId,
             Title = _pendingSelectedThreadId is null
-                ? cached?.ThreadTitle ?? "OpenClaw Windows Tray"
+                ? cached?.ThreadTitle ?? "Smart-Agent"
                 : LocalizationHelper.GetString("Chat_PendingNewSessionTitle"),
             Model = cached?.Model,
             ModelProvider = cached?.ModelProvider,

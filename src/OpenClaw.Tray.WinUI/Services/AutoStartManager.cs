@@ -80,7 +80,7 @@ public static class AutoStartManager
         {
             var exe = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
             if (enable && (string.IsNullOrWhiteSpace(exe) || !File.Exists(exe)))
-                throw new InvalidOperationException("The OpenClaw executable is unavailable for Windows startup.");
+                throw new InvalidOperationException("The Smart-Agent executable is unavailable for Windows startup.");
             SetupStartupPolicy.ApplyUnpackaged(enable,
                 () => WindowsStartupTaskRegistration.RegisterForSetup(exe, AppIdentity.StartupTaskName),
                 () => WindowsStartupTaskRegistration.InspectStrict(AppIdentity.StartupTaskName, enable ? exe : null),
@@ -296,7 +296,7 @@ public static class AutoStartManager
             state switch
             {
                 StartupTaskState.DisabledByUser =>
-                    "Windows startup is disabled by the user. Re-enable OpenClaw Companion in Settings > Apps > Startup.",
+                    "Windows startup is disabled by the user. Re-enable Smart-Agent in Settings > Apps > Startup.",
                 StartupTaskState.DisabledByPolicy =>
                     "Windows startup is disabled by policy.",
                 _ => $"Windows did not enable the packaged startup task (state: {state})."

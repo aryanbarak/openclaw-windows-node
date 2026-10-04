@@ -15,7 +15,7 @@
         <StackPanel Grid.Row="0" Spacing="4" HorizontalAlignment="Stretch">
             <controls:OnboardingMascot x:Name="MascotHero" Mood="Thinking"
                                       HorizontalAlignment="Center" />
-            <TextBlock Text="OpenClaw onboard"
+            <TextBlock Text="Smart-Agent onboarding"
                        Style="{StaticResource TitleTextBlockStyle}" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
             <TextBlock x:Name="StatusText" Text="Connecting to gateway..."
                        Style="{StaticResource CaptionTextBlockStyle}"

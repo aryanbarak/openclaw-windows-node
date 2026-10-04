@@ -297,7 +297,7 @@ public sealed class NativeGatewaySetupUxContractTests
         var wsl = document.Descendants().Single(element => (string?)element.Attribute(names + "Name") == "InstallChoice");
         Assert.Equal("Install a local Gateway (WSL), recommended", (string?)wsl.Attribute("AutomationProperties.Name"));
         Assert.Equal("Install a local Gateway (WSL)", resources["Onboarding_Copy_GatewayLocalTitle.Text"]);
-        Assert.Equal("Install and set up an OpenClaw gateway on this device", resources["Onboarding_Native_Description.Text"]);
+        Assert.Equal("Install and set up a Smart-Agent gateway on this device", resources["Onboarding_Native_Description.Text"]);
         var source = File.ReadAllText(Path.Combine(pages, "WelcomePage.xaml.cs"));
         Assert.Contains("AutomationProperties.SetName(InstallChoice, SetupLocalization.GetString(\"Onboarding_Wsl_Title.Text\"))", source);
     }
@@ -321,7 +321,7 @@ public sealed class NativeGatewaySetupUxContractTests
             (string?)element.Attribute(names + "Name") == "NativeRecommendedBadge");
         var description = heading.ElementsAfterSelf().First();
         Assert.Equal("Onboarding_Native_Description", (string?)description.Attribute(names + "Uid"));
-        Assert.Equal("Install and set up an OpenClaw gateway on this device", (string?)description.Attribute("Text"));
+        Assert.Equal("Install and set up a Smart-Agent gateway on this device", (string?)description.Attribute("Text"));
         Assert.Empty(description.ElementsAfterSelf());
         Assert.DoesNotContain(document.Descendants(), element =>
             (string?)element.Attribute(names + "Name") is "NativeSupportAvailablePanel" or "NativeSupportAvailableText");

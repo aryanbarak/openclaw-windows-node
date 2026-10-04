@@ -33,7 +33,7 @@ public sealed class OnboardingArtworkRenderingTests(UIThreadFixture ui, ITestOut
                 theme == ElementTheme.Dark ? Microsoft.UI.Colors.Black : Microsoft.UI.Colors.White);
             gallery.Children.Add(new TextBlock
             {
-                Text = $"OpenClaw onboarding: {theme}, animation disabled",
+                Text = $"Smart-Agent onboarding: {theme}, animation disabled",
                 TextWrapping = TextWrapping.Wrap,
             });
             var rows = new Grid { ColumnSpacing = 8, RowSpacing = 8 };

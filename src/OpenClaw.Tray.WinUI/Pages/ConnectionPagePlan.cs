@@ -565,7 +565,7 @@ internal sealed record ConnectionPagePlan
                 StripGlyph = OpenClawTray.Helpers.FluentIconCatalog.StatusWarn,
                 StripAccent = ConnectionAccent.Caution,
                 StripHeadline = "Local gateway port conflict",
-                StripSub = "Another process is using this managed gateway address. OpenClaw will not send gateway credentials to an unverified listener.",
+                StripSub = "Another process is using this managed gateway address. Smart-Agent will not send gateway credentials to an unverified listener.",
                 StripPrimaryLabel = "Retry",
                 StripPrimaryAction = ConnectionPrimaryAction.Retry,
                 ActiveGatewayDisplayName = name,
