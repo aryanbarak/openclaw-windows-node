@@ -11,19 +11,18 @@
   <!-- Version is patched at build time by the SyncAppxManifestVersionTarget in
        OpenClaw.Tray.WinUI.csproj from $(Version) (see docs/VERSIONING.md).
        The 0.0.0.0 below is a sentinel and is never shipped. -->
-  <!-- Identity/@Publisher must be the Partner Center "Package/Identity/Publisher" value
-       verbatim, not the Authenticode code-signing subject used for the unpackaged
-       installer (see docs/RELEASING.md). The Store re-signs the package to this identity,
-       so do NOT change this to the Azure Artifact Signing certificate subject: that
-       certificate signs the unpackaged installer and its executables, never this MSIX. -->
+  <!-- Identity/@Name and @Publisher below are retained only as the upstream template.
+       Smart-Agent Store MSIX packaging is fail-closed until its own Partner Center
+       package identity and publisher are approved. These upstream values must never ship
+       in a Smart-Agent package. Dev MSIX builds rewrite both values in obj/. -->
   <Identity
     Name="OpenClawFoundation.OpenClaw"
     Publisher="CN=4BA40A7A-B719-4C40-BF91-84AF4F1136FC"
     Version="0.0.0.0" />
 
   <Properties>
-    <DisplayName>OpenClaw</DisplayName>
-    <PublisherDisplayName>OpenClaw Foundation</PublisherDisplayName>
+    <DisplayName>Smart-Agent</DisplayName>
+    <PublisherDisplayName>Smart-Agent</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -44,8 +43,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="OpenClaw"
-        Description="OpenClaw Windows system tray for gateway management, node capabilities, and agent interaction"
+        DisplayName="Smart-Agent"
+        Description="Smart Agent Companion for gateway management, node capabilities, and agent interaction"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">
@@ -54,16 +53,16 @@
       </uap:VisualElements>
 
       <Extensions>
-        <!-- Protocol activation for openclaw:// deep links -->
+        <!-- Protocol activation for smartagent:// deep links -->
         <uap:Extension Category="windows.protocol">
-          <uap:Protocol Name="openclaw">
-            <uap:DisplayName>OpenClaw Protocol</uap:DisplayName>
+          <uap:Protocol Name="smartagent">
+            <uap:DisplayName>Smart-Agent Protocol</uap:DisplayName>
           </uap:Protocol>
         </uap:Extension>
 
         <!-- Packaged COM activation for Microsoft.Toolkit.Uwp.Notifications. -->
         <desktop:Extension Category="windows.toastNotificationActivation">
-          <desktop:ToastNotificationActivation ToastActivatorCLSID="EF9297B3-EEEB-4E50-8306-D1D118E04BC7" />
+          <desktop:ToastNotificationActivation ToastActivatorCLSID="4195C1A8-252F-46CD-9CC1-E9593CF15D17" />
         </desktop:Extension>
 
         <com:Extension Category="windows.comServer">
@@ -71,10 +70,10 @@
             <com:ExeServer
               Executable="OpenClaw.Tray.WinUI.exe"
               Arguments="-ToastActivated"
-              DisplayName="OpenClaw Toast Activator">
+              DisplayName="Smart-Agent Toast Activator">
               <com:Class
-                Id="EF9297B3-EEEB-4E50-8306-D1D118E04BC7"
-                DisplayName="OpenClaw Toast Activator" />
+                Id="4195C1A8-252F-46CD-9CC1-E9593CF15D17"
+                DisplayName="Smart-Agent Toast Activator" />
             </com:ExeServer>
           </com:ComServer>
         </com:Extension>
@@ -86,9 +85,9 @@
           Executable="OpenClaw.Tray.WinUI.exe"
           EntryPoint="Windows.FullTrustApplication">
           <desktop:StartupTask
-            TaskId="OpenClawStartup"
+            TaskId="SmartAgentStartup"
             Enabled="false"
-            DisplayName="OpenClaw" />
+            DisplayName="Smart-Agent" />
         </desktop:Extension>
       </Extensions>
     </Application>

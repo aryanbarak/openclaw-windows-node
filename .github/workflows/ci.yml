@@ -1016,7 +1016,7 @@ jobs:
       shell: pwsh
       run: |
         $info = Get-Content -LiteralPath "$env:RUNNER_TEMP\openclaw-msix-version.json" -Raw | ConvertFrom-Json
-        $thumbprint = (Get-Content "$env:LOCALAPPDATA\OpenClawDevelopment\MSIX\dev-msix-thumbprint.txt" -Raw).Trim()
+        $thumbprint = (Get-Content "$env:LOCALAPPDATA\SmartAgentDevelopment\MSIX\dev-msix-thumbprint.txt" -Raw).Trim()
         .\scripts\Export-DevMsixArtifact.ps1 `
           -Architecture ${{ matrix.architecture }} `
           -PackageDirectory "$env:RUNNER_TEMP\openclaw-dev-appx" `

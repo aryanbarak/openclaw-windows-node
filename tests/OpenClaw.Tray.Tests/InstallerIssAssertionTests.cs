@@ -383,7 +383,7 @@ public sealed class InstallerIssAssertionTests
         Assert.Contains("Version=\"0.0.0.0\"", manifest);
         Assert.Contains("Name=\"OpenClawFoundation.OpenClaw\"", manifest);
         Assert.Contains("<uap:Protocol Name=\"openclaw\">", manifest);
-        Assert.DoesNotContain("OpenClawFoundation.OpenClaw.Dev", manifest);
+        Assert.DoesNotContain("SmartAgent.Companion.Dev", manifest);
     }
 
     [Fact]

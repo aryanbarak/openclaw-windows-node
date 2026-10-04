@@ -6,7 +6,7 @@
     Creates a non-exportable current-user code-signing certificate whose
     subject matches the generated development manifest, trusts its public
     certificate for local package installation, and stores only its thumbprint
-    under %LOCALAPPDATA%\OpenClawDevelopment\MSIX.
+    under %LOCALAPPDATA%\SmartAgentDevelopment\MSIX.
 
     The certificate is development-only. Microsoft Store submissions use the
     Partner Center identity and signing process instead.
@@ -23,10 +23,10 @@ $ErrorActionPreference = "Stop"
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 $projectPath = Join-Path $repoRoot "src\OpenClaw.Tray.WinUI\OpenClaw.Tray.WinUI.csproj"
-$certificateDirectory = Join-Path $env:LOCALAPPDATA "OpenClawDevelopment\MSIX"
+$certificateDirectory = Join-Path $env:LOCALAPPDATA "SmartAgentDevelopment\MSIX"
 $thumbprintPath = Join-Path $certificateDirectory "dev-msix-thumbprint.txt"
-$legacyPfxPath = Join-Path $env:LOCALAPPDATA "OpenClawTray\dev-msix.pfx"
-$friendlyName = "OpenClaw Development MSIX Signing"
+$legacyPfxPath = Join-Path $env:LOCALAPPDATA "SmartAgent\dev-msix.pfx"
+$friendlyName = "Smart-Agent Development MSIX Signing"
 $codeSigningOid = "1.3.6.1.5.5.7.3.3"
 
 [xml]$project = Get-Content -LiteralPath $projectPath
@@ -68,7 +68,7 @@ if (Test-Path -LiteralPath $legacyPfxPath) {
     try {
         $legacyCertificate = [System.Security.Cryptography.X509Certificates.X509Certificate2]::new(
             $legacyPfxPath,
-            "openclaw-dev")
+            "smartagent-dev")
         $legacyThumbprint = $legacyCertificate.Thumbprint
         $legacyCertificate.Dispose()
     } catch {
@@ -135,7 +135,7 @@ if (-not $SkipTrust) {
     $trusted = Get-ChildItem Cert:\LocalMachine\TrustedPeople -ErrorAction SilentlyContinue |
         Where-Object Thumbprint -eq $certificate.Thumbprint
     if (-not $trusted) {
-        $cerPath = Join-Path $env:TEMP "openclaw-dev-msix-$($certificate.Thumbprint).cer"
+        $cerPath = Join-Path $env:TEMP "smartagent-dev-msix-$($certificate.Thumbprint).cer"
         try {
             Export-Certificate -Cert $certificate -FilePath $cerPath | Out-Null
             Import-Certificate -FilePath $cerPath -CertStoreLocation "Cert:\LocalMachine\TrustedPeople" | Out-Null
