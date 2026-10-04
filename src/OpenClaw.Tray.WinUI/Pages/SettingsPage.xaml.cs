@@ -32,7 +32,7 @@ public sealed partial class SettingsPage : Page
     private DateTime _sampledGatewayUptimeUtc;
 
     private const string DocumentationUrl = "https://docs.openclaw.ai/platforms/windows";
-    private const string GitHubUrl = "https://github.com/openclaw/openclaw-windows-node";
+    private static string GitHubUrl => OpenClawAppIdentity.PlannedReleaseRepositoryUrl;
 
     private enum UninstallUiState { Idle, InProgress, Success, Failure }
 
@@ -43,6 +43,9 @@ public sealed partial class SettingsPage : Page
     public SettingsPage()
     {
         InitializeComponent();
+        GitHubLink.Visibility = OpenClawAppIdentity.ReleaseRepositoryOwnershipConfigured
+            ? Visibility.Visible
+            : Visibility.Collapsed;
         LocalGatewaySetupDescriptionText.Text =
             $"Launches setup to install the app-owned {AppIdentity.SetupDistroName} WSL distro or re-run provider and model setup for an existing one. Existing local gateways are only replaced after confirmation.";
         GatewayBodyText.Text = GatewayIdleBodyText;
@@ -370,6 +373,9 @@ public sealed partial class SettingsPage : Page
 
     private void OnGitHubLink(object sender, RoutedEventArgs e)
     {
+        if (!OpenClawAppIdentity.ReleaseRepositoryOwnershipConfigured)
+            return;
+
         OpenShellTarget(GitHubUrl, "GitHub");
     }
 

@@ -50,13 +50,35 @@ public static class OpenClawAppIdentity
         "Smart-Agent managed Native Gateway support is deferred until the upstream package provides independent per-consumer lifecycle ownership.";
 
     /// <summary>
-    /// Smart-Agent v1 does not claim the upstream OpenClaw release channel. Automatic
-    /// update checks/downloads remain disabled until a Smart-Agent-owned release source,
-    /// artifact verification policy, and signing identity are explicitly approved.
+    /// Planned Smart-Agent release ownership. The repository target is approved, but the
+    /// repository itself has not yet been created/published and no production signing
+    /// identity has been configured. Runtime update ownership therefore remains disabled.
     /// </summary>
-    public static readonly bool ManagedReleaseUpdaterEnabled = false;
+    public const string PlannedReleaseRepositoryOwner = "aryanbarak";
+    public const string PlannedReleaseRepositoryName = "smart-agent-windows";
+    public const string PlannedReleaseRepositorySlug =
+        PlannedReleaseRepositoryOwner + "/" + PlannedReleaseRepositoryName;
+    public const string PlannedReleaseRepositoryUrl =
+        "https://github.com/aryanbarak/smart-agent-windows";
+    public const string PlannedReleaseSupportUrl =
+        "https://github.com/aryanbarak/smart-agent-windows/issues";
+    public const string PlannedReleaseUpdatesUrl =
+        "https://github.com/aryanbarak/smart-agent-windows/releases";
+    public const string ReleaseChecksumAlgorithm = "SHA-256";
+    public const bool ReleaseAuthenticodeRequired = true;
+    public const bool ReleaseChecksumManifestRequired = true;
+
+    public static readonly bool ReleaseRepositoryOwnershipConfigured = false;
+    public static readonly bool ReleaseSigningIdentityConfigured = false;
+    public static readonly bool ReleaseArtifactVerificationConfigured = false;
+
+    public static bool ManagedReleaseUpdaterEnabled =>
+        ReleaseRepositoryOwnershipConfigured &&
+        ReleaseSigningIdentityConfigured &&
+        ReleaseArtifactVerificationConfigured;
+
     public const string ManagedReleaseUpdaterDeferredMessage =
-        "Smart-Agent updates are disabled until a Smart-Agent-owned release source and signing policy are approved.";
+        "Smart-Agent updates are disabled until repository ownership, release signing, and artifact verification are configured.";
 
     public static int GetManagedGatewayPort(string? identity) =>
         NormalizeIdentity(identity) == DevIdentity ? DevManagedGatewayPort : ReleaseManagedGatewayPort;

@@ -672,6 +672,7 @@
                                                      Padding="0"
                                                      Click="OnDocumentationLink"/>
                                     <HyperlinkButton x:Uid="SettingsPage_AppInfoGitHub"
+                                                     x:Name="GitHubLink"
                                                      Content="GitHub"
                                                      Padding="0"
                                                      Click="OnGitHubLink"/>

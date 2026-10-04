@@ -30,11 +30,22 @@ public sealed class OpenClawAppIdentityTests
     }
 
     [Fact]
-    public void ManagedReleaseUpdater_IsDeferredUntilSmartAgentOwnsReleaseAndSigningPolicy()
+    public void ManagedReleaseUpdater_IsDeferredUntilOwnershipSigningAndVerificationAreConfigured()
     {
+        Assert.Equal("aryanbarak/smart-agent-windows", OpenClawAppIdentity.PlannedReleaseRepositorySlug);
+        Assert.Equal("https://github.com/aryanbarak/smart-agent-windows", OpenClawAppIdentity.PlannedReleaseRepositoryUrl);
+        Assert.Equal("https://github.com/aryanbarak/smart-agent-windows/issues", OpenClawAppIdentity.PlannedReleaseSupportUrl);
+        Assert.Equal("https://github.com/aryanbarak/smart-agent-windows/releases", OpenClawAppIdentity.PlannedReleaseUpdatesUrl);
+        Assert.Equal("SHA-256", OpenClawAppIdentity.ReleaseChecksumAlgorithm);
+        Assert.True(OpenClawAppIdentity.ReleaseAuthenticodeRequired);
+        Assert.True(OpenClawAppIdentity.ReleaseChecksumManifestRequired);
+        Assert.False(OpenClawAppIdentity.ReleaseRepositoryOwnershipConfigured);
+        Assert.False(OpenClawAppIdentity.ReleaseSigningIdentityConfigured);
+        Assert.False(OpenClawAppIdentity.ReleaseArtifactVerificationConfigured);
         Assert.False(OpenClawAppIdentity.ManagedReleaseUpdaterEnabled);
-        Assert.Contains("Smart-Agent-owned release source", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
-        Assert.Contains("signing policy", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+        Assert.Contains("repository ownership", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+        Assert.Contains("release signing", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+        Assert.Contains("artifact verification", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
     }
     [Fact]
     public void ResolveRoamingDataDirectory_DefaultsToReleaseProfile()

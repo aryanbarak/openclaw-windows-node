@@ -24,7 +24,6 @@
   #define MyOutputSuffix ""
 #endif
 #define MyAppPublisher "Smart-Agent"
-#define MyAppURL "https://github.com/openclaw/openclaw-windows-node"
 #define MyAppExeName "OpenClaw.Tray.WinUI.exe"
 
 ; Must stay equal to MigrationRecordCodec.PackageName. The uninstaller reads the
@@ -56,9 +55,9 @@ AppId={#MyAppId}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL=https://github.com/openclaw/openclaw-windows-node/issues
-AppUpdatesURL=https://github.com/openclaw/openclaw-windows-node/releases
+; Smart-Agent product/support/update URLs are intentionally omitted until the
+; planned release repository is actually owned and the release signing/verification
+; policy is configured. Do not fall back to upstream OpenClaw URLs.
 DefaultDirName={localappdata}\{#MyInstallDir}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
