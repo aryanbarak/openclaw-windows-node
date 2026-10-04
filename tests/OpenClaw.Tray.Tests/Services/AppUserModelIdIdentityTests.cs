@@ -68,15 +68,15 @@ public sealed class AppUserModelIdIdentityTests
     }
 
     [Fact]
-    public void InstallerAumid_RemainsDeferredToPackagingSlice()
+    public void InstallerAumid_MatchesSmartAgentUnpackagedIdentity()
     {
         var iss = File.ReadAllText(Path.Combine(
             TestRepositoryPaths.GetRepositoryRoot(),
             "installer.iss"));
 
-        Assert.DoesNotContain($@"#define MyAppAumid ""{AppIdentity.AppUserModelId}""", iss);
-        Assert.Contains(@"#define MyAppAumid ""OpenClaw.Companion""", iss);
-        Assert.Contains(@"#define MyAppAumid ""OpenClaw.Companion.Dev""", iss);
+        Assert.Contains($@"#define MyAppAumid ""{AppIdentity.AppUserModelId}""", iss);
+        Assert.Contains(@"#define MyAppAumid ""SmartAgent.Companion""", iss);
+        Assert.Contains(@"#define MyAppAumid ""SmartAgent.Companion.Dev""", iss);
     }
 
     [Fact]
