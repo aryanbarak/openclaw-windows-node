@@ -30,6 +30,16 @@ public sealed class OpenClawAppIdentityTests
     }
 
     [Fact]
+    public void ManagedSystemRun_DefaultsToFailClosedWhenMxcIsUnavailable()
+    {
+        Assert.True(OpenClawAppIdentity.ManagedSystemRunBlockHostFallbackByDefault);
+        Assert.Equal(2, OpenClawAppIdentity.ManagedSystemRunFailClosedSettingsSchemaVersion);
+        Assert.True(OpenClawAppIdentity.ResolveManagedSystemRunBlockHostFallback(1, persistedValue: false));
+        Assert.False(OpenClawAppIdentity.ResolveManagedSystemRunBlockHostFallback(2, persistedValue: false));
+        Assert.True(OpenClawAppIdentity.ResolveManagedSystemRunBlockHostFallback(2, persistedValue: true));
+    }
+
+    [Fact]
     public void ManagedReleaseUpdater_IsDeferredUntilOwnershipSigningAndVerificationAreConfigured()
     {
         Assert.Equal("aryanbarak/smart-agent-windows", OpenClawAppIdentity.PlannedReleaseRepositorySlug);

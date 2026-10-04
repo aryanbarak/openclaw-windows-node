@@ -687,7 +687,8 @@ public sealed class NodeService : IDisposable, IAsyncDisposable
             // constructed only to satisfy the constructor contract and is never
             // invoked.
             var reason = string.Join("; ", peeked.SystemRunSandboxUnsupportedReasons);
-            var unavailableMode = (_settings?.SystemRunBlockHostFallbackWhenMxcUnavailable ?? false)
+            var unavailableMode = (_settings?.SystemRunBlockHostFallbackWhenMxcUnavailable
+                    ?? OpenClawAppIdentity.ManagedSystemRunBlockHostFallbackByDefault)
                 ? "commands will be blocked by strict fallback settings"
                 : "commands will run through host fallback";
             _logger.Info($"[mxc] system.run runner = MxcCommandRunner (BaseContainer unavailable, {unavailableMode}: {reason})");
@@ -718,7 +719,7 @@ public sealed class NodeService : IDisposable, IAsyncDisposable
             return new SettingsData
             {
                 SystemRunSandboxEnabled = true,
-                SystemRunBlockHostFallbackWhenMxcUnavailable = false,
+                SystemRunBlockHostFallbackWhenMxcUnavailable = OpenClawAppIdentity.ManagedSystemRunBlockHostFallbackByDefault,
                 SystemRunAllowOutbound = false,
                 SystemRunAllowWindowsUi = false,
             };

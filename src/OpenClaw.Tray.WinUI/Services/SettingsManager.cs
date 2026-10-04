@@ -22,7 +22,7 @@ public class SettingsManager
     private readonly string _settingsFilePath;
     private string? _persistedJson;
     private const string ProtectedSecretPrefix = "dpapi:";
-    private const int CurrentSettingsSchemaVersion = 1;
+    private const int CurrentSettingsSchemaVersion = OpenClawAppIdentity.ManagedSystemRunFailClosedSettingsSchemaVersion;
     private static readonly byte[] ProtectedSecretEntropy = Encoding.UTF8.GetBytes("OpenClawTray.Settings.v1");
     public const string AppThemeSystem = "System";
     public const string AppThemeLight = "Light";
@@ -181,7 +181,7 @@ public class SettingsManager
     // ── MXC sandbox ─────────────────────────────────────────────────────
     /// <summary>Master switch for system.run containment. When true (default), system.run uses MXC when available and falls back to host execution when unavailable unless strict fallback blocking is enabled. When false, system.run runs on host like before.</summary>
     public bool SystemRunSandboxEnabled { get => _data.SystemRunSandboxEnabled; set => _data = _data with { SystemRunSandboxEnabled = value }; }
-    /// <summary>When true, sandbox-enabled system.run blocks instead of using the compatibility host fallback if MXC is unavailable. Default false.</summary>
+    /// <summary>When true, sandbox-enabled system.run blocks instead of using the compatibility host fallback if MXC is unavailable. Smart-Agent defaults this to true; an explicit schema-v2 operator choice is preserved.</summary>
     public bool SystemRunBlockHostFallbackWhenMxcUnavailable { get => _data.SystemRunBlockHostFallbackWhenMxcUnavailable; set => _data = _data with { SystemRunBlockHostFallbackWhenMxcUnavailable = value }; }
     /// <summary>When sandboxed, allow system.run commands to reach the public internet. Default false.</summary>
     public bool SystemRunAllowOutbound { get => _data.SystemRunAllowOutbound; set => _data = _data with { SystemRunAllowOutbound = value }; }
@@ -327,7 +327,7 @@ public class SettingsManager
         SkippedUpdateTag = "",
         PreferredGatewayId = null,
         SystemRunSandboxEnabled = true,
-        SystemRunBlockHostFallbackWhenMxcUnavailable = false,
+        SystemRunBlockHostFallbackWhenMxcUnavailable = OpenClawAppIdentity.ManagedSystemRunBlockHostFallbackByDefault,
         SystemRunAllowOutbound = false,
         SystemRunAllowWindowsUi = false,
         SandboxClipboard = SandboxClipboardMode.None,
@@ -342,6 +342,13 @@ public class SettingsManager
     private static SettingsData NormalizeLoadedData(SettingsData loaded, string? rawJson = null)
     {
         var defaults = CreateDefaultData();
+        // Schema v2 establishes Smart-Agent's fail-closed execution default. Schema v1
+        // serialized the upstream compatibility default (host fallback allowed), including
+        // files created automatically during first-run setup. Migrate those profiles once;
+        // from v2 onward an explicit operator choice is preserved.
+        var blockHostFallbackWhenMxcUnavailable = OpenClawAppIdentity.ResolveManagedSystemRunBlockHostFallback(
+            loaded.SettingsSchemaVersion,
+            loaded.SystemRunBlockHostFallbackWhenMxcUnavailable);
         var data = loaded with
         {
             SettingsSchemaVersion = CurrentSettingsSchemaVersion,
@@ -374,7 +381,7 @@ public class SettingsManager
             OpenTelemetryProtocol = OpenTelemetryEndpointProtocol.Normalize(loaded.OpenTelemetryProtocol),
             UserRules = loaded.UserRules != null ? new List<UserNotificationRule>(loaded.UserRules) : new(),
             SandboxCustomFolders = CloneSandboxCustomFolders(loaded.SandboxCustomFolders),
-            SystemRunBlockHostFallbackWhenMxcUnavailable = loaded.SystemRunBlockHostFallbackWhenMxcUnavailable,
+            SystemRunBlockHostFallbackWhenMxcUnavailable = blockHostFallbackWhenMxcUnavailable,
             SandboxTimeoutMs = loaded.SandboxTimeoutMs > 0 ? loaded.SandboxTimeoutMs : defaults.SandboxTimeoutMs,
             SandboxMaxOutputBytes = loaded.SandboxMaxOutputBytes > 0 ? loaded.SandboxMaxOutputBytes : defaults.SandboxMaxOutputBytes,
             McpOnlyMode = null
