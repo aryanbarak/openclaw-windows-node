@@ -84,7 +84,7 @@ internal static class StatusBadgeIconFactory
 
     private static (string Path, bool IsFallback) Build(ConnectionStatusAccent accent)
     {
-        var fallback = Path.Combine(AssetsPath, "openclaw.ico");
+        var fallback = Path.Combine(AssetsPath, "smart-agent.ico");
         try
         {
             Directory.CreateDirectory(OutputDir);
@@ -135,7 +135,7 @@ internal static class StatusBadgeIconFactory
         if (File.Exists(png))
             return new Bitmap(png);
 
-        var ico = Path.Combine(AssetsPath, "openclaw.ico");
+        var ico = Path.Combine(AssetsPath, "smart-agent.ico");
         using var icon = new Icon(ico, 256, 256);
         return icon.ToBitmap();
     }

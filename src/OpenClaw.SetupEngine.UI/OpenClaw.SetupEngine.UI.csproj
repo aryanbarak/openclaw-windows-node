@@ -29,7 +29,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\OpenClaw.Tray.WinUI\Assets\Setup\**\*"
+             Exclude="..\OpenClaw.Tray.WinUI\Assets\Setup\OpenClawMascot.png"
              Link="Assets\Setup\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\OpenClaw.Tray.WinUI\Assets\Brand\SmartAgentMark.png"
+             Link="Assets\Brand\SmartAgentMark.png"
              CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

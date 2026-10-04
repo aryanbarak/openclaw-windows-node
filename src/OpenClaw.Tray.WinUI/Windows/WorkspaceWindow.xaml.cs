@@ -70,7 +70,7 @@ public sealed partial class WorkspaceWindow : WindowEx
             UriSource = new Uri(BrandAssets.RedBotMarkUri),
             ShowAsMonochrome = false
         };
-        this.SetIcon("Assets\\openclaw.ico");
+        this.SetIcon("Assets\\smart-agent.ico");
         SetTitleBar(WorkspaceTitleBar);
         NewAgentLabel.Text = LocalizationHelper.GetString("AgentCreation_Title");
         AutomationProperties.SetName(NewAgentOption, NewAgentLabel.Text);

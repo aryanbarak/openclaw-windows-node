@@ -5,14 +5,16 @@ using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Input;
 using Windows.UI.ViewManagement;
 
 namespace OpenClaw.SetupEngine.UI.Controls;
 
 /// <summary>
-/// Decorative native vector mascot. The containing page owns accessible status text.
-/// Size with Width/Height; Mood selects the expression. No work runs before Loaded.
+/// Decorative Smart-Agent brand mark. The upstream mascot implementation remains behind the
+/// visible mark so existing setup state/mood contracts stay merge-compatible, but no OpenClaw
+/// character artwork is exposed on Smart-Agent surfaces.
 /// </summary>
 public sealed class OnboardingMascot : UserControl
 {
@@ -81,7 +83,29 @@ public sealed class OnboardingMascot : UserControl
         Content = new Grid
         {
             Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
-            Children = { new Viewbox { Stretch = Stretch.Uniform, Child = _drawing.Surface } },
+            Children =
+            {
+                // Retain the upstream drawing in the visual tree for its existing animation/state
+                // contracts while making it fully non-visible in the Smart-Agent downstream.
+                new Viewbox
+                {
+                    Stretch = Stretch.Uniform,
+                    Child = _drawing.Surface,
+                    Opacity = 0,
+                    IsHitTestVisible = false,
+                },
+                new Image
+                {
+                    Source = new BitmapImage(new Uri(
+                        "ms-appx:///OpenClaw.SetupEngine.UI/Assets/Brand/SmartAgentMark.png")),
+                    Width = 132,
+                    Height = 132,
+                    Stretch = Stretch.Uniform,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    IsHitTestVisible = false,
+                },
+            },
         };
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;

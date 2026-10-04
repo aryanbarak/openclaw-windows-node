@@ -67,7 +67,7 @@ Compression={#MyCompression}
 SolidCompression={#MySolidCompression}
 WizardStyle=modern
 PrivilegesRequired=lowest
-SetupIconFile=src\OpenClaw.Tray.WinUI\Assets\openclaw.ico
+SetupIconFile=src\OpenClaw.Tray.WinUI\Assets\smart-agent.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 ; Round 2 (Scott #5): block install/uninstall while the tray is running.
 ; Mutex name matches AppIdentity.MutexBaseName for this build variant.
