@@ -30,6 +30,13 @@ public sealed class OpenClawAppIdentityTests
     }
 
     [Fact]
+    public void ManagedReleaseUpdater_IsDeferredUntilSmartAgentOwnsReleaseAndSigningPolicy()
+    {
+        Assert.False(OpenClawAppIdentity.ManagedReleaseUpdaterEnabled);
+        Assert.Contains("Smart-Agent-owned release source", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+        Assert.Contains("signing policy", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
+    }
+    [Fact]
     public void ResolveRoamingDataDirectory_DefaultsToReleaseProfile()
     {
         var root = Path.Combine(Path.GetTempPath(), "openclaw-appdata");

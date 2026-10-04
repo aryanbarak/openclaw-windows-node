@@ -594,8 +594,7 @@ public sealed partial class WorkspaceWindow : WindowEx
         {
             ("Documentation", "https://docs.openclaw.ai"),
             ("Support", "https://docs.openclaw.ai/help"),
-            ("Community", "https://discord.gg/clawd"),
-            ("ReleaseNotes", "https://docs.openclaw.ai/releases")
+            ("Community", "https://discord.gg/clawd")
         })
         {
             var item = new MenuFlyoutItem { Text = Text(label) };

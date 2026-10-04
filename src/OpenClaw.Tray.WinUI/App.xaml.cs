@@ -43,11 +43,16 @@ namespace OpenClawTray;
 
 public partial class App : Application, OpenClawTray.Services.IAppCommands, IPermissionsPageRuntimeHost
 {
-    internal static readonly UpdatumManager AppUpdater = new("openclaw", "openclaw-windows-node")
+    internal static readonly UpdatumManager? AppUpdater = CreateAppUpdater();
+
+    private static UpdatumManager? CreateAppUpdater()
     {
-        FetchOnlyLatestRelease = true,
-        InstallUpdateSingleFileExecutableName = "OpenClaw.Tray.WinUI",
-    };
+        if (!OpenClawAppIdentity.ManagedReleaseUpdaterEnabled)
+            return null;
+
+        throw new InvalidOperationException(
+            "Smart-Agent release updater is enabled without an approved Smart-Agent-owned release source.");
+    }
 
     private ITrayController? _trayController;
     private IWindowManager? _windowManager;

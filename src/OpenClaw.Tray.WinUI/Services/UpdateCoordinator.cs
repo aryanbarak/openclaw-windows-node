@@ -18,7 +18,7 @@ namespace OpenClawTray.Services;
 /// All public methods must be called from the UI thread.
 /// </summary>
 internal sealed class UpdateCoordinator(
-    UpdatumManager updater,
+    UpdatumManager? updater,
     AppState appState,
     SettingsManager? settings,
     Func<IOperatorGatewayClient?> getGatewayClient,
@@ -28,8 +28,9 @@ internal sealed class UpdateCoordinator(
     IUpdateCheckBoundary? updateCheckBoundary = null)
 {
     private readonly SettingsManager? _settings = settings;
-    private readonly IUpdateCheckBoundary _updateCheckBoundary =
-        updateCheckBoundary ?? new UpdatumUpdateCheckBoundary(updater);
+    private readonly UpdatumManager? _updater = updater;
+    private readonly IUpdateCheckBoundary? _updateCheckBoundary =
+        updateCheckBoundary ?? (updater is null ? null : new UpdatumUpdateCheckBoundary(updater));
     private readonly Func<IOperatorGatewayClient?> _getGatewayClient =
         getGatewayClient ?? throw new ArgumentNullException(nameof(getGatewayClient));
 
@@ -53,6 +54,33 @@ internal sealed class UpdateCoordinator(
 
     public async Task<bool> CheckForUpdatesAsync(bool userInitiated = false)
     {
+        if (!OpenClawAppIdentity.ManagedReleaseUpdaterEnabled)
+        {
+            Logger.Info("Skipping update check: Smart-Agent release ownership is not configured");
+            appState.UpdateInfo = new UpdateCommandCenterInfo
+            {
+                Status = "Skipped",
+                CurrentVersion = AppVersionInfo.Version,
+                CheckedAt = DateTime.UtcNow,
+                Detail = OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage
+            };
+            return true;
+        }
+
+        var activeUpdater = _updater;
+        var updateBoundary = _updateCheckBoundary;
+        if (activeUpdater is null || updateBoundary is null)
+        {
+            Logger.Error("Smart-Agent updater policy is enabled without a configured release runtime");
+            appState.UpdateInfo = new UpdateCommandCenterInfo
+            {
+                Status = "Failed",
+                CurrentVersion = AppVersionInfo.Version,
+                CheckedAt = DateTime.UtcNow,
+                Detail = "Smart-Agent update source is not configured"
+            };
+            return true;
+        }
         // === Stage 1: metadata check (gate-protected) ===
         if (!await _updateCheckGate.WaitAsync(TimeSpan.FromSeconds(30)))
         {
@@ -130,7 +158,7 @@ internal sealed class UpdateCoordinator(
                 CheckedAt = DateTime.UtcNow
             };
             var checkOutcome = await UpdateCheckPipeline.CheckAsync(
-                _updateCheckBoundary,
+                updateBoundary,
                 AppVersionInfo.Version);
             var updateFound = checkOutcome.UpdateFound;
             if (checkOutcome.ActivatedFallbackTag is not null)
@@ -171,7 +199,7 @@ internal sealed class UpdateCoordinator(
                 return true;
             }
 
-            var release = updater.LatestRelease!;
+            var release = activeUpdater.LatestRelease!;
             if (string.IsNullOrEmpty(release.TagName))
             {
                 // Defensive: AppUpdater says an update is available but the
@@ -189,7 +217,7 @@ internal sealed class UpdateCoordinator(
             }
 
             releaseTag = release.TagName;
-            changelog = updater.GetChangelog(true) ?? "No release notes available.";
+            changelog = activeUpdater.GetChangelog(true) ?? "No release notes available.";
             Logger.Info($"Update available: {releaseTag}");
             appState.UpdateInfo = new UpdateCommandCenterInfo
             {
@@ -543,13 +571,20 @@ internal sealed class UpdateCoordinator(
 
     private async Task<bool> DownloadAndInstallUpdateAsync()
     {
+        var activeUpdater = _updater;
+        if (activeUpdater is null)
+        {
+            Logger.Error("Update download blocked: no Smart-Agent-owned updater runtime is configured");
+            return false;
+        }
+
         DownloadProgressDialog? progressDialog = null;
         try
         {
-            progressDialog = new DownloadProgressDialog(updater);
+            progressDialog = new DownloadProgressDialog(activeUpdater);
             progressDialog.ShowAsync(); // Fire and forget
 
-            var downloadedAsset = await updater.DownloadUpdateAsync();
+            var downloadedAsset = await activeUpdater.DownloadUpdateAsync();
 
             TryCloseProgressDialog(progressDialog);
 
@@ -560,7 +595,7 @@ internal sealed class UpdateCoordinator(
             }
 
             Logger.Info("Installing update and restarting...");
-            await updater.InstallUpdateAsync(downloadedAsset);
+            await activeUpdater.InstallUpdateAsync(downloadedAsset);
             return true;
         }
         catch (Exception ex)

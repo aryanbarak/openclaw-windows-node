@@ -49,6 +49,15 @@ public static class OpenClawAppIdentity
     public const string ManagedNativeGatewayDeferredMessage =
         "Smart-Agent managed Native Gateway support is deferred until the upstream package provides independent per-consumer lifecycle ownership.";
 
+    /// <summary>
+    /// Smart-Agent v1 does not claim the upstream OpenClaw release channel. Automatic
+    /// update checks/downloads remain disabled until a Smart-Agent-owned release source,
+    /// artifact verification policy, and signing identity are explicitly approved.
+    /// </summary>
+    public static readonly bool ManagedReleaseUpdaterEnabled = false;
+    public const string ManagedReleaseUpdaterDeferredMessage =
+        "Smart-Agent updates are disabled until a Smart-Agent-owned release source and signing policy are approved.";
+
     public static int GetManagedGatewayPort(string? identity) =>
         NormalizeIdentity(identity) == DevIdentity ? DevManagedGatewayPort : ReleaseManagedGatewayPort;
 
