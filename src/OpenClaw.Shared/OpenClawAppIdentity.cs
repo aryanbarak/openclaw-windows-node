@@ -122,6 +122,21 @@ public static class OpenClawAppIdentity
             ? DevDataDirectoryName
             : ReleaseDataDirectoryName;
 
+    public static string ResolveLocalDataDirectory(
+        Func<string, string?> envLookup,
+        string? explicitIdentity = null)
+    {
+        ArgumentNullException.ThrowIfNull(envLookup);
+
+        var dataDirOverride = envLookup(DataDirectoryOverrideEnvironmentVariable);
+        if (!string.IsNullOrWhiteSpace(dataDirOverride))
+            return dataDirOverride!;
+
+        return Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            GetDataDirectoryName(ResolveIdentity(envLookup, explicitIdentity)));
+    }
+
     public static string ResolveRoamingDataDirectory(
         Func<string, string?> envLookup,
         string? explicitIdentity = null)

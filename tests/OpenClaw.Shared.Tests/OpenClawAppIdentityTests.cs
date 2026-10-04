@@ -48,6 +48,27 @@ public sealed class OpenClawAppIdentityTests
         Assert.Contains("artifact verification", OpenClawAppIdentity.ManagedReleaseUpdaterDeferredMessage);
     }
     [Fact]
+    public void ResolveLocalDataDirectory_IsProfileAwareAndHonorsDirectOverride()
+    {
+        var direct = Path.Combine(Path.GetTempPath(), "smart-agent-local-override");
+        var overridden = OpenClawAppIdentity.ResolveLocalDataDirectory(
+            key => key switch
+            {
+                OpenClawAppIdentity.DataDirectoryOverrideEnvironmentVariable => direct,
+                OpenClawAppIdentity.IdentityEnvironmentVariable => OpenClawAppIdentity.DevIdentity,
+                _ => null
+            });
+        Assert.Equal(direct, overridden);
+
+        var devPath = OpenClawAppIdentity.ResolveLocalDataDirectory(
+            key => key == OpenClawAppIdentity.IdentityEnvironmentVariable
+                ? OpenClawAppIdentity.DevIdentity
+                : null);
+        Assert.Equal("SmartAgent-Dev", Path.GetFileName(devPath));
+        Assert.DoesNotContain("OpenClawTray", devPath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void ResolveRoamingDataDirectory_DefaultsToReleaseProfile()
     {
         var root = Path.Combine(Path.GetTempPath(), "openclaw-appdata");

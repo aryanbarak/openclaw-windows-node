@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
+using OpenClaw.Shared;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Windows.UI;
@@ -1094,8 +1095,7 @@ public sealed class FunctionalHostControl : ContentControl, IDisposable
                 Margin = new Thickness(16)
             };
             var logPath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "OpenClawTray",
+                OpenClawAppIdentity.ResolveLocalDataDirectory(Environment.GetEnvironmentVariable),
                 "functional-ui-error.log");
             Directory.CreateDirectory(Path.GetDirectoryName(logPath)!);
             File.AppendAllText(logPath, $"[{DateTime.Now:O}] {ex}\n");
