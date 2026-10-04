@@ -50,6 +50,22 @@ public static class OpenClawAppIdentity
         "Smart-Agent managed Native Gateway support is deferred until the upstream package provides independent per-consumer lifecycle ownership.";
 
     /// <summary>
+    /// Smart-Agent keeps Windows node command execution fail-closed when MXC containment
+    /// is unavailable. Operators may explicitly change the persisted sandbox policy after
+    /// migration, but a fresh or pre-policy Smart-Agent profile never falls back to
+    /// uncontained host execution merely because the sandbox stopped being available.
+    /// </summary>
+    public const bool ManagedSystemRunBlockHostFallbackByDefault = true;
+    public const int ManagedSystemRunFailClosedSettingsSchemaVersion = 2;
+
+    public static bool ResolveManagedSystemRunBlockHostFallback(
+        int settingsSchemaVersion,
+        bool persistedValue) =>
+        settingsSchemaVersion < ManagedSystemRunFailClosedSettingsSchemaVersion
+            ? ManagedSystemRunBlockHostFallbackByDefault
+            : persistedValue;
+
+    /// <summary>
     /// Planned Smart-Agent release ownership. The repository target is approved, but the
     /// repository itself has not yet been created/published and no production signing
     /// identity has been configured. Runtime update ownership therefore remains disabled.
