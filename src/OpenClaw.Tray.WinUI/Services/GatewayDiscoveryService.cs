@@ -116,8 +116,12 @@ public sealed class GatewayDiscoveryService : IDisposable
         {
             // Get all listening TCP ports on localhost (instant, no network I/O)
             var listeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
-            // Exclude: system ports (<1024), MCP server port (8765)
-            var excludePorts = new HashSet<int> { 8765 };
+            // Exclude system ports and both Smart-Agent local MCP profile endpoints.
+            var excludePorts = new HashSet<int>
+            {
+                OpenClawAppIdentity.ReleaseLocalMcpPort,
+                OpenClawAppIdentity.DevLocalMcpPort,
+            };
             var ports = listeners
                 .Where(ep => IPAddress.IsLoopback(ep.Address) || ep.Address.Equals(IPAddress.Any))
                 .Select(ep => ep.Port)

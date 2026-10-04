@@ -134,9 +134,14 @@ public sealed class SetupAccessDraft
         return true;
     }
 
-    public void SelectExistingNativeGateway(OpenClaw.Connection.GatewayRecord record)
+    public void SelectExistingNativeGateway(
+        OpenClaw.Connection.GatewayRecord record,
+        bool managedRuntimeEnabled = OpenClaw.Shared.OpenClawAppIdentity.ManagedNativeGatewayEnabled)
     {
         ArgumentNullException.ThrowIfNull(record);
+        if (!managedRuntimeEnabled)
+            throw new InvalidOperationException(
+                OpenClaw.Shared.OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage);
         if (record.NativePackageFamilyName is null ||
             record.NativeRuntimeContract != OpenClaw.Connection.NativeGateway.NativeGatewayPackageClient.IsolatedContract ||
             !TryAcceptNativeConnection(SetupGatewayRoute.Existing,

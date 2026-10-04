@@ -138,7 +138,7 @@ public sealed class NodeService : IDisposable, IAsyncDisposable
     // TODO: when the port becomes user-configurable (see docs/MCP_MODE.md
     // "Deferred"), McpServerUrl needs to read the live port off the running
     // server, not the constant. Settings UI is the only consumer today.
-    public const int McpDefaultPort = 8765;
+    public const int McpDefaultPort = AppIdentity.LocalMcpPort;
     // OPENCLAW_MCP_PORT lets test instances bind a free port instead of fighting
     // over the default. Falls back to McpDefaultPort when unset or unparseable.
     private static readonly int McpPort =

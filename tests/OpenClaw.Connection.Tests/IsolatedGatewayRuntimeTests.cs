@@ -695,6 +695,32 @@ public sealed class IsolatedGatewayRuntimeTests : IAsyncDisposable
     }
 
     [Fact]
+    public async Task DisabledRouterNeverInvokesNativeLifecycleOrPackageResolution()
+    {
+        var legacy = new RecordingRuntime();
+        var packageClient = new NativeGatewayPackageClient((_, _, _) =>
+            throw new InvalidOperationException("Package commands must not run."));
+        await using var router = new NativeGatewayRuntimeRouter(
+            legacy, _runtime, new Resolver(), packageClient, managedRuntimeEnabled: false);
+
+        var ensure = await Assert.ThrowsAsync<NativeGatewayContractException>(
+            () => router.EnsureRunningAsync(_record, default));
+        Assert.Equal(OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage, ensure.Message);
+
+        var restart = await Assert.ThrowsAsync<NativeGatewayContractException>(
+            () => router.RestartAsync(_record, default));
+        Assert.Equal(OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage, restart.Message);
+
+        var inspection = await router.InspectAsync(_record, default);
+        Assert.Equal(GatewayEndpointProvenanceKind.UnknownListener, inspection.Kind);
+        Assert.Equal(GatewayEndpointProvenanceFailureReason.InspectionUnavailable, inspection.FailureReason);
+        Assert.Equal(OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage, inspection.Detail);
+
+        await router.StopAsync(default);
+        Assert.Equal(0, legacy.Stops);
+    }
+
+    [Fact]
     public async Task PassiveInspectionPropagatesCallerCancellation()
     {
         using var cancellation = new CancellationTokenSource();

@@ -71,10 +71,12 @@ public sealed class NativeGatewaySetupService(
     GatewayRegistry registry,
     INativeGatewayPackageResolver packageResolver,
     INativeGatewaySetupHost host,
-    Func<INativeGatewayRuntime> runtimeFactory)
+    Func<INativeGatewayRuntime> runtimeFactory,
+    bool managedRuntimeEnabled = OpenClawAppIdentity.ManagedNativeGatewayEnabled)
 {
     public async Task<NativeGatewaySetupDraft> CreateDraftAsync(CancellationToken cancellationToken)
     {
+        RequireManagedRuntimeEnabled();
         var package = await packageResolver.ResolveAsync(cancellationToken);
         var contract = await host.DetectContractAsync(package, cancellationToken);
         var draftPath = GetDraftPath(registry);
@@ -217,6 +219,7 @@ public sealed class NativeGatewaySetupService(
         NativeGatewaySetupDraft draft,
         CancellationToken cancellationToken)
     {
+        RequireManagedRuntimeEnabled();
         if (draft.PreviousPort is not null)
             throw new InvalidOperationException("Resume the native setup draft to finish port recovery before preparing the Gateway.");
         ArgumentOutOfRangeException.ThrowIfLessThan(draft.Port, 1);
@@ -343,6 +346,12 @@ public sealed class NativeGatewaySetupService(
             SharedGatewayToken = token.GetString(),
             NativePackageFamilyName = draft.PackageFamilyName,
         };
+    }
+
+    private void RequireManagedRuntimeEnabled()
+    {
+        if (!managedRuntimeEnabled)
+            throw new InvalidOperationException(OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage);
     }
 
     private static bool HasString(JsonElement element, string name, string value) =>

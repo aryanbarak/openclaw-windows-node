@@ -41,7 +41,7 @@ internal static class Program
 
 internal static class CliRunner
 {
-    internal const int DefaultMcpPort = 8765;
+    internal const int DefaultMcpPort = OpenClawAppIdentity.ReleaseLocalMcpPort;
     internal const int MaxInvokeTimeoutMs = 600_000; // 10 min, matches Bash.timeout precedent
     internal const long MaxResponseContentBytes = 16L * 1024 * 1024; // 16 MiB
     internal const int MaxStderrEchoBytes = 4 * 1024; // 4 KiB cap on echoed error bodies
@@ -155,6 +155,16 @@ internal static class CliRunner
             }
         }
 
+        try
+        {
+            options.Identity = OpenClawAppIdentity.ResolveIdentity(envLookup, options.Identity);
+        }
+        catch (ArgumentException ex)
+        {
+            stderr.WriteLine($"Argument error: {ex.Message}");
+            return 2;
+        }
+
         // F-09: validate the resolved endpoint as an absolute http(s) URL up
         // front so a typo surfaces as exit-2 argument error rather than a
         // confusing transport error from deep inside HttpClient.
@@ -163,16 +173,6 @@ internal static class CliRunner
             || (endpointUri.Scheme != Uri.UriSchemeHttp && endpointUri.Scheme != Uri.UriSchemeHttps))
         {
             stderr.WriteLine($"--mcp-url must be an absolute http(s) URL: {endpoint}");
-            return 2;
-        }
-
-        try
-        {
-            options.Identity = OpenClawAppIdentity.ResolveIdentity(envLookup, options.Identity);
-        }
-        catch (ArgumentException ex)
-        {
-            stderr.WriteLine($"Argument error: {ex.Message}");
             return 2;
         }
 
@@ -524,25 +524,29 @@ internal static class CliRunner
         // F-19: clamp env-var-derived port to [1, 65535]. Out-of-range falls
         // back to default (current shape) but emits a verbose warning so the
         // operator knows the env var was ignored.
-        var port = options.McpPortOverride ?? ResolveEnvPort(envLookup, options.Verbose, stderr);
+        var identity = OpenClawAppIdentity.ResolveIdentity(envLookup, options.Identity);
+        var port = options.McpPortOverride ?? ResolveEnvPort(
+            envLookup, identity, options.Verbose, stderr);
         return $"http://127.0.0.1:{port}/";
     }
 
-    private static int ResolveEnvPort(Func<string, string?> envLookup, bool verbose, TextWriter stderr)
+    private static int ResolveEnvPort(
+        Func<string, string?> envLookup, string? identity, bool verbose, TextWriter stderr)
     {
+        var defaultPort = OpenClawAppIdentity.GetLocalMcpPort(identity);
         var raw = envLookup("OPENCLAW_MCP_PORT");
-        if (string.IsNullOrEmpty(raw)) return DefaultMcpPort;
+        if (string.IsNullOrEmpty(raw)) return defaultPort;
         if (!int.TryParse(raw, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed))
         {
             if (verbose)
-                stderr.WriteLine($"[winnode] OPENCLAW_MCP_PORT={raw} is not an integer; using default {DefaultMcpPort}.");
-            return DefaultMcpPort;
+                stderr.WriteLine($"[winnode] OPENCLAW_MCP_PORT={raw} is not an integer; using default {defaultPort}.");
+            return defaultPort;
         }
         if (parsed < 1 || parsed > 65535)
         {
             if (verbose)
-                stderr.WriteLine($"[winnode] OPENCLAW_MCP_PORT={parsed} is out of range [1,65535]; using default {DefaultMcpPort}.");
-            return DefaultMcpPort;
+                stderr.WriteLine($"[winnode] OPENCLAW_MCP_PORT={parsed} is out of range [1,65535]; using default {defaultPort}.");
+            return defaultPort;
         }
         return parsed;
     }
@@ -835,7 +839,7 @@ internal static class CliRunner
         stdout.WriteLine();
         stdout.WriteLine("Mirrors the flag surface of `openclaw nodes invoke`. The --node value is");
         stdout.WriteLine("accepted but ignored; calls always target the local tray's MCP server");
-        stdout.WriteLine("(default http://127.0.0.1:8765/). Enable \"Local MCP Server\" in tray Settings.");
+        stdout.WriteLine("(default release http://127.0.0.1:18893/; dev:18894). Enable \"Local MCP Server\" in tray Settings.");
         stdout.WriteLine();
         stdout.WriteLine("Usage:");
         stdout.WriteLine("  winnode --command <command> [--params <json>] [options]");
@@ -850,7 +854,7 @@ internal static class CliRunner
         stdout.WriteLine("  --invoke-timeout <ms>        Invoke timeout in ms (default: 15000, max: 600000)");
         stdout.WriteLine("  --idempotency-key <key>      Accepted for parity; ignored over local MCP (warns)");
         stdout.WriteLine("  --mcp-url <url>              Override MCP endpoint (default: http://127.0.0.1:<port>/)");
-        stdout.WriteLine("  --mcp-port <port>            Override MCP port [1-65535] (default: $OPENCLAW_MCP_PORT or 8765)");
+        stdout.WriteLine("  --mcp-port <port>            Override MCP port [1-65535] (default: $OPENCLAW_MCP_PORT or profile port)");
         stdout.WriteLine("  --mcp-token <token>          Bearer token (testing/explicit overrides only - visible to");
         stdout.WriteLine("                               other processes via the OS process listing). Prefer");
         stdout.WriteLine("                               $OPENCLAW_MCP_TOKEN or %APPDATA%\\SmartAgent\\mcp-token.txt");

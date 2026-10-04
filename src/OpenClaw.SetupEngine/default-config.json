@@ -3,7 +3,7 @@
   // WSL distro name to create (use distinct name to avoid conflicts)
   "DistroName": "SmartAgentGateway",
   // Gateway WebSocket port (tray connects here)
-  "GatewayPort": 18789,
+  "GatewayPort": 18889,
   // Ubuntu release to install as a fresh app-owned WSL gateway distro
   "BaseDistro": "Ubuntu-24.04",
   // Run without UI prompts

@@ -17,7 +17,25 @@ public class ResolveEndpointTests
     public void Default_port_when_nothing_set()
     {
         var endpoint = Resolve(new WinNodeOptions(), Env());
-        Assert.Equal("http://127.0.0.1:8765/", endpoint);
+        Assert.Equal("http://127.0.0.1:18893/", endpoint);
+    }
+
+    [Fact]
+    public void Dev_identity_uses_dev_local_mcp_port()
+    {
+        var endpoint = Resolve(
+            new WinNodeOptions { Identity = OpenClaw.Shared.OpenClawAppIdentity.DevIdentity }, Env());
+        Assert.Equal("http://127.0.0.1:18894/", endpoint);
+    }
+
+    [Fact]
+    public void Dev_identity_environment_uses_dev_local_mcp_port()
+    {
+        var endpoint = Resolve(
+            new WinNodeOptions(),
+            Env((OpenClaw.Shared.OpenClawAppIdentity.IdentityEnvironmentVariable,
+                OpenClaw.Shared.OpenClawAppIdentity.DevIdentity)));
+        Assert.Equal("http://127.0.0.1:18894/", endpoint);
     }
 
     [Fact]
@@ -63,7 +81,7 @@ public class ResolveEndpointTests
         var endpoint = Resolve(
             new WinNodeOptions(),
             Env(("OPENCLAW_MCP_PORT", envValue)));
-        Assert.Equal("http://127.0.0.1:8765/", endpoint);
+        Assert.Equal("http://127.0.0.1:18893/", endpoint);
     }
 
     [Theory]
@@ -85,7 +103,7 @@ public class ResolveEndpointTests
             new WinNodeOptions { Verbose = true },
             Env(("OPENCLAW_MCP_PORT", "70000")),
             stderr);
-        Assert.Equal("http://127.0.0.1:8765/", endpoint);
+        Assert.Equal("http://127.0.0.1:18893/", endpoint);
         Assert.Contains("OPENCLAW_MCP_PORT", stderr.ToString());
         Assert.Contains("out of range", stderr.ToString());
     }
@@ -96,6 +114,6 @@ public class ResolveEndpointTests
         var endpoint = Resolve(
             new WinNodeOptions { McpUrlOverride = "   " },
             Env());
-        Assert.Equal("http://127.0.0.1:8765/", endpoint);
+        Assert.Equal("http://127.0.0.1:18893/", endpoint);
     }
 }

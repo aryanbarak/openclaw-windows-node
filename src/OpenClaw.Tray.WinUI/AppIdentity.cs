@@ -47,10 +47,13 @@ internal static class AppIdentity
     public const string SetupDistroName = OpenClawAppIdentity.DevDistroName;
 
     /// <summary>Loopback gateway port used by embedded setup.</summary>
-    public const int SetupGatewayPort = 18790;
+    public const int SetupGatewayPort = OpenClawAppIdentity.DevManagedGatewayPort;
 
     /// <summary>Explicit IPv4 loopback gateway URL used by embedded setup and post-setup startup.</summary>
-    public const string SetupGatewayUrl = "ws://127.0.0.1:18790";
+    public const string SetupGatewayUrl = OpenClawAppIdentity.DevManagedGatewayUrl;
+
+    /// <summary>Loopback port owned by this build's local MCP server.</summary>
+    public const int LocalMcpPort = OpenClawAppIdentity.DevLocalMcpPort;
 
     /// <summary>Whether this is a development build.</summary>
     public static bool IsDev => true;
@@ -93,10 +96,13 @@ internal static class AppIdentity
     public const string SetupDistroName = OpenClawAppIdentity.ReleaseDistroName;
 
     /// <summary>Loopback gateway port used by embedded setup.</summary>
-    public const int SetupGatewayPort = 18789;
+    public const int SetupGatewayPort = OpenClawAppIdentity.ReleaseManagedGatewayPort;
 
     /// <summary>Explicit IPv4 loopback gateway URL used by embedded setup and post-setup startup.</summary>
-    public const string SetupGatewayUrl = "ws://127.0.0.1:18789";
+    public const string SetupGatewayUrl = OpenClawAppIdentity.ReleaseManagedGatewayUrl;
+
+    /// <summary>Loopback port owned by this build's local MCP server.</summary>
+    public const int LocalMcpPort = OpenClawAppIdentity.ReleaseLocalMcpPort;
 
     /// <summary>Whether this is a development build.</summary>
     public static bool IsDev => false;

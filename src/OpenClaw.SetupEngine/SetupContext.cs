@@ -15,7 +15,7 @@ namespace OpenClaw.SetupEngine;
 public sealed class SetupConfig
 {
     public string DistroName { get; set; } = OpenClawAppIdentity.ReleaseDistroName;
-    public int GatewayPort { get; set; } = 18789;
+    public int GatewayPort { get; set; } = OpenClawAppIdentity.ReleaseManagedGatewayPort;
     public string BaseDistro { get; set; } = "Ubuntu-24.04";
     public bool SkipPermissions { get; set; }
     public bool SkipWizard { get; set; }

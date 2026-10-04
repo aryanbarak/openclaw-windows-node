@@ -415,17 +415,20 @@ public sealed class NativeGatewayRuntimeRouter(
     INativeGatewayRuntime legacy,
     INativeGatewayRuntime isolated,
     INativeGatewayPackageResolver resolver,
-    NativeGatewayPackageClient client) : INativeGatewayRuntime
+    NativeGatewayPackageClient client,
+    bool managedRuntimeEnabled = true) : INativeGatewayRuntime
 {
     private INativeGatewayRuntime? _active;
 
     public static NativeGatewayRuntimeRouter Create(
         GatewayRegistry registry, INativeGatewayPackageResolver resolver, IOpenClawLogger logger) =>
         new(new NativeGatewayRuntime(registry, resolver, logger),
-            new IsolatedGatewayRuntime(resolver), resolver, new NativeGatewayPackageClient());
+            new IsolatedGatewayRuntime(resolver), resolver, new NativeGatewayPackageClient(),
+            OpenClawAppIdentity.ManagedNativeGatewayEnabled);
 
     public async Task EnsureRunningAsync(GatewayRecord record, CancellationToken cancellationToken)
     {
+        RequireManagedRuntimeEnabled();
         if (record.NativeRuntimeContract == NativeGatewayPackageClient.IsolatedContract)
         {
             _active = isolated;
@@ -448,14 +451,18 @@ public sealed class NativeGatewayRuntimeRouter(
 
     public Task<GatewayEndpointProvenance> InspectAsync(
         GatewayRecord record, CancellationToken cancellationToken) =>
-        record.NativeRuntimeContract == NativeGatewayPackageClient.IsolatedContract
+        !managedRuntimeEnabled
+            ? Task.FromResult(Deferred(record))
+            : record.NativeRuntimeContract == NativeGatewayPackageClient.IsolatedContract
             ? isolated.InspectAsync(record, cancellationToken)
             : record.NativeRuntimeContract is null && ReferenceEquals(_active, legacy)
                 ? legacy.InspectAsync(record, cancellationToken)
                 : Task.FromResult(Unestablished(record));
 
     public GatewayEndpointProvenance Inspect(GatewayRecord record) =>
-        record.NativeRuntimeContract == NativeGatewayPackageClient.IsolatedContract
+        !managedRuntimeEnabled
+            ? Deferred(record)
+            : record.NativeRuntimeContract == NativeGatewayPackageClient.IsolatedContract
             ? isolated.Inspect(record)
             : record.NativeRuntimeContract is null && ReferenceEquals(_active, legacy)
                 ? legacy.Inspect(record)
@@ -463,6 +470,7 @@ public sealed class NativeGatewayRuntimeRouter(
 
     public async Task RestartAsync(GatewayRecord record, CancellationToken cancellationToken)
     {
+        RequireManagedRuntimeEnabled();
         if (record.NativeRuntimeContract == NativeGatewayPackageClient.IsolatedContract)
         {
             _active = isolated;
@@ -473,11 +481,14 @@ public sealed class NativeGatewayRuntimeRouter(
         await legacy.RestartAsync(record, cancellationToken).ConfigureAwait(false);
     }
 
-    public Task StopAsync(CancellationToken cancellationToken) =>
-        Task.WhenAll(legacy.StopAsync(cancellationToken), isolated.StopAsync(cancellationToken));
+    public Task StopAsync(CancellationToken cancellationToken) => managedRuntimeEnabled
+        ? Task.WhenAll(legacy.StopAsync(cancellationToken), isolated.StopAsync(cancellationToken))
+        : Task.CompletedTask;
 
     public async ValueTask DisposeAsync()
     {
+        if (!managedRuntimeEnabled)
+            return;
         try { await legacy.DisposeAsync().ConfigureAwait(false); }
         finally { await isolated.DisposeAsync().ConfigureAwait(false); }
     }
@@ -485,4 +496,15 @@ public sealed class NativeGatewayRuntimeRouter(
     private static GatewayEndpointProvenance Unestablished(GatewayRecord record) =>
         new(GatewayEndpointProvenanceKind.UnknownListener, NativeGatewayPaths.ValidateRecord(record).Port,
             Detail: "Gateway ownership has not been established for this profile. Credentials were not sent.");
+
+    private static GatewayEndpointProvenance Deferred(GatewayRecord record) =>
+        new(GatewayEndpointProvenanceKind.UnknownListener, NativeGatewayPaths.ValidateRecord(record).Port,
+            Detail: OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage,
+            FailureReason: GatewayEndpointProvenanceFailureReason.InspectionUnavailable);
+
+    private void RequireManagedRuntimeEnabled()
+    {
+        if (!managedRuntimeEnabled)
+            throw new NativeGatewayContractException(OpenClawAppIdentity.ManagedNativeGatewayDeferredMessage);
+    }
 }

@@ -33,6 +33,33 @@ public static class OpenClawAppIdentity
     public const string ReleaseMutexBaseName = "SmartAgent";
     public const string DevMutexBaseName = "SmartAgent-Dev";
 
+    public const int ReleaseManagedGatewayPort = 18889;
+    public const int DevManagedGatewayPort = 18890;
+    public const int ReleaseLocalMcpPort = 18893;
+    public const int DevLocalMcpPort = 18894;
+    public const string ReleaseManagedGatewayUrl = "ws://127.0.0.1:18889";
+    public const string DevManagedGatewayUrl = "ws://127.0.0.1:18890";
+
+    /// <summary>
+    /// Smart-Agent v1 owns its WSL Gateway lifecycle. The upstream native package remains
+    /// available as source, but its package-wide isolated-session lifecycle is not an
+    /// independently attributable Smart-Agent runtime.
+    /// </summary>
+    public const bool ManagedNativeGatewayEnabled = false;
+    public const string ManagedNativeGatewayDeferredMessage =
+        "Smart-Agent managed Native Gateway support is deferred until the upstream package provides independent per-consumer lifecycle ownership.";
+
+    public static int GetManagedGatewayPort(string? identity) =>
+        NormalizeIdentity(identity) == DevIdentity ? DevManagedGatewayPort : ReleaseManagedGatewayPort;
+
+    public static int GetBrowserControlPort(string? identity) => GetManagedGatewayPort(identity) + 2;
+
+    public static bool IsManagedLocalGatewayPort(int port) =>
+        port is ReleaseManagedGatewayPort or DevManagedGatewayPort;
+
+    public static int GetLocalMcpPort(string? identity) =>
+        NormalizeIdentity(identity) == DevIdentity ? DevLocalMcpPort : ReleaseLocalMcpPort;
+
     public static string NormalizeIdentity(string? identity)
     {
         if (string.IsNullOrWhiteSpace(identity))

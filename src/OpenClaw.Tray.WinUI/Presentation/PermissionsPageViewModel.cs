@@ -47,7 +47,7 @@ internal sealed class PermissionsPageViewModel : INavigationAware, IDisposable, 
     private int _mcpServedCapabilityCount;
     private IReadOnlyList<string> _localNodeCapabilities = Array.Empty<string>();
     private PermissionsMcpTokenState _mcpTokenState;
-    private string _mcpEndpoint = "http://127.0.0.1:8765/mcp";
+    private string _mcpEndpoint = $"http://127.0.0.1:{AppIdentity.LocalMcpPort}/mcp";
     private string _mcpStatusResourceKey = "PermissionsPage_McpStatus_TokenPending";
     private string? _mcpStatusErrorText;
     private bool _voiceSettingsVisible;

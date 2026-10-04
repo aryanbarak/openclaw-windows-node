@@ -5,6 +5,31 @@ namespace OpenClaw.Shared.Tests;
 public sealed class OpenClawAppIdentityTests
 {
     [Fact]
+    public void ManagedLocalPorts_AreProfileAwareDerivedAndNonColliding()
+    {
+        Assert.Equal(18889, OpenClawAppIdentity.GetManagedGatewayPort(OpenClawAppIdentity.ReleaseIdentity));
+        Assert.Equal(18891, OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.ReleaseIdentity));
+        Assert.Equal(18893, OpenClawAppIdentity.GetLocalMcpPort(OpenClawAppIdentity.ReleaseIdentity));
+        Assert.Equal(18890, OpenClawAppIdentity.GetManagedGatewayPort(OpenClawAppIdentity.DevIdentity));
+        Assert.Equal(18892, OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.DevIdentity));
+        Assert.Equal(18894, OpenClawAppIdentity.GetLocalMcpPort(OpenClawAppIdentity.DevIdentity));
+
+        var ports = new[]
+        {
+            OpenClawAppIdentity.ReleaseManagedGatewayPort,
+            OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.ReleaseIdentity),
+            OpenClawAppIdentity.ReleaseLocalMcpPort,
+            OpenClawAppIdentity.DevManagedGatewayPort,
+            OpenClawAppIdentity.GetBrowserControlPort(OpenClawAppIdentity.DevIdentity),
+            OpenClawAppIdentity.DevLocalMcpPort,
+        };
+        Assert.Equal(ports.Length, ports.Distinct().Count());
+        Assert.True(OpenClawAppIdentity.IsManagedLocalGatewayPort(18889));
+        Assert.True(OpenClawAppIdentity.IsManagedLocalGatewayPort(18890));
+        Assert.False(OpenClawAppIdentity.IsManagedLocalGatewayPort(18789));
+    }
+
+    [Fact]
     public void ResolveRoamingDataDirectory_DefaultsToReleaseProfile()
     {
         var root = Path.Combine(Path.GetTempPath(), "openclaw-appdata");

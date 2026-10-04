@@ -26,7 +26,7 @@ public class SetupConfigTests : IDisposable
     {
         var config = new SetupConfig();
         Assert.Equal("SmartAgentGateway", config.DistroName);
-        Assert.Equal(18789, config.GatewayPort);
+        Assert.Equal(18889, config.GatewayPort);
         Assert.Equal("Ubuntu-24.04", config.BaseDistro);
         Assert.False(config.Headless);
         Assert.False(config.DryRun);
@@ -270,7 +270,7 @@ public class SetupConfigTests : IDisposable
         {
             Environment.SetEnvironmentVariable("OPENCLAW_SETUP_PORT", "notanumber");
             var config = SetupConfig.FromEnvironment();
-            Assert.Equal(18789, config.GatewayPort); // default
+            Assert.Equal(18889, config.GatewayPort); // default
         }
         finally
         {

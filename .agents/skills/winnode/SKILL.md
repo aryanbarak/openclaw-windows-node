@@ -16,7 +16,8 @@ description: Invoke and troubleshoot OpenClaw Windows-node commands through the 
 # winnode skill reference
 
 `winnode.exe` invokes OpenClaw Windows-node commands on the local tray over a
-loopback MCP HTTP endpoint (default `http://127.0.0.1:8765/`). Enable
+loopback MCP HTTP endpoint (release default `http://127.0.0.1:18893/`, dev
+default `http://127.0.0.1:18894/`). Enable
 **Local MCP Server** in the tray's Settings → Advanced before calling.
 
 This document is the agent-facing reference: every supported command, its
@@ -48,20 +49,21 @@ winnode --list-tools [--mcp-url <url>|--mcp-port <port>] [--identity release|dev
   re-running a command after a transient failure can double-execute side
   effects. If you need idempotency, target the gateway, not winnode.
 - `--mcp-url <url>` / `--mcp-port <port>` - override the endpoint. Falls back to
-  `OPENCLAW_MCP_PORT` env var, then port 8765. `--mcp-port` must be in
+  `OPENCLAW_MCP_PORT`, then the selected profile's port: release `18893` or dev
+  `18894`. `--mcp-port` must be in
   `[1, 65535]`; out of range fails with exit code 2.
 - `--mcp-token <token>` - bearer token override (testing / explicit only). The
   literal value is **visible to other same-user processes via the OS process
   listing** (`Get-CimInstance Win32_Process | Select CommandLine`,
   Process Explorer, etc.). The CLI emits a stderr warning when this flag is
   used. **Prefer `OPENCLAW_MCP_TOKEN` (env var) or the on-disk
-  `%APPDATA%\OpenClawTray\mcp-token.txt`** which the release tray writes when
+  `%APPDATA%\SmartAgent\mcp-token.txt`** which the release tray writes when
   MCP is enabled. Both `OPENCLAW_MCP_TOKEN` and the on-disk file should
   themselves be treated as sensitive operational secrets.
 - `--identity release|dev` - selects which tray profile supplies the default
   on-disk MCP token. Defaults to `OPENCLAW_APP_IDENTITY`, then `release`.
   Use `--identity dev` for a side-by-side dev tray; its default token path is
-  `%APPDATA%\OpenClawTray-Dev\mcp-token.txt`. `OPENCLAW_TRAY_DATA_DIR` still
+  `%APPDATA%\SmartAgent-Dev\mcp-token.txt`. `OPENCLAW_TRAY_DATA_DIR` still
   wins for isolated runs and points directly at the data folder.
 - `--verbose` - log endpoint + ignored flags to stderr. Without `--verbose`,
   HTTP error bodies are emitted only as the first line; with `--verbose`, the
