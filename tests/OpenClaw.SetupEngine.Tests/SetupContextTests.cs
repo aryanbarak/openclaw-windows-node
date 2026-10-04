@@ -27,7 +27,8 @@ public class SetupContextTests
         {
             Environment.SetEnvironmentVariable("OPENCLAW_TRAY_DATA_DIR", null);
             var ctx = CreateContext();
-            Assert.Contains("OpenClawTray", ctx.DataDir);
+            Assert.EndsWith("SmartAgent", ctx.DataDir);
+            Assert.DoesNotContain("OpenClawTray", ctx.DataDir);
         }
         finally
         {
@@ -62,7 +63,7 @@ public class SetupContextTests
         {
             Environment.SetEnvironmentVariable("OPENCLAW_TRAY_LOCALAPPDATA_DIR", @"C:\custom\localappdata");
             var ctx = CreateContext();
-            Assert.Equal(@"C:\custom\localappdata\OpenClawTray", ctx.LocalDataDir);
+            Assert.Equal(@"C:\custom\localappdata\SmartAgent", ctx.LocalDataDir);
         }
         finally
         {

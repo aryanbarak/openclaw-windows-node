@@ -85,7 +85,9 @@ public sealed class SetupGatewaySession : IAsyncDisposable
         var token = deviceToken ?? record.SharedGatewayToken ?? record.BootstrapToken
             ?? throw new InvalidOperationException("No gateway credential found.");
         var gatewayUrl = binding.Endpoint;
-        var provenanceService = new ManagedLocalGatewayPortProvenanceService(NullLogger.Instance);
+        var provenanceService = new ManagedLocalGatewayPortProvenanceService(
+            NullLogger.Instance,
+            Path.GetFileName(Path.TrimEndingDirectorySeparator(dataDir)));
         var needsProvenance = record.SshTunnel is null &&
             GatewayRecordEditing.ResolveManagedDistroName(record) is not null &&
             GatewayRecordEditing.IsLoopbackEndpoint(record.Url);

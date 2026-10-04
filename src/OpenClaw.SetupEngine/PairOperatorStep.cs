@@ -189,7 +189,8 @@ public sealed class PairOperatorStep : SetupStep
         };
         var probe = ctx.EndpointProvenanceProbe ??
             new ManagedLocalGatewayPortProvenanceService(
-                new SetupOpenClawLogger(ctx.Logger)).InspectAsync;
+                new SetupOpenClawLogger(ctx.Logger),
+                Path.GetFileName(Path.TrimEndingDirectorySeparator(ctx.LocalDataDir))).InspectAsync;
         var provenance =
             await GatewayWizardRestartRecoveryPolicy.WaitForExpectedManagedGatewayAsync(
                 cancellationToken => probe(record, cancellationToken),

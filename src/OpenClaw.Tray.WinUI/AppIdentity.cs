@@ -1,3 +1,5 @@
+using OpenClaw.Shared;
+
 namespace OpenClawTray;
 
 /// <summary>
@@ -8,10 +10,10 @@ internal static class AppIdentity
 {
 #if DEV_BUILD
     /// <summary>Human-visible app name shown in tray tooltips, window titles, and notifications.</summary>
-    public const string DisplayName = "OpenClaw Companion (Dev)";
+    public const string DisplayName = OpenClawAppIdentity.DevDisplayName;
 
     /// <summary>Short name used in tray tooltip prefix.</summary>
-    public const string TrayName = "OpenClaw Tray (Dev)";
+    public const string TrayName = OpenClawAppIdentity.DevDisplayName;
 
     /// <summary>
     /// Win32 AppUserModelID used for notifications and shell grouping. This applies to
@@ -21,28 +23,28 @@ internal static class AppIdentity
     /// to the MSIX identity would orphan the AUMID already written into existing users'
     /// Start menu shortcuts and break their notifications.
     /// </summary>
-    public const string AppUserModelId = "OpenClaw.Companion.Dev";
+    public const string AppUserModelId = OpenClawAppIdentity.DevAppUserModelId;
 
     /// <summary>Windows Registry auto-start value name (must differ so both can auto-start).</summary>
-    public const string AutoStartRegistryName = "OpenClawTray-Dev";
+    public const string AutoStartRegistryName = OpenClawAppIdentity.DevAutoStartName;
 
     /// <summary>Windows scheduled task name (must differ so both can auto-start).</summary>
-    public const string StartupTaskName = "OpenClaw Companion (Dev)";
+    public const string StartupTaskName = OpenClawAppIdentity.DevStartupTaskName;
 
     /// <summary>MSIX manifest startup task identifier.</summary>
-    public const string PackageStartupTaskId = "OpenClawStartup";
+    public const string PackageStartupTaskId = OpenClawAppIdentity.DevPackageStartupTaskId;
 
     /// <summary>Leaf directory for local and roaming app-owned data.</summary>
-    public const string DataDirectoryName = "OpenClawTray-Dev";
+    public const string DataDirectoryName = OpenClawAppIdentity.DevDataDirectoryName;
 
     /// <summary>Single-instance mutex base name.</summary>
-    public const string MutexBaseName = "OpenClawTray-Dev";
+    public const string MutexBaseName = OpenClawAppIdentity.DevMutexBaseName;
 
     /// <summary>Protocol scheme for deep links.</summary>
-    public const string ProtocolScheme = "openclaw-dev";
+    public const string ProtocolScheme = OpenClawAppIdentity.DevProtocolScheme;
 
     /// <summary>App-owned WSL distro used by embedded setup.</summary>
-    public const string SetupDistroName = "OpenClawGateway-Dev";
+    public const string SetupDistroName = OpenClawAppIdentity.DevDistroName;
 
     /// <summary>Loopback gateway port used by embedded setup.</summary>
     public const int SetupGatewayPort = 18790;
@@ -54,10 +56,10 @@ internal static class AppIdentity
     public static bool IsDev => true;
 #else
     /// <summary>Human-visible app name shown in tray tooltips, window titles, and notifications.</summary>
-    public const string DisplayName = "OpenClaw Companion";
+    public const string DisplayName = OpenClawAppIdentity.ReleaseDisplayName;
 
     /// <summary>Short name used in tray tooltip prefix.</summary>
-    public const string TrayName = "OpenClaw Tray";
+    public const string TrayName = OpenClawAppIdentity.ReleaseDisplayName;
 
     /// <summary>
     /// Win32 AppUserModelID used for notifications and shell grouping. This applies to
@@ -67,28 +69,28 @@ internal static class AppIdentity
     /// to the MSIX identity would orphan the AUMID already written into existing users'
     /// Start menu shortcuts and break their notifications.
     /// </summary>
-    public const string AppUserModelId = "OpenClaw.Companion";
+    public const string AppUserModelId = OpenClawAppIdentity.ReleaseAppUserModelId;
 
     /// <summary>Windows Registry auto-start value name.</summary>
-    public const string AutoStartRegistryName = "OpenClawTray";
+    public const string AutoStartRegistryName = OpenClawAppIdentity.ReleaseAutoStartName;
 
     /// <summary>Windows scheduled task name.</summary>
-    public const string StartupTaskName = "OpenClaw Companion";
+    public const string StartupTaskName = OpenClawAppIdentity.ReleaseStartupTaskName;
 
     /// <summary>MSIX manifest startup task identifier.</summary>
-    public const string PackageStartupTaskId = "OpenClawStartup";
+    public const string PackageStartupTaskId = OpenClawAppIdentity.ReleasePackageStartupTaskId;
 
     /// <summary>Leaf directory for local and roaming app-owned data.</summary>
-    public const string DataDirectoryName = "OpenClawTray";
+    public const string DataDirectoryName = OpenClawAppIdentity.ReleaseDataDirectoryName;
 
     /// <summary>Single-instance mutex base name.</summary>
-    public const string MutexBaseName = "OpenClawTray";
+    public const string MutexBaseName = OpenClawAppIdentity.ReleaseMutexBaseName;
 
     /// <summary>Protocol scheme for deep links.</summary>
-    public const string ProtocolScheme = "openclaw";
+    public const string ProtocolScheme = OpenClawAppIdentity.ReleaseProtocolScheme;
 
     /// <summary>App-owned WSL distro used by embedded setup.</summary>
-    public const string SetupDistroName = "OpenClawGateway";
+    public const string SetupDistroName = OpenClawAppIdentity.ReleaseDistroName;
 
     /// <summary>Loopback gateway port used by embedded setup.</summary>
     public const int SetupGatewayPort = 18789;

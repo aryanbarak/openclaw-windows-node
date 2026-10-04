@@ -558,8 +558,8 @@ internal static class CliRunner
     ///   per-tool secret env-var convention — same shape as <c>GITHUB_TOKEN</c>,
     ///   <c>ANTHROPIC_API_KEY</c>, <c>NUGET_API_KEY</c>.</item>
     ///   <item>The on-disk token file the tray writes when MCP is enabled —
-    ///   <c>%APPDATA%\OpenClawTray\mcp-token.txt</c> by default,
-    ///   <c>%APPDATA%\OpenClawTray-Dev\mcp-token.txt</c> when
+    ///   <c>%APPDATA%\SmartAgent\mcp-token.txt</c> by default,
+    ///   <c>%APPDATA%\SmartAgent-Dev\mcp-token.txt</c> when
     ///   <c>--identity dev</c> or <c>OPENCLAW_APP_IDENTITY=dev</c> is set, or
     ///   <c>$OPENCLAW_TRAY_DATA_DIR\mcp-token.txt</c> when the tray was launched
     ///   with that sandbox override (the integration test fixture uses it).</item>
@@ -853,7 +853,7 @@ internal static class CliRunner
         stdout.WriteLine("  --mcp-port <port>            Override MCP port [1-65535] (default: $OPENCLAW_MCP_PORT or 8765)");
         stdout.WriteLine("  --mcp-token <token>          Bearer token (testing/explicit overrides only - visible to");
         stdout.WriteLine("                               other processes via the OS process listing). Prefer");
-        stdout.WriteLine("                               $OPENCLAW_MCP_TOKEN or %APPDATA%\\OpenClawTray\\mcp-token.txt");
+        stdout.WriteLine("                               $OPENCLAW_MCP_TOKEN or %APPDATA%\\SmartAgent\\mcp-token.txt");
         stdout.WriteLine("  --identity <release|dev>     Select tray profile for default token lookup");
         stdout.WriteLine("                               (default: $OPENCLAW_APP_IDENTITY or release)");
         stdout.WriteLine("  --verbose                    Print endpoint + ignored flags to stderr");

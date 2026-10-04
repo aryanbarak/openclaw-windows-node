@@ -11,7 +11,7 @@ internal sealed record StartupTaskDescription(
 
 public static class WindowsStartupTaskRegistration
 {
-    public const string TaskName = "OpenClaw Companion";
+    public const string TaskName = OpenClawAppIdentity.ReleaseStartupTaskName;
 
     public static bool Register(string trayExecutablePath, string taskName = TaskName)
     {

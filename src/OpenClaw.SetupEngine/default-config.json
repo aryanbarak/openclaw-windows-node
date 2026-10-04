@@ -1,7 +1,7 @@
 {
   // ─── Core Setup ───
   // WSL distro name to create (use distinct name to avoid conflicts)
-  "DistroName": "OpenClawGateway",
+  "DistroName": "SmartAgentGateway",
   // Gateway WebSocket port (tray connects here)
   "GatewayPort": 18789,
   // Ubuntu release to install as a fresh app-owned WSL gateway distro
@@ -33,7 +33,7 @@
   },
   // Log verbosity: "trace", "debug", "info", "warn", "error"
   "LogLevel": "trace",
-  // Override log file path (null = %APPDATA%\OpenClawTray\Logs\Setup\)
+  // Override log file path (null = %APPDATA%\SmartAgent\Logs\Setup\)
   "LogPath": null,
   // Override gateway WebSocket URL (null = ws://127.0.0.1:{GatewayPort})
   "GatewayUrl": null,
@@ -134,7 +134,7 @@
   },
 
   // ─── Tray Settings ───
-  // Written to %APPDATA%\OpenClawTray\settings.json after setup.
+  // Written to %APPDATA%\SmartAgent\settings.json after setup.
   // Merged with existing settings (preserves user prefs, overwrites these keys).
   "Settings": {
     // Master switch: tray starts node mode on launch

@@ -14,7 +14,7 @@ namespace OpenClaw.SetupEngine;
 
 public sealed class SetupConfig
 {
-    public string DistroName { get; set; } = "OpenClawGateway";
+    public string DistroName { get; set; } = OpenClawAppIdentity.ReleaseDistroName;
     public int GatewayPort { get; set; } = 18789;
     public string BaseDistro { get; set; } = "Ubuntu-24.04";
     public bool SkipPermissions { get; set; }
@@ -633,18 +633,18 @@ public sealed class SetupContext
 
     public static string ResolveDataDir()
         => Environment.GetEnvironmentVariable("OPENCLAW_TRAY_DATA_DIR")
-            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OpenClawTray");
+            ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), OpenClawAppIdentity.ReleaseDataDirectoryName);
 
     public static string ResolveLocalDataDir()
     {
         if (Environment.GetEnvironmentVariable("OPENCLAW_TRAY_LOCALAPPDATA_DIR") is { Length: > 0 } localAppDataRoot)
-            return Path.Combine(localAppDataRoot, "OpenClawTray");
+            return Path.Combine(localAppDataRoot, OpenClawAppIdentity.ReleaseDataDirectoryName);
 
         // Compatibility alias used by early SetupEngine tests/builds. Unlike
-        // LOCALAPPDATA_DIR, this points directly at the OpenClawTray data folder.
+        // LOCALAPPDATA_DIR, this points directly at the product data folder.
         if (Environment.GetEnvironmentVariable("OPENCLAW_TRAY_LOCAL_DATA_DIR") is { Length: > 0 } localDataDir)
             return localDataDir;
 
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "OpenClawTray");
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), OpenClawAppIdentity.ReleaseDataDirectoryName);
     }
 }

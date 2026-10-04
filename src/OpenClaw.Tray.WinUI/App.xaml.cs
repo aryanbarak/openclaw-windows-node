@@ -881,7 +881,7 @@ public partial class App : Application, OpenClawTray.Services.IAppCommands, IPer
         };
         // SshTunnelService implements ISshTunnelManager directly — no shim needed
         var managedLocalPortProvenance = _managedLocalPortProvenance =
-            new ManagedLocalGatewayPortProvenanceService(appLogger);
+            new ManagedLocalGatewayPortProvenanceService(appLogger, AppIdentity.DataDirectoryName);
         var nativeGatewayResolver = new OpenClaw.SetupEngine.UI.NativeGatewayPackageResolver();
         var nativeGatewayRuntime = OpenClaw.Connection.NativeGateway.NativeGatewayRuntimeRouter.Create(
             _gatewayRegistry, nativeGatewayResolver, appLogger);

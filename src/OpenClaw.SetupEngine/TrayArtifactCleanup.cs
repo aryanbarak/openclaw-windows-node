@@ -14,7 +14,7 @@ namespace OpenClaw.SetupEngine;
 public static class TrayArtifactCleanup
 {
     private const string AutoStartKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
-    private const string DefaultAutoStartValue = "OpenClawTray";
+    private const string DefaultAutoStartValue = OpenClawAppIdentity.ReleaseAutoStartName;
 
     public static void Run(
         SetupContext ctx,
@@ -23,7 +23,7 @@ public static class TrayArtifactCleanup
         string startupTaskName = WindowsStartupTaskRegistration.TaskName)
     {
         var logger = ctx.Logger;
-        var appDataDir = ctx.DataDir; // %APPDATA%\OpenClawTray
+        var appDataDir = ctx.DataDir;
         var localDataDir = ctx.LocalDataDir;
 
         // 1. Remove autostart entries

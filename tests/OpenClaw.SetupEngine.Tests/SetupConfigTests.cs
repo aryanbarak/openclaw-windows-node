@@ -25,7 +25,7 @@ public class SetupConfigTests : IDisposable
     public void Defaults_AreReasonable()
     {
         var config = new SetupConfig();
-        Assert.Equal("OpenClawGateway", config.DistroName);
+        Assert.Equal("SmartAgentGateway", config.DistroName);
         Assert.Equal(18789, config.GatewayPort);
         Assert.Equal("Ubuntu-24.04", config.BaseDistro);
         Assert.False(config.Headless);
@@ -527,7 +527,7 @@ public class SetupConfigTests : IDisposable
         var summary = SetupReviewSummaryBuilder.Build(new SetupConfig());
 
         Assert.Equal("Install Ubuntu 24.04 in WSL", summary.DistroTitle);
-        Assert.Equal("Creates a separate OpenClawGateway instance. Uses several GB.", summary.DistroDescription);
+        Assert.Equal("Creates a separate SmartAgentGateway instance. Uses several GB.", summary.DistroDescription);
     }
 
     [Fact]
@@ -673,7 +673,7 @@ public class SetupConfigTests : IDisposable
         Assert.Equal("wss://openclaw-test.example.ts.net", summary.GatewayEndpoint);
         Assert.DoesNotContain("<tailnet>", summary.GatewayEndpoint);
         Assert.Contains("requires existing Companion token or device authentication", summary.GatewayDescription);
-        Assert.Equal("OpenClawGateway · wss://openclaw-test.example.ts.net", summary.CompletionGatewaySummary);
+        Assert.Equal("SmartAgentGateway · wss://openclaw-test.example.ts.net", summary.CompletionGatewaySummary);
     }
 
     [Fact]

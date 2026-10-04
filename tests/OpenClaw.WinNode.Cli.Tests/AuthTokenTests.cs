@@ -189,13 +189,13 @@ public class AuthTokenTests : IDisposable
     }
 
     [Fact]
-    public void ResolveTokenPath_falls_back_to_AppData_OpenClawTray()
+    public void ResolveTokenPath_falls_back_to_AppData_SmartAgent()
     {
         Func<string, string?> env = _ => null;
         var path = CliRunner.ResolveTokenPath(env);
         var expected = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "OpenClawTray",
+            "SmartAgent",
             "mcp-token.txt");
         Assert.Equal(expected, path);
     }
@@ -208,7 +208,7 @@ public class AuthTokenTests : IDisposable
         var path = CliRunner.ResolveTokenPath(env);
         var expected = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "OpenClawTray-Dev",
+            "SmartAgent-Dev",
             "mcp-token.txt");
         Assert.Equal(expected, path);
     }
@@ -221,7 +221,7 @@ public class AuthTokenTests : IDisposable
         var path = CliRunner.ResolveTokenPath(env, OpenClawAppIdentity.ReleaseIdentity);
         var expected = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "OpenClawTray",
+            "SmartAgent",
             "mcp-token.txt");
         Assert.Equal(expected, path);
     }
