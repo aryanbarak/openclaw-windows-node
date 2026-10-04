@@ -282,6 +282,9 @@ public sealed class OnboardingAiPageTests(UIThreadFixture ui, ITestOutputHelper 
     {
         await WithPageAsync(async (page, transport, completed) =>
         {
+            var scroll = Find<ScrollViewer>(page, "ChoicesScroller");
+            var viewportSettled = true;
+            scroll.ViewChanged += (_, e) => viewportSettled = !e.IsIntermediate;
             var more = Find<SettingsExpander>(page, "MoreExpander");
             more.IsExpanded = true;
             await InvokeCardAsync(Find<SettingsCard>(page, "ApiKeysButton"));
@@ -294,9 +297,10 @@ public sealed class OnboardingAiPageTests(UIThreadFixture ui, ITestOutputHelper 
             input.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = false });
             await OnboardingNativeProof.NextCompositionAsync();
             await WaitAsync(() => Find<Button>(page, "ApiKeyConnectButton").IsEnabled);
-            var scroll = Find<ScrollViewer>(page, "ChoicesScroller");
-            var viewportSettled = true;
-            scroll.ViewChanged += (_, e) => viewportSettled = !e.IsIntermediate;
+            // Opening the form already scheduled an animated bring-into-view.
+            // Capture its settled viewport, not an intermediate compositor offset.
+            await TestSupport.WaitForRenderedConditionAsync(
+                () => viewportSettled && scroll.VerticalOffset > 0, "API key form finishes scrolling before opening provider");
             var offset = scroll.VerticalOffset;
             var candidates = Find<ItemsControl>(page, "CandidateChoices").ItemsSource;
             var subtitle = Find<TextBlock>(page, "StatusText").Text;
@@ -311,9 +315,17 @@ public sealed class OnboardingAiPageTests(UIThreadFixture ui, ITestOutputHelper 
             Assert.Equal(0, completed());
             transport.CancelStatus = "cancelled";
             Invoke(cancel);
-            await WaitAsync(() => Find<Button>(page, "RefreshButton").IsEnabled &&
-                ReferenceEquals(Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(page.XamlRoot), input) &&
-                viewportSettled && Math.Abs(scroll.VerticalOffset - offset) <= 1);
+            await TestSupport.WaitForRenderedConditionAsync(
+                () => Find<Button>(page, "RefreshButton").IsEnabled, "provider cancellation re-enables the page");
+            await TestSupport.WaitForRenderedConditionAsync(
+                () => ReferenceEquals(Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(page.XamlRoot), input),
+                "provider cancellation restores API key input focus");
+            await TestSupport.WaitForRenderedConditionAsync(
+                () => viewportSettled && Math.Abs(scroll.VerticalOffset - offset) <= 1,
+                "provider cancellation restores the settled viewport");
+            Assert.True(Find<Button>(page, "RefreshButton").IsEnabled);
+            Assert.Same(input, Microsoft.UI.Xaml.Input.FocusManager.GetFocusedElement(page.XamlRoot));
+            Assert.True(viewportSettled);
             Assert.InRange(Math.Abs(scroll.VerticalOffset - offset), 0, 1);
             Assert.Same(selected, picker.SelectedItem);
             Assert.Empty(input.Password);

@@ -452,7 +452,7 @@ public sealed class NativeGatewaySetupUxContractTests
         Assert.DoesNotContain("MarkWizardCompleted", ai);
         Assert.DoesNotContain("MarkWizardCompleted", window);
         Assert.Contains("ConnectForFinalizationAsync", session);
-        Assert.Contains("await VerifyConnectionAsync(connection, proof, linked.Token)", session);
+        Assert.Contains("await VerifyConnectionAsync(connection, proof, linked.Token, progress)", session);
         Assert.Contains("registry.Save(beforePublication)", session);
         foreach (var file in new[] { Path.Combine(ui, "Pages", "AiSetupPage.xaml"),
                      Path.Combine(ui, "Controls", "ProviderSetupDialog.xaml") })

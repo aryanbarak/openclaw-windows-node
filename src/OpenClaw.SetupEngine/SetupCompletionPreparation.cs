@@ -102,7 +102,13 @@ public sealed class SetupCompletionPreparation(
 
     private async Task DisposeAfterCleanupAsync()
     {
-        try { await Task.WhenAll(ActiveTask, _draining ?? Task.CompletedTask); }
+        try
+        {
+            // Drain admission may still be returning its task when cancellation arrives.
+            // Join the owner before reading the drain it retained.
+            try { await ActiveTask; }
+            finally { await (_draining ?? Task.CompletedTask); }
+        }
         catch (Exception) { /* ActiveTask reports failure; disposal still joins retained ownership. */ }
         finally { _lifetime.Dispose(); }
     }

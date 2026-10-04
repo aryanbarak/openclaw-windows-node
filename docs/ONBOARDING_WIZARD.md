@@ -16,6 +16,10 @@ cancelled phases retain the interrupted substep. Download measurements and the
 expandable activity log remain below the phase overview; the internal pipeline
 step count is not displayed.
 
+The shared loading surface centers its bounded content group inside the scroll
+viewport, independently of the current status text or window width. Short
+windows retain vertical scrolling without horizontal overflow.
+
 Reopening an incomplete native Local AI setup uses this Companion profile's saved
 Gateway ownership to offer **Recover and use Local AI**, including pending
 configuration writes not yet reflected in runtime status. Recovery preserves the
@@ -537,6 +541,9 @@ replays a failed or uncertain finalization. Runtime restarts and security gates
 remain intact.
 The presentation waits at most 30 seconds for the previous page drain, while
 the actual drain remains tracked and owns the setup lock until it settles.
+Cleanup first joins the completion task, then reads and joins its retained
+page drain. Cancellation while the drain callback is returning cannot release
+ownership before that admitted cleanup finishes.
 Explicit retry is available before finalization, or for publication after
 confirmed finalization; the latter reuses the freshly verified proof without
 rerunning finalization. An uncertain finalization cannot be retried blindly.
@@ -1415,6 +1422,10 @@ gateway or profile in a test. Use only owned disposable resources and compare
 protected profile metadata and notification/COM, URI, and startup registration
 fingerprints before and after native runs.
 
+A fresh isolated profile opens onboarding without `OPENCLAW_FORCE_ONBOARDING`.
+Leave that override unset when testing restart handoffs: it is inherited by the
+new process and deliberately takes precedence over normal launch routing.
+
 ### Setup image packaging
 
 Setup images use `ms-appx:///OpenClaw.SetupEngine.UI/Assets/Setup/...` URIs.
@@ -1451,6 +1462,13 @@ clean directory and checks every setup asset, including nested SVGs and notices.
 Run the repository-required build, Shared and Tray suites, plus
 `OpenClaw.SetupEngine.Tests` for the flow and AI protocol contracts.
 `AiReadyPageRenderingTests` covers the three destinations and isolated startup.
+`SetupLoadingViewRenderingTests` checks the arranged mascot, text and progress
+bounds against the viewport center across progress updates, themes and resizing.
+Ready badge assertions wait for layout after receipt consumption reveals the
+choices; mounting the page alone does not lay out collapsed choices.
+`SetupHandoffReceiptCompatibilityTests` checks current-reader handling of kindless
+destination receipts and retained retries. These schema fixtures supplement, but
+do not replace, signed-package upgrade/downgrade and live authority-chain proof.
 `ApprovedMock_FivePagesAndProviderPopup_LightAndDark` provides an opt-in native
 comparison without installation. Building fixtures alone is not rendered proof;
 high contrast and Windows text scaling need authorized visible validation.

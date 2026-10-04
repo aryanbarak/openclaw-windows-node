@@ -38,16 +38,30 @@ public sealed class SetupReadinessTests
     {
         var drain = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        using var owner = new SetupCompletionPreparation(Proof, _ => { entered.SetResult(); return drain.Task; },
+        using var returnDrain = new ManualResetEventSlim();
+        using var owner = new SetupCompletionPreparation(Proof, _ =>
+        {
+            entered.SetResult();
+            Assert.True(returnDrain.Wait(TimeSpan.FromSeconds(10)), "The admitted drain must be allowed to return.");
+            return drain.Task;
+        },
             (_, _) => throw new InvalidOperationException("Must not verify"),
             (_, _) => throw new InvalidOperationException("Must not finalize"),
             (_, _) => throw new InvalidOperationException("Must not publish"));
         var task = owner.StartAsync();
-        await entered.Task;
-        owner.Dispose();
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task);
-        Assert.False(owner.CleanupCompleted.IsCompleted);
-        drain.SetResult();
+        try
+        {
+            await entered.Task.WaitAsync(TimeSpan.FromSeconds(10));
+            owner.Dispose();
+            returnDrain.Set();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task);
+            Assert.False(owner.CleanupCompleted.IsCompleted);
+        }
+        finally
+        {
+            returnDrain.Set();
+            drain.TrySetResult();
+        }
         await owner.CleanupCompleted;
     }
 

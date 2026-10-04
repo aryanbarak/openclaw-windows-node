@@ -88,6 +88,9 @@ public sealed class AiReadyPageRenderingTests(UIThreadFixture ui, ITestOutputHel
                 Assert.Null(page.FindName("FinishButton"));
                 var badge = Assert.IsType<RecommendedBadge>(page.FindName("RecommendedBadge"));
                 Assert.Equal("Recommended", Assert.IsType<TextBlock>(badge.FindName("Label")).Text);
+                await TestSupport.WaitForRenderedConditionAsync(
+                    () => badge.IsLoaded && badge.ActualWidth > 0 && badge.ActualHeight > 0,
+                    "admitted Ready choices have completed layout");
                 Assert.True(badge.ActualWidth > 0 && badge.ActualHeight > 0);
                 Assert.Equal("Talk to my agent, recommended",
                     Microsoft.UI.Xaml.Automation.AutomationProperties.GetName(choices.Children[0]));
