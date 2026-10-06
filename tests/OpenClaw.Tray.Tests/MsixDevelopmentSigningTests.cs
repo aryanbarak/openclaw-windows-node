@@ -371,10 +371,10 @@ public sealed class MsixDevelopmentSigningTests
         // Store listing, the Start menu tile, and Startup Apps display. Package identity is
         // Identity/@Name plus @Publisher, so display names are labels only and changing them
         // breaks nothing, which is precisely why a silent revert would otherwise go unnoticed.
-        Assert.Contains("<DisplayName>OpenClaw</DisplayName>", manifest);
-        Assert.Contains(@"DisplayName=""OpenClaw""", manifest);
+        Assert.Contains("<DisplayName>Smart-Agent</DisplayName>", manifest);
+        Assert.Contains(@"DisplayName=""Smart-Agent""", manifest);
         Assert.DoesNotContain("OpenClaw Companion", manifest);
-        Assert.Contains(@"DisplayName=""OpenClaw (Dev)""", project);
+        Assert.Contains(@"DisplayName=""Smart-Agent (Dev)""", project);
     }
 
     [Fact]

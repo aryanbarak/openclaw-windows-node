@@ -1,24 +1,24 @@
 ; OpenClaw Companion Inno Setup Script (WinUI version)
 ; Pass /DDevBuild=1 to produce a side-by-side dev installer.
 #ifdef DevBuild
-  #define MyAppName "OpenClaw Companion (Dev)"
+  #define MyAppName "Smart-Agent (Dev)"
   #define MyAppAumid "OpenClaw.Companion.Dev"
   #define MyAppId "{{M0LTB0T-TRAY-4PP1-DEV}"
   #define MyInstallDir "OpenClawTray-Dev"
   #define MyMutex "OpenClawTray-Dev"
   #define MyAutoStartName "OpenClawTray-Dev"
-  #define MyStartupTaskName "OpenClaw Companion (Dev)"
+  #define MyStartupTaskName "Smart-Agent (Dev)"
   #define MyDistroName "OpenClawGateway-Dev"
   #define MyProtocol "openclaw-dev"
   #define MyOutputSuffix "-Dev"
 #else
-  #define MyAppName "OpenClaw Companion"
+  #define MyAppName "Smart-Agent"
   #define MyAppAumid "OpenClaw.Companion"
   #define MyAppId "{{M0LTB0T-TRAY-4PP1-D3N7}"
   #define MyInstallDir "OpenClawTray"
   #define MyMutex "OpenClawTray"
   #define MyAutoStartName "OpenClawTray"
-  #define MyStartupTaskName "OpenClaw Companion"
+  #define MyStartupTaskName "Smart-Agent"
   #define MyDistroName "OpenClawGateway"
   #define MyProtocol "openclaw"
   #define MyOutputSuffix ""
@@ -126,9 +126,9 @@ Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}\shell\open\command"; ValueTy
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Gateway Setup"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://setup"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Companion Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://commandcenter"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Chat"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://chat"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Gateway Setup"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://setup"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://commandcenter"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Chat"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://chat"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
 Name: "{group}\Check for Updates"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://check-updates"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; AppUserModelID: "{#MyAppAumid}"

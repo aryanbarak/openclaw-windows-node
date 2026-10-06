@@ -47,7 +47,7 @@ public sealed class InstallerIssAssertionTests
     {
         var iss = File.ReadAllText(Path.Combine(TestRepositoryPaths.GetRepositoryRoot(), "installer.iss"));
 
-        Assert.Contains(@"#define MyAppName ""OpenClaw Companion""", iss);
+        Assert.Contains(@"#define MyAppName ""Smart-Agent""", iss);
         Assert.Contains(@"#define MyAppAumid ""OpenClaw.Companion""", iss);
         Assert.Contains(@"#define MyCompression ""lzma""", iss);
         Assert.Contains(@"#define MySolidCompression ""yes""", iss);
@@ -55,9 +55,9 @@ public sealed class InstallerIssAssertionTests
         foreach (var iconEntry in new[]
         {
             @"Name: ""{group}\{#MyAppName}""; Filename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
-            @"Name: ""{group}\OpenClaw Gateway Setup""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://setup""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
-            @"Name: ""{group}\OpenClaw Companion Settings""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://commandcenter""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
-            @"Name: ""{group}\OpenClaw Chat""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://chat""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
+            @"Name: ""{group}\Smart-Agent Gateway Setup""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://setup""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
+            @"Name: ""{group}\Smart-Agent Settings""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://commandcenter""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
+            @"Name: ""{group}\Smart-Agent Chat""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://chat""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
             @"Name: ""{group}\Check for Updates""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://check-updates""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
             @"Name: ""{autodesktop}\{#MyAppName}""; Filename: ""{app}\{#MyAppExeName}""; Tasks: desktopicon; AppUserModelID: ""{#MyAppAumid}""",
             @"Name: ""{userstartup}\{#MyAppName}""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""--background""; Tasks: startupicon; AppUserModelID: ""{#MyAppAumid}"""
@@ -161,7 +161,7 @@ public sealed class InstallerIssAssertionTests
     {
         var iss = File.ReadAllText(Path.Combine(TestRepositoryPaths.GetRepositoryRoot(), "installer.iss"));
 
-        Assert.Contains(@"#define MyAppName ""OpenClaw Companion (Dev)""", iss);
+        Assert.Contains(@"#define MyAppName ""Smart-Agent (Dev)""", iss);
         Assert.Contains(@"#define MyAppAumid ""OpenClaw.Companion.Dev""", iss);
         Assert.Contains(@"#define MyInstallDir ""OpenClawTray-Dev""", iss);
         Assert.Contains(@"#define MyMutex ""OpenClawTray-Dev""", iss);
