@@ -1302,7 +1302,7 @@ public sealed class AppRefactorContractTests
         var root = TestRepositoryPaths.GetRepositoryRoot();
         var source = File.ReadAllText(Path.Combine(root, "src", "OpenClaw.SetupEngine.UI", "SetupWindow.xaml.cs"));
         var trayProject = File.ReadAllText(Path.Combine(root, "src", "OpenClaw.Tray.WinUI", "OpenClaw.Tray.WinUI.csproj"));
-        var iconPath = Path.Combine(root, "src", "OpenClaw.Tray.WinUI", "Assets", "openclaw.ico");
+        var iconPath = Path.Combine(root, "src", "OpenClaw.Tray.WinUI", "Assets", "smart-agent.ico");
         var applyWindowIcon = ExtractMethod(source, "ApplyWindowIcon");
 
         Assert.True(File.Exists(iconPath), $"Expected setup window icon at '{iconPath}'.");
@@ -1417,7 +1417,7 @@ public sealed class AppRefactorContractTests
 
         Assert.Contains("restartRequired: result.RequiresRestart", progress);
         Assert.Contains("if (args.RequiresRestart)", complete);
-        Assert.Contains("OpenClaw needs to restart Windows to continue the installation. Would you like to restart now?", complete);
+        Assert.Contains("Smart-Agent needs to restart Windows to continue the installation. Would you like to restart now?", complete);
         Assert.Contains("Content=\"Yes, restart now\"", xaml);
         Assert.Contains("Content=\"No, I'm not ready yet\"", xaml);
         Assert.Contains("Path.Combine(Environment.SystemDirectory, \"shutdown.exe\")", restartLauncher);

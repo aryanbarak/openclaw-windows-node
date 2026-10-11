@@ -12,7 +12,7 @@
         <StackPanel x:Name="InstallHeader" Grid.Row="0" Padding="40,4,40,0" Spacing="4">
             <controls:OnboardingMascot x:Name="ProgressMascot" Mood="Working"
                                       HorizontalAlignment="Center" />
-            <TextBlock x:Name="TitleText" Text="Setting up OpenClaw"
+            <TextBlock x:Name="TitleText" Text="Setting up Smart-Agent"
                        Style="{StaticResource TitleTextBlockStyle}"
                        HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" />
             <TextBlock x:Name="SubtitleText"

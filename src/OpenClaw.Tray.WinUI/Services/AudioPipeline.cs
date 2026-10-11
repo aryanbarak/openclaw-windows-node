@@ -18,7 +18,7 @@ namespace OpenClawTray.Services;
 public sealed class AudioPipeline : IAsyncDisposable
 {
     private readonly IOpenClawLogger _logger;
-    private readonly SpeechToTextService _stt;
+    private readonly ISpeechToTextService _stt;
     private readonly object _captureGate = new();
     private readonly SemaphoreSlim _stopGate = new(1, 1);
     private readonly Func<IAudioCapture> _captureFactory;
@@ -107,7 +107,7 @@ public sealed class AudioPipeline : IAsyncDisposable
     /// <summary>When true, incoming audio is ignored (prevents echo during TTS playback).</summary>
     public bool IsMuted { get; set; }
 
-    public AudioPipeline(IOpenClawLogger logger, SpeechToTextService stt)
+    public AudioPipeline(IOpenClawLogger logger, ISpeechToTextService stt)
         : this(
             logger,
             stt,
@@ -121,7 +121,7 @@ public sealed class AudioPipeline : IAsyncDisposable
 
     internal AudioPipeline(
         IOpenClawLogger logger,
-        SpeechToTextService stt,
+        ISpeechToTextService stt,
         Func<IAudioCapture> captureFactory,
         Func<TimeSpan, CancellationToken, Task> delayAsync,
         TimeSpan firstAudioTimeout,
@@ -174,7 +174,7 @@ public sealed class AudioPipeline : IAsyncDisposable
                     return;
 
                 var captureFormat = _captureFormat ?? throw new InvalidOperationException("Audio capture format was not initialized.");
-                var sttStatus = _stt.IsModelLoaded ? "loaded" : "NOT loaded";
+                var sttStatus = _stt.IsReady ? "ready" : "NOT ready";
                 _logger.Info($"Audio pipeline started: {captureFormat.SampleRate}Hz {captureFormat.BitsPerSample}bit {captureFormat.Channels}ch → 16kHz mono, VAD=energy, STT={sttStatus}");
                 DiagnosticMessage?.Invoke($"Mic: {captureFormat.SampleRate}Hz, STT model: {sttStatus}");
             }
@@ -347,7 +347,7 @@ public sealed class AudioPipeline : IAsyncDisposable
                     await Task.Delay(50).ConfigureAwait(false);
                 }
 
-                if (_speechBuffer.Count > 0 && _stt.IsModelLoaded)
+                if (_speechBuffer.Count > 0 && _stt.IsReady)
                 {
                     await FlushSpeechBufferAsync();
                 }
@@ -535,9 +535,9 @@ public sealed class AudioPipeline : IAsyncDisposable
 
     private async Task TranscribeSamplesAsync(float[] samples, CancellationToken? overrideToken = null)
     {
-        if (!_stt.IsModelLoaded || samples.Length == 0)
+        if (!_stt.IsReady || samples.Length == 0)
         {
-            DiagnosticMessage?.Invoke(_stt.IsModelLoaded ? "Empty audio segment" : "⚠️ Model not loaded");
+            DiagnosticMessage?.Invoke(_stt.IsReady ? "Empty audio segment" : "Speech recognition is not configured");
             return;
         }
 

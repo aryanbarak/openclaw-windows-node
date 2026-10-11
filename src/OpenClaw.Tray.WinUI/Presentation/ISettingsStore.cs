@@ -140,6 +140,7 @@ public sealed record SettingsSnapshot
     public bool NodeOllamaInferenceEnabled { get; init; }
     public bool EnableManagedLocalGatewayAutoRepair { get; init; }
     public string SttModelName { get; init; } = "base";
+    public string SttProvider { get; init; } = "local";
     public string TtsProvider { get; init; } = "";
     public string TtsPiperVoiceId { get; init; } = "";
     public string TtsElevenLabsApiKey { get; init; } = "";

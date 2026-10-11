@@ -49,6 +49,8 @@ public class SettingsRoundTripTests
             NodeTtsEnabled = true,
             TtsProvider = "elevenlabs",
             TtsElevenLabsApiKey = "elevenlabs-key",
+            SttProvider = "openai",
+            SttOpenAiApiKey = "openai-stt-key",
             TtsElevenLabsModel = "eleven_multilingual_v2",
             TtsElevenLabsVoiceId = "voice-123",
             TtsMiniMaxApiKey = "minimax-key",
@@ -120,6 +122,8 @@ public class SettingsRoundTripTests
         Assert.Equal(original.NodeTtsEnabled, restored.NodeTtsEnabled);
         Assert.Equal(original.TtsProvider, restored.TtsProvider);
         Assert.Equal(original.TtsElevenLabsApiKey, restored.TtsElevenLabsApiKey);
+        Assert.Equal(original.SttProvider, restored.SttProvider);
+        Assert.Equal(original.SttOpenAiApiKey, restored.SttOpenAiApiKey);
         Assert.Equal(original.TtsElevenLabsModel, restored.TtsElevenLabsModel);
         Assert.Equal(original.TtsElevenLabsVoiceId, restored.TtsElevenLabsVoiceId);
         Assert.Equal(original.TtsMiniMaxApiKey, restored.TtsMiniMaxApiKey);
@@ -589,12 +593,16 @@ public class SettingsRoundTripTests
             var settings = new SettingsManager(dir)
             {
                 TtsElevenLabsApiKey = "elevenlabs-key",
-                TtsMiniMaxApiKey = "minimax-key"
+                TtsMiniMaxApiKey = "minimax-key",
+                SttProvider = "openai",
+                SttOpenAiApiKey = "openai-stt-key"
             };
 
             settings.Save();
             Assert.Equal("elevenlabs-key", settings.TtsElevenLabsApiKey);
             Assert.Equal("minimax-key", settings.TtsMiniMaxApiKey);
+            Assert.Equal("openai", settings.SttProvider);
+            Assert.Equal("openai-stt-key", settings.SttOpenAiApiKey);
 
             using (var saved = JsonDocument.Parse(File.ReadAllText(settingsPath)))
             {
@@ -603,16 +611,20 @@ public class SettingsRoundTripTests
                 Assert.DoesNotContain("elevenlabs-key", stored);
                 var miniMaxStored = saved.RootElement.GetProperty(nameof(SettingsData.TtsMiniMaxApiKey)).GetString();
                 Assert.StartsWith("dpapi:", miniMaxStored);
+                var openAiSttStored = saved.RootElement.GetProperty(nameof(SettingsData.SttOpenAiApiKey)).GetString();
+                Assert.StartsWith("dpapi:", openAiSttStored);
                 Assert.DoesNotContain("minimax-key", miniMaxStored);
             }
 
             settings.Save();
             Assert.Equal("elevenlabs-key", settings.TtsElevenLabsApiKey);
             Assert.Equal("minimax-key", settings.TtsMiniMaxApiKey);
+            Assert.Equal("openai-stt-key", settings.SttOpenAiApiKey);
 
             var reloaded = new SettingsManager(dir);
             Assert.Equal("elevenlabs-key", reloaded.TtsElevenLabsApiKey);
             Assert.Equal("minimax-key", reloaded.TtsMiniMaxApiKey);
+            Assert.Equal("openai-stt-key", reloaded.SttOpenAiApiKey);
         }
         finally
         {

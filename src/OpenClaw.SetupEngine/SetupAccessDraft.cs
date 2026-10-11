@@ -89,11 +89,11 @@ public sealed class SetupAccessDraft
     private string? _confirmedReplacementDistroName;
     private readonly string? _managedGatewayUrl;
 
-    public SetupAccessDraft(SetupConfig config)
+    public SetupAccessDraft(SetupConfig config, string? suggestedRemoteGatewayUrl = null)
     {
         Config = config ?? throw new ArgumentNullException(nameof(config));
         _managedGatewayUrl = config.GatewayUrl;
-        NativeConnectionRequest = new(config.GatewayUrl ?? "");
+        NativeConnectionRequest = new(config.GatewayUrl ?? suggestedRemoteGatewayUrl ?? "");
         SkipWizardWithoutLocalAi = config.SkipWizard;
         config.Settings.EnableMcpServer ??= false;
         config.Settings.NodeOllamaInferenceEnabled ??= false;

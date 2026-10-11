@@ -3,6 +3,26 @@ namespace OpenClaw.SetupEngine.Tests;
 public sealed class SetupAccessDraftTests
 {
     [Fact]
+    public void SuggestedRemoteGateway_PrefillsEditorWithoutConfiguringGateway()
+    {
+        var config = new SetupConfig();
+        var draft = new SetupAccessDraft(config, "wss://agent.smartaryn.com");
+
+        Assert.Equal("wss://agent.smartaryn.com", draft.NativeConnectionRequest.GatewayUrl);
+        Assert.Null(config.GatewayUrl);
+        Assert.False(draft.GatewayAvailable);
+    }
+
+    [Fact]
+    public void ConfiguredGateway_TakesPrecedenceOverSuggestion()
+    {
+        var config = new SetupConfig { GatewayUrl = "wss://configured.example" };
+        var draft = new SetupAccessDraft(config, "wss://agent.smartaryn.com");
+
+        Assert.Equal("wss://configured.example", draft.NativeConnectionRequest.GatewayUrl);
+    }
+
+    [Fact]
     public void ExistingNativeLocalAi_BindsExactGatewayWithoutWslFinalizationOrSettingsReplacement()
     {
         var config = new SetupConfig();

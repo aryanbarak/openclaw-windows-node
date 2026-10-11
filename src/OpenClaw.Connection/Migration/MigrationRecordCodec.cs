@@ -58,8 +58,8 @@ namespace OpenClaw.Connection.Migration
         public const string ConsentFileName = "consent.dpapi";
         public const string ConsentFingerprint = "0000000000000000000000000000000000000000000000000000000000000000";
         public const string CompletionFileName = "completed.dpapi";
-        public const string PackageName = "OpenClawFoundation.OpenClaw";
-        public const string PackagePublisher = "CN=4BA40A7A-B719-4C40-BF91-84AF4F1136FC";
+        public const string PackageName = "AryanBarakzai.Smart-Agent";
+        public const string PackagePublisher = "CN=C364B4A9-3399-4961-B2B4-36D29AC552C3";
         public const int MaximumRecordBytes = 4 * 1024 * 1024;
         private const string SourceId = "{M0LTB0T-TRAY-4PP1-D3N7}";
         private static readonly byte[] Entropy = Encoding.UTF8.GetBytes("OpenClaw.InnoToStore.Migration.v1");

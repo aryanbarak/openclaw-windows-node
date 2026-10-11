@@ -98,9 +98,10 @@ public sealed class MsixDevelopmentSigningTests
 
         // Exactly one package per architecture, deterministically named, with provenance.
         Assert.Contains("$builtPackages.Count -ne 1", packagingScript);
-        Assert.Contains("\"OpenClaw-$Architecture.msix\"", packagingScript);
-        Assert.Contains(@"artifacts\msix\$storeArchitecture\OpenClaw-$storeArchitecture.msix", buildScript);
+        Assert.Contains("\"SmartAgent-$Architecture.msix\"", packagingScript);
+        Assert.Contains(@"artifacts\msix\$storeArchitecture\SmartAgent-$storeArchitecture.msix", buildScript);
         Assert.Contains("msix-metadata.json", packagingScript);
+        Assert.Contains("https://github.com/aryanbarak/openclaw-windows-node", packagingScript);
         Assert.Contains("signed = $false", packagingScript);
         Assert.Contains("sourceTreeDirty = $sourceTreeDirty", packagingScript);
 
@@ -239,7 +240,7 @@ public sealed class MsixDevelopmentSigningTests
             root, "src", "OpenClaw.Tray.WinUI", "Services", "AutoStartManager.cs"));
 
         Assert.Contains("Category=\"windows.startupTask\"", manifest);
-        Assert.Contains("TaskId=\"OpenClawStartup\"", manifest);
+        Assert.Contains("TaskId=\"SmartAgentStartup\"", manifest);
         Assert.Contains("Enabled=\"false\"", manifest);
         Assert.Contains("EntryPoint=\"Windows.FullTrustApplication\"", manifest);
 
@@ -367,12 +368,12 @@ public sealed class MsixDevelopmentSigningTests
         var project = File.ReadAllText(Path.Combine(
             root, "src", "OpenClaw.Tray.WinUI", "OpenClaw.Tray.WinUI.csproj"));
 
-        // "OpenClaw" is the reserved Partner Center name, and these strings are what the
+        // "Smart-Agent" is the reserved Partner Center name, and these strings are what the
         // Store listing, the Start menu tile, and Startup Apps display. Package identity is
         // Identity/@Name plus @Publisher, so display names are labels only and changing them
         // breaks nothing, which is precisely why a silent revert would otherwise go unnoticed.
-        Assert.Contains("<DisplayName>OpenClaw</DisplayName>", manifest);
-        Assert.Contains(@"DisplayName=""OpenClaw""", manifest);
+        Assert.Contains("<DisplayName>Smart-Agent</DisplayName>", manifest);
+        Assert.Contains(@"DisplayName=""Smart-Agent""", manifest);
         Assert.DoesNotContain("OpenClaw Companion", manifest);
         Assert.Contains(@"DisplayName=""OpenClaw (Dev)""", project);
     }

@@ -97,7 +97,7 @@ public sealed partial class SetupWindow : Window
 
     private void ApplyWindowIcon()
     {
-        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "openclaw.ico");
+        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "smart-agent.ico");
         if (!File.Exists(iconPath))
         {
             System.Diagnostics.Debug.WriteLine($"Setup window icon was not found at '{iconPath}'.");
@@ -134,7 +134,8 @@ public sealed partial class SetupWindow : Window
         Func<bool, CancellationToken, Task>? applyNativeStartup = null,
         bool startupRegistrationAllowed = true,
         Action<TraySettingsConfig, bool?, bool>? persistChoices = null,
-        GatewayConnectionManager? connectionManager = null)
+        GatewayConnectionManager? connectionManager = null,
+        string? suggestedRemoteGatewayUrl = null)
     {
         _startupRegistrationAllowed = startupRegistrationAllowed;
         _dataDir = dataDir ?? SetupContext.ResolveDataDir();
@@ -316,7 +317,7 @@ public sealed partial class SetupWindow : Window
         }
         _config.ApplyUiDefaults(rollbackOnFailure: setupArguments.RollbackOnFailure);
         _localAiRecoveryBaseline = LocalAiRecoveryConfigurationBaseline.Capture(_config);
-        AccessDraft = new SetupAccessDraft(_config);
+        AccessDraft = new SetupAccessDraft(_config, suggestedRemoteGatewayUrl);
         if (startAtLocalAiRecoveryReview)
         {
             _config.LocalAiRecoveryGatewayId = localAiRecoveryGatewayId;

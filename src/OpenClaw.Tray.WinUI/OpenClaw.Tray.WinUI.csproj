@@ -7,10 +7,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <EnableMsixTooling>true</EnableMsixTooling>
-    <ApplicationIcon>Assets\openclaw.ico</ApplicationIcon>
-    <AssemblyTitle>OpenClaw Companion</AssemblyTitle>
-    <FileDescription>OpenClaw Companion</FileDescription>
-    <Product>OpenClaw Companion</Product>
+    <ApplicationIcon>Assets\smart-agent.ico</ApplicationIcon>
+    <AssemblyTitle>Smart-Agent</AssemblyTitle>
+    <FileDescription>Smart-Agent</FileDescription>
+    <Product>Smart-Agent</Product>
     <RootNamespace>OpenClawTray</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
     <Platforms>x64;ARM64</Platforms>
@@ -29,9 +29,9 @@
   <PropertyGroup Condition="'$(DevBuild)' == 'true'">
     <DefineConstants>$(DefineConstants);DEV_BUILD</DefineConstants>
     <AppIdentityMarker>dev</AppIdentityMarker>
-    <AssemblyTitle>OpenClaw Companion (Dev)</AssemblyTitle>
-    <FileDescription>OpenClaw Companion (Dev)</FileDescription>
-    <Product>OpenClaw Companion (Dev)</Product>
+    <AssemblyTitle>Smart-Agent (Dev)</AssemblyTitle>
+    <FileDescription>Smart-Agent (Dev)</FileDescription>
+    <Product>Smart-Agent (Dev)</Product>
   </PropertyGroup>
   <PropertyGroup Condition="'$(DevBuild)' != 'true'">
     <AppIdentityMarker>release</AppIdentityMarker>
@@ -125,6 +125,7 @@
 
   <ItemGroup>
     <Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <Content Remove="Assets\openclaw.ico" />
     <Content Include="THIRD_PARTY_NOTICES.md" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <None Include="..\OpenClaw.SetupEngine\default-config.json"
              Link="default-config.json"

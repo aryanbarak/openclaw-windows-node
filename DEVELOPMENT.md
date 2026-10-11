@@ -272,9 +272,9 @@ is what lets a packaged smoke test run without disturbing a working install:
 
 | | `-Msix Dev` | `-Msix Store` |
 | --- | --- | --- |
-| Identity | `OpenClawFoundation.OpenClaw.Dev` | `OpenClawFoundation.OpenClaw` |
+| Identity | `OpenClawFoundation.OpenClaw.Dev` | `AryanBarakzai.Smart-Agent` |
 | Publisher | local development certificate | Partner Center |
-| Protocol | `openclaw-dev` | `openclaw` |
+| Protocol | `openclaw-dev` | `smartagent` |
 | Signing | signed locally | unsigned; the Store signs |
 | Version revision | installed revision + 1 locally; explicit CI run number | pinned to `0` |
 | Architectures | host only | x64 and ARM64 |

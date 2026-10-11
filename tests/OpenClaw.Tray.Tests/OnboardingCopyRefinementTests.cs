@@ -69,12 +69,15 @@ public sealed class OnboardingCopyRefinementTests
     public void WelcomeAndGatewayCopyIsTruthfulLocalizedAndUsesRepositorySafetyUrl()
     {
         var strings = Strings("en-us");
-        Assert.Equal("OpenClaw is your AI assistant for getting things done on your PC.",
+        Assert.Equal("Smart-Agent is your AI assistant for getting things done on your PC.",
             strings["Onboarding_Flow_WelcomeDescription.Text"]);
+        Assert.Equal("Welcome to Smart-Agent", strings["Onboarding_V2_WelcomeTitle.Text"]);
+        Assert.Equal("Smart-Agent Setup", strings["Onboarding_V2_WindowTitle.Text"]);
         Assert.Equal("Before you get started", strings["Onboarding_V2_WelcomeTrust.Title"]);
         Assert.Contains("change or delete files", strings["Onboarding_V2_WelcomeTrust.Message"]);
         Assert.Contains("expose private information", strings["Onboarding_V2_WelcomeTrust.Message"]);
         Assert.Contains("control and limit", strings["Onboarding_V2_WelcomeTrust.Message"]);
+        Assert.Contains("Smart-Agent", strings["Onboarding_V2_WelcomeTrust.Message"]);
         Assert.Equal("Install a local Gateway (WSL)", strings["Onboarding_Copy_GatewayLocalTitle.Text"]);
         Assert.Equal("Install a local Gateway (WSL), recommended",
             strings["Onboarding_Copy_GatewayLocalChoice.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name"]);
@@ -85,6 +88,9 @@ public sealed class OnboardingCopyRefinementTests
         var link = Assert.Single(welcome.Descendants(), element => element.Name.LocalName == "HyperlinkButton");
         Assert.Equal("https://trust.openclaw.ai", link.Attribute("NavigateUri")!.Value);
         Assert.Contains(link.Attribute("NavigateUri")!.Value, Read("SECURITY.md"));
+        var setupWindow = XDocument.Parse(Read(@"src\OpenClaw.SetupEngine.UI\SetupWindow.xaml"));
+        var brandImage = Assert.Single(setupWindow.Descendants(), element => element.Name.LocalName == "Image");
+        Assert.Equal("ms-appx:///Assets/Brand/SmartAgentMark.png", brandImage.Attribute("Source")?.Value);
         foreach (var locale in new[] { "en-us", "fr-fr", "nl-nl", "pt-br", "zh-cn", "zh-tw" })
         {
             var localized = Strings(locale);
@@ -93,6 +99,34 @@ public sealed class OnboardingCopyRefinementTests
             Assert.Contains("{0}", localized["Onboarding_Welcome_LocalAiAvailabilityDetail"]);
             Assert.Contains("WSL", localized["Onboarding_Copy_GatewayLocalDescription.Text"]);
             Assert.Contains("WSL", localized["Onboarding_Copy_GatewayLocalTitle.Text"]);
+        }
+    }
+
+    [Fact]
+    public void CompletionStartupAndRestartCopyUsesSmartAgentBrandInEveryLocale()
+    {
+        string[] brandedKeys =
+        [
+            "Onboarding_Flow_CompletionUnavailable",
+            "Onboarding_Flow_AutoStart.Text",
+            "Onboarding_Flow_AutoStartToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name",
+            "Onboarding_V2_StartupCard.Header",
+            "Onboarding_StartupWarning_Message",
+            "Onboarding_RegistryRecovery_Message",
+            "Onboarding_RestartRecovery_Title",
+            "Onboarding_RestartRecovery_Waiting",
+            "Onboarding_RestartRecovery_Storage",
+            "Onboarding_RestartRecovery_Invalid",
+        ];
+
+        foreach (var locale in new[] { "en-us", "fr-fr", "nl-nl", "pt-br", "zh-cn", "zh-tw" })
+        {
+            var strings = Strings(locale);
+            foreach (var key in brandedKeys)
+            {
+                Assert.Contains("Smart-Agent", strings[key]);
+                Assert.DoesNotContain("OpenClaw", strings[key]);
+            }
         }
     }
 

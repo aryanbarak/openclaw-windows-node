@@ -337,7 +337,7 @@ public sealed class ReactorChatTimeline : Component<ReactorChatTimelineProps>
                 .AutomationName("OpenClaw")
                 .HAlign(HorizontalAlignment.Center),
             Text(
-                    LocalizedOrDefault("Chat_ZeroState_WelcomeTitle", "Welcome to OpenClaw"),
+                    LocalizedOrDefault("Chat_ZeroState_WelcomeTitle", "Welcome to Smart-Agent"),
                     20,
                     FontWeights.SemiBold)
                 .TextAlignment(TextAlignment.Center)

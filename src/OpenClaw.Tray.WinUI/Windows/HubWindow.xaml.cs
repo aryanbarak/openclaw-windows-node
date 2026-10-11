@@ -95,7 +95,7 @@ public sealed partial class HubWindow : WindowEx
     public HubWindow()
     {
         InitializeComponent();
-        Title = LocalizationHelper.GetString("HubWindow_winexWindowEx_2.Title");
+        Title = AppIdentity.DecorateWindowTitle(LocalizationHelper.GetString("HubWindow_winexWindowEx_2.Title"));
         AppTitleBar.Title = Title;
         AppTitleBar.IconSource = new BitmapIconSource
         {

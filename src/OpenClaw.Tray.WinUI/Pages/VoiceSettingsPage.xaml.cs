@@ -86,6 +86,20 @@ public sealed partial class VoiceSettingsPage : Page
         {
             var settings = CurrentApp.Settings;
 
+            for (int i = 0; i < SttProviderCombo.Items.Count; i++)
+            {
+                if (SttProviderCombo.Items[i] is ComboBoxItem providerItem &&
+                    string.Equals(providerItem.Tag?.ToString(), settings.SttProvider, StringComparison.OrdinalIgnoreCase))
+                {
+                    SttProviderCombo.SelectedIndex = i;
+                    break;
+                }
+            }
+            if (SttProviderCombo.SelectedIndex < 0)
+                SttProviderCombo.SelectedIndex = 0;
+            OpenAiApiKeyBox.Password = settings.SttOpenAiApiKey;
+            UpdateSttProviderVisibility();
+
             // Select model in combo
             for (int i = 0; i < ModelCombo.Items.Count; i++)
             {
@@ -126,6 +140,24 @@ public sealed partial class VoiceSettingsPage : Page
 
     private void UpdateModelStatus()
     {
+        var online = string.Equals(
+            CurrentApp.Settings?.SttProvider,
+            OpenClaw.Shared.Audio.OpenAiSpeechToTextService.ProviderName,
+            StringComparison.OrdinalIgnoreCase);
+        if (online)
+        {
+            var configured = !string.IsNullOrWhiteSpace(CurrentApp.Settings?.SttOpenAiApiKey);
+            ModelRequirementText.Text = configured
+                ? L("VoiceSettingsPage_OpenAiReady")
+                : L("VoiceSettingsPage_OpenAiKeyRequired");
+            ModelStatusText.Text = configured
+                ? L("VoiceSettingsPage_OpenAiReady")
+                : L("VoiceSettingsPage_OpenAiKeyRequired");
+            TestVoiceButton.Visibility = configured ? Visibility.Visible : Visibility.Collapsed;
+            return;
+        }
+        ModelRequirementText.Text = L("VoiceSettingsPage_LocalRequirement");
+
         // Determine the selected model. Prefer settings; fall back to the
         // ModelCombo selection if settings haven't been wired yet so the
         // status reflects what's on disk even before Initialize completes.
@@ -152,6 +184,37 @@ public sealed partial class VoiceSettingsPage : Page
             DownloadButtonText.Text = L("VoiceSettingsPage_ButtonDownloadModel");
             TestVoiceButton.Visibility = Visibility.Collapsed;
         }
+    }
+
+    private void UpdateSttProviderVisibility()
+    {
+        var provider = (SttProviderCombo.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "local";
+        OpenAiSttPanel.Visibility = string.Equals(
+            provider,
+            OpenClaw.Shared.Audio.OpenAiSpeechToTextService.ProviderName,
+            StringComparison.OrdinalIgnoreCase)
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+    }
+
+    private void OnSttProviderChanged(object sender, SelectionChangedEventArgs e)
+    {
+        UpdateSttProviderVisibility();
+        if (_suppressEvents || CurrentApp.Settings == null) return;
+        if (SttProviderCombo.SelectedItem is ComboBoxItem item && item.Tag is string provider)
+        {
+            CurrentApp.Settings.SttProvider = provider;
+            CurrentApp.Settings.Save();
+            UpdateModelStatus();
+        }
+    }
+
+    private void OnOpenAiApiKeyChanged(object sender, RoutedEventArgs e)
+    {
+        if (_suppressEvents || CurrentApp.Settings == null) return;
+        CurrentApp.Settings.SttOpenAiApiKey = OpenAiApiKeyBox.Password;
+        CurrentApp.Settings.Save();
+        UpdateModelStatus();
     }
 
     private void UpdateCapabilityState()

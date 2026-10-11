@@ -231,4 +231,18 @@ public sealed class CapabilitiesPageLocalizationCoverageTests
         Assert.Contains("VoiceSettingsPage_TtsCapabilityDisabledNotice.Text", keys);
         Assert.Contains("VoiceSettingsPage_OpenPermissionsLink.Content", keys);
     }
+
+    [Fact]
+    public void VoiceSettingsPage_OffersExplicitPersianSpeechRecognition()
+    {
+        var doc = XDocument.Load(GetVoiceSettingsXamlPath());
+        var persian = doc.Descendants()
+            .Single(e => string.Equals(
+                e.Attribute(XNs + "Uid")?.Value,
+                "VoiceSettingsPage_LangFa",
+                StringComparison.Ordinal));
+
+        Assert.Equal("fa", persian.Attribute("Tag")?.Value);
+        Assert.Contains("VoiceSettingsPage_LangFa.Content", LoadReswKeys());
+    }
 }

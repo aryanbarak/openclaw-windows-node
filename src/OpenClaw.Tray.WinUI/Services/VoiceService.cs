@@ -27,6 +27,7 @@ public sealed class VoiceService : IAsyncDisposable
     private readonly IOpenClawLogger _logger;
     private readonly SettingsManager _settings;
     private readonly SpeechToTextService _stt;
+    private readonly OpenAiSpeechToTextService _openAiStt;
     private readonly WhisperModelManager _modelManager;
     private AudioPipeline? _pipeline;
     private VoiceMode _currentMode = VoiceMode.Inactive;
@@ -101,6 +102,7 @@ public sealed class VoiceService : IAsyncDisposable
         _logger = logger;
         _settings = settings;
         _stt = new SpeechToTextService(logger);
+        _openAiStt = new OpenAiSpeechToTextService(logger, () => _settings.SttOpenAiApiKey);
         _modelManager = new WhisperModelManager(SettingsManager.SettingsDirectoryPath, logger);
     }
 
@@ -112,6 +114,19 @@ public sealed class VoiceService : IAsyncDisposable
         IProgress<(long downloaded, long total)>? downloadProgress = null,
         CancellationToken cancellationToken = default)
     {
+        if (UsesOpenAi)
+        {
+            if (!_openAiStt.IsReady)
+                throw new InvalidOperationException("Add an OpenAI API key in Voice & Audio settings before using online speech recognition.");
+
+            // Keep an already-downloaded Whisper model available as a private,
+            // offline fallback. Selecting OpenAI never downloads a local model.
+            var fallbackName = _settings.SttModelName;
+            if (!_stt.IsModelLoaded && _modelManager.IsModelDownloaded(fallbackName))
+                _stt.LoadModel(_modelManager.GetModelPath(fallbackName));
+            return;
+        }
+
         // Download Whisper model if needed
         var modelName = _settings.SttModelName;
         if (!_modelManager.IsModelDownloaded(modelName))
@@ -146,7 +161,7 @@ public sealed class VoiceService : IAsyncDisposable
         SetMode(VoiceMode.PushToTalk);
 
         _sessionCts = new CancellationTokenSource();
-        _pipeline = new AudioPipeline(_logger, _stt);
+        _pipeline = new AudioPipeline(_logger, GetConfiguredTranscriber());
         WirePipelineEvents(_pipeline);
 
         var options = new AudioPipelineOptions
@@ -188,7 +203,7 @@ public sealed class VoiceService : IAsyncDisposable
         SetMode(VoiceMode.VoiceChat);
 
         _sessionCts = new CancellationTokenSource();
-        _pipeline = new AudioPipeline(_logger, _stt);
+        _pipeline = new AudioPipeline(_logger, GetConfiguredTranscriber());
         WirePipelineEvents(_pipeline);
 
         var options = new AudioPipelineOptions
@@ -252,7 +267,7 @@ public sealed class VoiceService : IAsyncDisposable
         using var timeoutCts = new CancellationTokenSource(args.TimeoutMs);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
 
-        var pipeline = new AudioPipeline(_logger, _stt);
+        var pipeline = new AudioPipeline(_logger, GetConfiguredTranscriber());
         WirePipelineEvents(pipeline);
         var tcs = new TaskCompletionSource<SttListenResult>();
         var sw = Stopwatch.StartNew();
@@ -346,7 +361,8 @@ public sealed class VoiceService : IAsyncDisposable
 
         await EnsureInitializedAsync();
 
-        var pipeline = new AudioPipeline(_logger, _stt);
+        var transcriber = GetConfiguredTranscriber();
+        var pipeline = new AudioPipeline(_logger, transcriber);
         var sw = Stopwatch.StartNew();
         try
         {
@@ -369,7 +385,7 @@ public sealed class VoiceService : IAsyncDisposable
                 ? args.Language!
                 : _settings.SttLanguage ?? "auto";
 
-            var results = await _stt.TranscribeAsync(samples, lang, cancellationToken).ConfigureAwait(false);
+            var results = await transcriber.TranscribeAsync(samples, lang, cancellationToken).ConfigureAwait(false);
             var text = string.Join(" ", results.Select(r => r.Text)).Trim();
 
             return new SttTranscribeResult
@@ -435,11 +451,20 @@ public sealed class VoiceService : IAsyncDisposable
 
     private async Task EnsureInitializedAsync()
     {
-        if (!_stt.IsModelLoaded)
+        if (UsesOpenAi || !_stt.IsModelLoaded)
         {
             await InitializeAsync();
         }
     }
+
+    private bool UsesOpenAi => string.Equals(
+        _settings.SttProvider,
+        OpenAiSpeechToTextService.ProviderName,
+        StringComparison.OrdinalIgnoreCase);
+
+    private ISpeechToTextService GetConfiguredTranscriber() => UsesOpenAi
+        ? new FallbackSpeechToTextService(_openAiStt, _stt, _logger)
+        : _stt;
 
     private void WirePipelineEvents(AudioPipeline pipeline)
     {
@@ -485,6 +510,7 @@ public sealed class VoiceService : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await StopAsync();
+        _openAiStt.Dispose();
         _stt.Dispose();
     }
 }

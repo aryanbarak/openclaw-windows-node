@@ -660,7 +660,7 @@ if ($buildStoreMsix) {
             Write-Error "Store MSIX ($storeArchitecture) packaging failed: $($_.Exception.Message)"
             exit 1
         }
-        $storePackages += Join-Path $repoRoot "artifacts\msix\$storeArchitecture\OpenClaw-$storeArchitecture.msix"
+        $storePackages += Join-Path $repoRoot "artifacts\msix\$storeArchitecture\SmartAgent-$storeArchitecture.msix"
     }
 
     Write-Header "Store MSIX Packages"

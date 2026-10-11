@@ -21,7 +21,7 @@ public sealed class MigrationBuildConfigurationTests
 
         Assert.Equal(0, result.ExitCode);
         Assert.Contains("PRODUCTION_MIGRATION", result.Output);
-        Assert.Contains("MigrationStoreProductId=9NFPR3BGDRR5", result.Output);
+        Assert.Contains("MigrationStoreProductId=9PJK1RFSRJKL", result.Output);
         Assert.Contains("MigrationMinimumSourceVersion=2026.9.5.0", result.Output);
         Assert.DoesNotContain("MigrationMinimumSourceVersion=2027", result.Output);
         Assert.DoesNotContain("MIGRATION_PREVIEW", result.Output);
@@ -34,7 +34,7 @@ public sealed class MigrationBuildConfigurationTests
 
         Assert.Equal(0, result.ExitCode);
         Assert.Contains("PRODUCTION_MIGRATION", result.Output);
-        Assert.Contains("MigrationStoreProductId=9NFPR3BGDRR5", result.Output);
+        Assert.Contains("MigrationStoreProductId=9PJK1RFSRJKL", result.Output);
         Assert.Contains("MigrationMinimumSourceVersion=2026.9.5.0", result.Output);
         Assert.DoesNotContain("MigrationMinimumSourceVersion=2027", result.Output);
         Assert.DoesNotContain("MIGRATION_PREVIEW", result.Output);
@@ -90,7 +90,7 @@ public sealed class MigrationBuildConfigurationTests
         var result = await EvaluateAsync(
             ("Configuration", "Debug"), ("PackageMsix", packaged.ToString()),
             ("MigrationProductionEnabled", "false"), (flag, "true"),
-            ("MigrationPreviewStoreProductId", "9NFPR3BGDRR5"),
+            ("MigrationPreviewStoreProductId", "9PJK1RFSRJKL"),
             ("StoreMigrationPreviewMinimumSourceVersion", "2026.9.5.0"));
 
         Assert.Equal(0, result.ExitCode);
@@ -119,7 +119,7 @@ public sealed class MigrationBuildConfigurationTests
         Assert.Single(project.Descendants("Import"), element =>
             (string?)element.Attribute("Project") == "Migration.Build.props");
         var policy = XDocument.Load(Path.Combine(directory, "Migration.Build.props"));
-        Assert.Equal("9NFPR3BGDRR5", policy.Descendants("MigrationStoreProductId").Single().Value);
+        Assert.Equal("9PJK1RFSRJKL", policy.Descendants("MigrationStoreProductId").Single().Value);
         var minimum = policy.Descendants("MigrationMinimumSourceVersion").Single().Value;
         Assert.Equal("2026.9.5.0", minimum);
         Assert.DoesNotContain("$(Version)", minimum);

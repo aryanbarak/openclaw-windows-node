@@ -22,7 +22,7 @@ Partner Center submission.
 
 Issue #1374 is delivered in two PRs: the preservation/startup foundation, then
 the complete migration experience and release enablement. There is no planned
-third PR. The Store product ID is **`9NFPR3BGDRR5`**. The selected first supported
+third PR. The Store product ID is **`9PJK1RFSRJKL`**. The selected first supported
 Inno release is **`v2026.9.5`**, the planned next patch after `v2026.9.4`, provided
 both PRs ship together. The fixed source floor is pinned to **`2026.9.5.0`**.
 `MigrationProductionEnabled` is checked in as `true` so the coordinated release
@@ -147,7 +147,7 @@ including CI's installer and Store package payloads:
 
 | Property | Checked-in value | Shipping requirement |
 |---|---|---|
-| `MigrationStoreProductId` | `9NFPR3BGDRR5` | Verify the listing and installed production package identity. |
+| `MigrationStoreProductId` | `9PJK1RFSRJKL` | Verify the listing and installed production package identity. |
 | `MigrationMinimumSourceVersion` | `2026.9.5.0` | Verify that the selected first stable Inno release contains all preservation, lifetime-lock, and startup safeguards. |
 | `MigrationProductionEnabled` | `true` | Enabled for the coordinated `2026.9.5` release. Set to `false` to ship a release without migration. |
 

@@ -58,7 +58,7 @@
                            Style="{StaticResource TitleTextBlockStyle}"
                            HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
 
-                <TextBlock x:Name="SubtitleText" Text="OpenClaw is ready to go"
+                <TextBlock x:Name="SubtitleText" Text="Smart-Agent is ready to go"
                            Style="{StaticResource BodyTextBlockStyle}"
                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                            HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
@@ -159,7 +159,7 @@
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="1" CornerRadius="4" Padding="14,6,8,6">
                     <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Grid.Column="0" Text="Launch OpenClaw at startup"
+                        <TextBlock Grid.Column="0" Text="Launch Smart-Agent at startup"
                                    VerticalAlignment="Center"
                                    Style="{StaticResource BodyTextBlockStyle}" />
                         <ToggleSwitch x:Name="StartupToggle" Grid.Column="1"

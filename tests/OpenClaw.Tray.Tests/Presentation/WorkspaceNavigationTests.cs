@@ -304,7 +304,7 @@ public sealed class WorkspaceNavigationTests
         var document = XDocument.Load(Source("Windows", "WorkspaceWindow.xaml"));
         XNamespace x = "http://schemas.microsoft.com/winfx/2006/xaml";
         var title = document.Descendants().Single(element => element.Name.LocalName == "TitleBar");
-        Assert.Equal("OpenClaw", (string?)title.Attribute("Title"));
+        Assert.Equal("Smart-Agent", (string?)title.Attribute("Title"));
         Assert.DoesNotContain(title.Descendants(), element => element.Name.LocalName == "Button");
         Assert.DoesNotContain(title.Descendants(), element => element.Name.LocalName == "TextBlock");
         foreach (var name in new[] { "BackButton", "ForwardButton" })

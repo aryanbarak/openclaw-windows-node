@@ -266,6 +266,9 @@ file sealed class InitialTailPositioner : IDisposable
         }
 
         _following = true;
+        if (IsTailAlreadyVisible(request))
+            return true;
+
         itemsView.StartBringItemIntoView(request.Index, new BringIntoViewOptions
         {
             AnimationDesired = false,
@@ -273,6 +276,10 @@ file sealed class InitialTailPositioner : IDisposable
         });
         return true;
     }
+
+    private bool IsTailAlreadyVisible(TailNavigationRequest request) =>
+        itemsView.TryGetItemIndex(0.5, 1.0, out var bottomIndex)
+        && bottomIndex >= request.Index;
 
     private static bool IsNearBottom(WinUIScrollView scrollView) =>
         scrollView.ScrollableHeight - scrollView.VerticalOffset <= FollowThreshold;

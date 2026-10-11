@@ -1,37 +1,36 @@
-; OpenClaw Companion Inno Setup Script (WinUI version)
+; Smart-Agent Inno Setup Script (WinUI version)
 ; Pass /DDevBuild=1 to produce a side-by-side dev installer.
 #ifdef DevBuild
-  #define MyAppName "OpenClaw Companion (Dev)"
-  #define MyAppAumid "OpenClaw.Companion.Dev"
-  #define MyAppId "{{M0LTB0T-TRAY-4PP1-DEV}"
-  #define MyInstallDir "OpenClawTray-Dev"
-  #define MyMutex "OpenClawTray-Dev"
-  #define MyAutoStartName "OpenClawTray-Dev"
-  #define MyStartupTaskName "OpenClaw Companion (Dev)"
-  #define MyDistroName "OpenClawGateway-Dev"
-  #define MyProtocol "openclaw-dev"
+  #define MyAppName "Smart-Agent (Dev)"
+  #define MyAppAumid "SmartAgent.Companion.Dev"
+  #define MyAppId "{{1344D80D-ECF7-4E4B-BC17-236B3509661D}"
+  #define MyInstallDir "SmartAgent-Dev"
+  #define MyMutex "SmartAgent-Dev"
+  #define MyAutoStartName "SmartAgent-Dev"
+  #define MyStartupTaskName "Smart-Agent (Dev)"
+  #define MyDistroName "SmartAgentGateway-Dev"
+  #define MyProtocol "smartagent-dev"
   #define MyOutputSuffix "-Dev"
 #else
-  #define MyAppName "OpenClaw Companion"
-  #define MyAppAumid "OpenClaw.Companion"
-  #define MyAppId "{{M0LTB0T-TRAY-4PP1-D3N7}"
-  #define MyInstallDir "OpenClawTray"
-  #define MyMutex "OpenClawTray"
-  #define MyAutoStartName "OpenClawTray"
-  #define MyStartupTaskName "OpenClaw Companion"
-  #define MyDistroName "OpenClawGateway"
-  #define MyProtocol "openclaw"
+  #define MyAppName "Smart-Agent"
+  #define MyAppAumid "SmartAgent.Companion"
+  #define MyAppId "{{011A8C2B-1CC9-4F76-9B27-CA1DA1933DBA}"
+  #define MyInstallDir "SmartAgent"
+  #define MyMutex "SmartAgent"
+  #define MyAutoStartName "SmartAgent"
+  #define MyStartupTaskName "Smart-Agent"
+  #define MyDistroName "SmartAgentGateway"
+  #define MyProtocol "smartagent"
   #define MyOutputSuffix ""
 #endif
-#define MyAppPublisher "OpenClaw Foundation"
-#define MyAppURL "https://github.com/openclaw/openclaw-windows-node"
+#define MyAppPublisher "Smart-Agent"
 #define MyAppExeName "OpenClaw.Tray.WinUI.exe"
 
 ; Must stay equal to MigrationRecordCodec.PackageName. The uninstaller reads the
 ; packaged-app registration under this identity to decide whether the Store app is
 ; present, and a drift here would silently restore the destructive advice.
 ; Pinned by InnoMigrationContractTests.Installer_PinsTheStorePackageIdentity.
-#define MyStorePackageName "OpenClawFoundation.OpenClaw"
+#define MyStorePackageName "AryanBarakzai.Smart-Agent"
 
 ; MyAppArch should be passed via /DMyAppArch=x64 or /DMyAppArch=arm64
 #ifndef MyAppArch
@@ -53,18 +52,15 @@ AppId={#MyAppId}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL}
-AppSupportURL=https://github.com/openclaw/openclaw-windows-node/issues
-AppUpdatesURL=https://github.com/openclaw/openclaw-windows-node/releases
 DefaultDirName={localappdata}\{#MyInstallDir}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-OutputBaseFilename=OpenClawCompanion{#MyOutputSuffix}-Setup-{#MyAppArch}
+OutputBaseFilename=SmartAgent{#MyOutputSuffix}-Setup-{#MyAppArch}
 Compression={#MyCompression}
 SolidCompression={#MySolidCompression}
 WizardStyle=modern
 PrivilegesRequired=lowest
-SetupIconFile=src\OpenClaw.Tray.WinUI\Assets\openclaw.ico
+SetupIconFile=src\OpenClaw.Tray.WinUI\Assets\smart-agent.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 ; Round 2 (Scott #5): block install/uninstall while the tray is running.
 ; Mutex name matches AppIdentity.MutexBaseName for this build variant.
@@ -119,16 +115,16 @@ Source: "{#vcRedist}"; DestDir: "{tmp}"; DestName: "vc_redist.exe"; Flags: delet
 #endif
 
 [Registry]
-Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}"; ValueType: string; ValueName: ""; ValueData: "URL:OpenClaw Protocol"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}"; ValueType: string; ValueName: ""; ValueData: "URL:Smart-Agent Protocol"; Flags: uninsdeletekey
 Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""
 Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"",0"
 Root: HKCU; Subkey: "Software\Classes\{#MyProtocol}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Gateway Setup"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://setup"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Companion Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://commandcenter"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
-Name: "{group}\OpenClaw Chat"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://chat"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Gateway Setup"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://setup"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Settings"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://commandcenter"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
+Name: "{group}\Smart-Agent Chat"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://chat"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
 Name: "{group}\Check for Updates"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{#MyProtocol}://check-updates"; IconFilename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppAumid}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; AppUserModelID: "{#MyAppAumid}"

@@ -32,7 +32,7 @@ public sealed partial class SettingsPage : Page
     private DateTime _sampledGatewayUptimeUtc;
 
     private const string DocumentationUrl = "https://docs.openclaw.ai/platforms/windows";
-    private const string GitHubUrl = "https://github.com/openclaw/openclaw-windows-node";
+    private const string GitHubUrl = OpenClawAppIdentity.UpdateRepositoryUrl;
 
     private enum UninstallUiState { Idle, InProgress, Success, Failure }
 

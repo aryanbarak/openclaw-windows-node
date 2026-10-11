@@ -871,6 +871,7 @@ internal sealed class WindowManager : IWindowManager
                 publishNativeCompletion: _callbacks.PublishNativeCompletion,
                 applyNativeStartup: _callbacks.ApplyNativeStartup,
                 startupRegistrationAllowed: !AppIdentity.IsIsolated,
+                suggestedRemoteGatewayUrl: AppIdentity.DefaultRemoteGatewayUrl,
                 persistChoices: (config, startup, onlyStartup) => settingsWriter.Apply(config.CreatePatch(startup, onlyStartup)),
                 nativeConnectionHost: _callbacks.GetGatewayDirectConnectService() is { } directConnect &&
                     _callbacks.GetGatewayRegistry() is { } registry
@@ -881,7 +882,7 @@ internal sealed class WindowManager : IWindowManager
                     _callbacks.IsDeepLinkArg,
                     Environment.ProcessId))
             {
-                Title = AppIdentity.DecorateWindowTitle("OpenClaw Setup"),
+                Title = AppIdentity.DecorateWindowTitle("Smart-Agent Setup"),
             };
             _setupWindow = setupWindow;
             _callbacks.ApplyTheme(setupWindow);

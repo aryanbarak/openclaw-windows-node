@@ -1008,6 +1008,33 @@ public class LocalizationValidationTests
     }
 
     [Fact]
+    public void LegacyWindowAndWelcomeSurfaces_UseSmartAgentBrandInEveryLocale()
+    {
+        string[] brandedKeys =
+        [
+            "WindowTitle_Settings",
+            "WindowTitle_Status",
+            "WindowTitle_ActivityStream",
+            "WindowTitle_NotificationHistory",
+            "WindowTitle_WebChat",
+            "WindowTitle_Welcome",
+            "WindowTitle_Update",
+            "Welcome_Title",
+            "Welcome_Description",
+        ];
+
+        foreach (var localeDir in Directory.GetDirectories(GetStringsDirectory()))
+        {
+            var resources = LoadResw(Path.Combine(localeDir, "Resources.resw"));
+            foreach (var key in brandedKeys)
+            {
+                Assert.Contains("Smart-Agent", resources[key]);
+                Assert.DoesNotContain("OpenClaw", resources[key]);
+            }
+        }
+    }
+
+    [Fact]
     public void NoLocale_HasWindows1252MojibakeValues()
     {
         var stringsDir = GetStringsDirectory();

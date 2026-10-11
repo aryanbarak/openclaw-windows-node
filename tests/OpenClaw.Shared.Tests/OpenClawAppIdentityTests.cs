@@ -5,13 +5,17 @@ namespace OpenClaw.Shared.Tests;
 public sealed class OpenClawAppIdentityTests
 {
     [Fact]
+    public void DefaultRemoteGateway_UsesSmartAgentSecureEndpoint() =>
+        Assert.Equal("wss://agent.smartaryn.com", OpenClawAppIdentity.DefaultRemoteGatewayUrl);
+
+    [Fact]
     public void ResolveRoamingDataDirectory_DefaultsToReleaseProfile()
     {
         var root = Path.Combine(Path.GetTempPath(), "openclaw-appdata");
         var path = OpenClawAppIdentity.ResolveRoamingDataDirectory(
             key => key == OpenClawAppIdentity.AppDataRootEnvironmentVariable ? root : null);
 
-        Assert.Equal(Path.Combine(root, "OpenClawTray"), path);
+        Assert.Equal(Path.Combine(root, "SmartAgent"), path);
     }
 
     [Fact]
@@ -26,7 +30,7 @@ public sealed class OpenClawAppIdentityTests
                 _ => null
             });
 
-        Assert.Equal(Path.Combine(root, "OpenClawTray-Dev"), path);
+        Assert.Equal(Path.Combine(root, "SmartAgent-Dev"), path);
     }
 
     [Fact]
@@ -42,7 +46,7 @@ public sealed class OpenClawAppIdentityTests
             },
             explicitIdentity: OpenClawAppIdentity.ReleaseIdentity);
 
-        Assert.Equal(Path.Combine(root, "OpenClawTray"), path);
+        Assert.Equal(Path.Combine(root, "SmartAgent"), path);
     }
 
     [Fact]
@@ -68,11 +72,29 @@ public sealed class OpenClawAppIdentityTests
             key == OpenClawAppIdentity.AppDataRootEnvironmentVariable ? root : null;
 
         Assert.Equal(
-            Path.Combine(root, "OpenClawTray-Dev", "settings.json"),
+            Path.Combine(root, "SmartAgent-Dev", "settings.json"),
             OpenClawAppIdentity.ResolveSettingsPath(env, OpenClawAppIdentity.DevIdentity));
         Assert.Equal(
-            Path.Combine(root, "OpenClawTray-Dev", "mcp-token.txt"),
+            Path.Combine(root, "SmartAgent-Dev", "mcp-token.txt"),
             OpenClawAppIdentity.ResolveMcpTokenPath(env, OpenClawAppIdentity.DevIdentity));
+    }
+
+    [Fact]
+    public void RuntimeIdentity_IsDistinctFromOfficialOpenClaw()
+    {
+        Assert.Equal("Smart-Agent", OpenClawAppIdentity.ReleaseDisplayName);
+        Assert.Equal("SmartAgent", OpenClawAppIdentity.ReleaseDataDirectoryName);
+        Assert.Equal("SmartAgent.Companion", OpenClawAppIdentity.ReleaseAppUserModelId);
+        Assert.Equal("smartagent", OpenClawAppIdentity.ReleaseProtocolScheme);
+        Assert.Equal("SmartAgentGateway", OpenClawAppIdentity.ReleaseDistroName);
+        Assert.Equal(18889, OpenClawAppIdentity.ReleaseGatewayPort);
+        Assert.Equal("ws://127.0.0.1:18889", OpenClawAppIdentity.ReleaseGatewayUrl);
+        Assert.Equal("SmartAgent", OpenClawAppIdentity.ReleaseMutexBaseName);
+        Assert.Equal("aryanbarak", OpenClawAppIdentity.UpdateRepositoryOwner);
+        Assert.Equal("smart-agent-windows-releases", OpenClawAppIdentity.UpdateRepositoryName);
+        Assert.Equal(
+            "https://github.com/aryanbarak/smart-agent-windows-releases",
+            OpenClawAppIdentity.UpdateRepositoryUrl);
     }
 
     [Fact]

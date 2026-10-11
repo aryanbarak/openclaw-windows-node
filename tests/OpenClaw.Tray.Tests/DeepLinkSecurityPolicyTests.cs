@@ -30,10 +30,10 @@ public class DeepLinkSecurityPolicyTests
     }
 
     [Theory]
-    [InlineData("openclaw://agent?message=hello%20world&token=secret", "openclaw://agent?<redacted>")]
-    [InlineData("openclaw://send/private-message?message=secret", "openclaw://send/...?<redacted>")]
-    [InlineData("openclaw://dashboard/sessions?filter=abc", "openclaw://dashboard/...?<redacted>")]
-    [InlineData("openclaw://settings", "openclaw://settings")]
+    [InlineData("smartagent://agent?message=hello%20world&token=secret", "smartagent://agent?<redacted>")]
+    [InlineData("smartagent://send/private-message?message=secret", "smartagent://send/...?<redacted>")]
+    [InlineData("smartagent://dashboard/sessions?filter=abc", "smartagent://dashboard/...?<redacted>")]
+    [InlineData("smartagent://settings", "smartagent://settings")]
     public void RedactForLog_RemovesQueryAndPathPayloads(string uri, string expected)
     {
         Assert.Equal(expected, DeepLinkSecurityPolicy.RedactForLog(uri));

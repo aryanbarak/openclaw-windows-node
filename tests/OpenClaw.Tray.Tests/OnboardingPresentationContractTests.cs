@@ -37,7 +37,7 @@ public sealed class OnboardingPresentationContractTests
         Assert.Contains("new SettingsCard", source);
         Assert.DoesNotContain("GetProperty", source);
         var window = Read(@"src\OpenClaw.SetupEngine.UI\SetupWindow.xaml.cs");
-        Assert.Equal(1, window.Split("new SetupAccessDraft(_config)").Length - 1);
+        Assert.Equal(1, window.Split("new SetupAccessDraft(_config,").Length - 1);
         Assert.Contains("if (!AccessDraft.CanInstall(_startAtLocalAiRecoveryReview))", window);
         Assert.DoesNotContain("AlternateSetupReady", window);
         Assert.Contains("OnboardingFlowPolicy.GetAccessDestination(AccessDraft.Route)", window);

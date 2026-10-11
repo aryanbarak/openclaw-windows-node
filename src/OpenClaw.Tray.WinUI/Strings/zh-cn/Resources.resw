@@ -276,25 +276,25 @@
     <value>关闭</value>
   </data>
   <data name="WindowTitle_Settings" xml:space="preserve">
-    <value>设置: OpenClaw 托盘</value>
+    <value>设置: Smart-Agent</value>
   </data>
   <data name="WindowTitle_Status" xml:space="preserve">
-    <value>状态: OpenClaw 托盘</value>
+    <value>状态: Smart-Agent</value>
   </data>
   <data name="WindowTitle_ActivityStream" xml:space="preserve">
-    <value>活动流: OpenClaw 托盘</value>
+    <value>活动流: Smart-Agent</value>
   </data>
   <data name="WindowTitle_NotificationHistory" xml:space="preserve">
-    <value>通知历史: OpenClaw 托盘</value>
+    <value>通知历史: Smart-Agent</value>
   </data>
   <data name="WindowTitle_WebChat" xml:space="preserve">
-    <value>OpenClaw 聊天</value>
+    <value>Smart-Agent 聊天</value>
   </data>
   <data name="WindowTitle_Welcome" xml:space="preserve">
-    <value>欢迎使用 OpenClaw</value>
+    <value>欢迎使用 Smart-Agent</value>
   </data>
   <data name="WindowTitle_Update" xml:space="preserve">
-    <value>OpenClaw 更新</value>
+    <value>Smart-Agent 更新</value>
   </data>
   <data name="Status_Testing" xml:space="preserve">
     <value>测试中...</value>
@@ -306,10 +306,10 @@
     <value>❌ 连接失败</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>欢迎使用 OpenClaw！</value>
+    <value>欢迎使用 Smart-Agent！</value>
   </data>
   <data name="Welcome_Description" xml:space="preserve">
-    <value>OpenClaw 托盘是 OpenClaw 的 Windows 伴侣应用，一个 AI 驱动的个人助手。</value>
+    <value>Smart-Agent 是 Windows 上由 AI 驱动的个人助手。</value>
   </data>
   <data name="Welcome_GettingStarted" xml:space="preserve">
     <value>开始使用前，您需要：</value>
@@ -2437,22 +2437,22 @@
     <value>工作区文件</value>
   </data>
   <data name="ChatWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Chat</value>
+    <value>Smart-Agent Chat</value>
   </data>
   <data name="SearchBox.PlaceholderText" xml:space="preserve">
     <value>键入命令...</value>
   </data>
   <data name="HubWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw 设置</value>
+    <value>Smart-Agent 设置</value>
   </data>
   <data name="TitleSearchBox.PlaceholderText" xml:space="preserve">
     <value>搜索… (Ctrl+E)</value>
   </data>
   <data name="CanvasWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Canvas</value>
+    <value>Smart-Agent Canvas</value>
   </data>
   <data name="CanvasWindow_TextBlock_31.Text" xml:space="preserve">
-    <value>OpenClaw Canvas</value>
+    <value>Smart-Agent Canvas</value>
   </data>
   <data name="CanvasWindowReloadToolTip.Content" xml:space="preserve">
     <value>重新加载</value>
@@ -2461,7 +2461,7 @@
     <value>重新加载 Canvas</value>
   </data>
   <data name="TrayMenuWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Menu</value>
+    <value>Smart-Agent Menu</value>
   </data>
   <data name="UsagePage_TextBlock_10.Text" xml:space="preserve">
     <value>使用量和成本</value>
@@ -2494,7 +2494,7 @@
     <value>语音和音频</value>
   </data>
   <data name="VoiceSettingsPage_PageDescription.Text" xml:space="preserve">
-    <value>配置语音转文字和语音交互设置。所有语音处理均在本机本地运行。</value>
+    <value>配置语音转文字，并选择本地处理或 OpenAI 在线转录。</value>
   </data>
   <data name="VoiceSettingsPage_SttHeader.Text" xml:space="preserve">
     <value>语音转文字</value>
@@ -2531,6 +2531,9 @@
   </data>
   <data name="VoiceSettingsPage_LangAuto.Content" xml:space="preserve">
     <value>自动检测</value>
+  </data>
+  <data name="VoiceSettingsPage_LangFa.Content" xml:space="preserve">
+    <value>波斯语</value>
   </data>
   <data name="VoiceSettingsPage_LangEn.Content" xml:space="preserve">
     <value>英语</value>
@@ -2896,7 +2899,7 @@
     <value>强制使用伴侣聊天 UI</value>
   </data>
   <data name="Chat_ZeroState_WelcomeTitle" xml:space="preserve">
-    <value>欢迎使用 OpenClaw</value>
+    <value>欢迎使用 Smart-Agent</value>
   </data>
   <data name="Chat_ZeroState_WelcomeSubtitle" xml:space="preserve">
     <value>今天我能帮你做什么？</value>
@@ -7140,17 +7143,17 @@
   <data name="Chat_Composer_Effort_Faster" xml:space="preserve"><value>更快</value></data>
   <data name="Chat_Composer_Effort_Smarter" xml:space="preserve"><value>更深入</value></data>
   <data name="Onboarding_Flow_Position" xml:space="preserve"><value>第 {0} 步，共 {1} 步</value></data>
-  <data name="Onboarding_Flow_CompletionUnavailable" xml:space="preserve"><value>设置无法打开 Chat。请关闭设置并重新打开 OpenClaw。</value></data>
+  <data name="Onboarding_Flow_CompletionUnavailable" xml:space="preserve"><value>设置无法打开 Chat。请关闭设置并重新打开 Smart-Agent。</value></data>
   <data name="Onboarding_Flow_AiNavigationFailed" xml:space="preserve"><value>网关已安装，但无法打开 AI 设置。请重新打开设置以继续，无需重新安装。</value></data>
   <data name="Onboarding_Flow_AccessTitle" xml:space="preserve"><value>你的电脑，你的权限</value></data>
   <data name="Onboarding_Flow_InstallAction" xml:space="preserve"><value>安装并设置</value></data>
   <data name="Onboarding_Flow_Permissions.Header" xml:space="preserve"><value>Windows 权限</value></data>
   <data name="Onboarding_Flow_InstallReview.Text" xml:space="preserve"><value>将安装的内容</value></data>
-  <data name="Onboarding_Flow_AutoStart.Text" xml:space="preserve"><value>登录时启动 OpenClaw</value></data>
-  <data name="Onboarding_Flow_AutoStartToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>登录时启动 OpenClaw</value></data>
+  <data name="Onboarding_Flow_AutoStart.Text" xml:space="preserve"><value>登录时启动 Smart-Agent</value></data>
+  <data name="Onboarding_Flow_AutoStartToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>登录时启动 Smart-Agent</value></data>
   <data name="ChatDashboardButton.Content" xml:space="preserve"><value>Dashboard</value></data>
   <data name="ChatDashboardHint.Text" xml:space="preserve"><value>频道、集成和网关设置</value></data>
-  <data name="Onboarding_Flow_WelcomeDescription.Text" xml:space="preserve"><value>OpenClaw 是帮助你在电脑上完成任务的 AI 助手。</value></data>
+  <data name="Onboarding_Flow_WelcomeDescription.Text" xml:space="preserve"><value>Smart-Agent 是帮助你在电脑上完成任务的 AI 助手。</value></data>
   <data name="Onboarding_AiSetup_Title.Text" xml:space="preserve"><value>连接你的 AI</value></data>
   <data name="Onboarding_AiSetup_CatalogOptIn" xml:space="preserve"><value>发现现有提供商对话（可选）</value></data>
   <data name="Onboarding_AiSetup_Starting" xml:space="preserve"><value>正在启动提供商设置…</value></data>
@@ -7282,12 +7285,12 @@
   <data name="Onboarding_V2_LocalAiReview.Header" xml:space="preserve"><value>Local AI</value></data>
   <data name="Onboarding_V2_TailscaleReview.Header" xml:space="preserve"><value>Tailscale Serve</value></data>
   <data name="Onboarding_V2_ReplacementCard.Header" xml:space="preserve"><value>检查 WSL 替换</value></data>
-  <data name="Onboarding_V2_StartupCard.Header" xml:space="preserve"><value>登录时启动 OpenClaw</value></data>
+  <data name="Onboarding_V2_StartupCard.Header" xml:space="preserve"><value>登录时启动 Smart-Agent</value></data>
   <data name="Onboarding_V2_ExactCommands.Header" xml:space="preserve"><value>具体命令和文件</value></data>
   <data name="Onboarding_V2_ReviewRequired.Title" xml:space="preserve"><value>检查必需选项</value></data>
   <data name="Onboarding_V2_ReviewRequired.Message" xml:space="preserve"><value>安装前请检查所选 Local AI 和 Tailscale 的先决条件，并确认任何 WSL 替换。</value></data>
   <data name="Onboarding_V2_Install.Content" xml:space="preserve"><value>安装</value></data>
-  <data name="Onboarding_V2_WelcomeTitle.Text" xml:space="preserve"><value>欢迎使用 OpenClaw</value></data>
+  <data name="Onboarding_V2_WelcomeTitle.Text" xml:space="preserve"><value>欢迎使用 Smart-Agent</value></data>
   <data name="Onboarding_V2_WelcomeChat.Header" xml:space="preserve"><value>与您的 AI 聊天</value></data>
   <data name="Onboarding_V2_WelcomeChat.Description" xml:space="preserve"><value>在原生 Chat 中使用您选择的 AI 提供商。</value></data>
   <data name="Onboarding_V2_WelcomePc.Header" xml:space="preserve"><value>让代理在此电脑上提供帮助</value></data>
@@ -7295,7 +7298,7 @@
   <data name="Onboarding_V2_WelcomeGateway.Header" xml:space="preserve"><value>让 Gateway 始终由您掌控</value></data>
   <data name="Onboarding_V2_WelcomeGateway.Description" xml:space="preserve"><value>在此运行私有 WSL Gateway，或连接到现有 Gateway。</value></data>
   <data name="Onboarding_V2_WelcomeTrust.Title" xml:space="preserve"><value>开始之前</value></data>
-  <data name="Onboarding_V2_WelcomeTrust.Message" xml:space="preserve"><value>AI 智能体功能强大，授予其电脑访问权限也存在风险。它们可能犯错、更改或删除文件，或泄露私人信息。&#x0a;&#x0a;你可以控制并限制 OpenClaw 对电脑的访问。</value></data>
+  <data name="Onboarding_V2_WelcomeTrust.Message" xml:space="preserve"><value>AI 智能体功能强大，授予其电脑访问权限也存在风险。它们可能犯错、更改或删除文件，或泄露私人信息。&#x0a;&#x0a;你可以控制并限制 Smart-Agent 对电脑的访问。</value></data>
   <data name="Onboarding_V2_Continue.Content" xml:space="preserve"><value>继续</value></data>
   <data name="Onboarding_V2_Retry.Content" xml:space="preserve"><value>重试</value></data>
   <data name="Onboarding_V2_AlternativeRoutes.Content" xml:space="preserve"><value>远程、本地 MCP 或稍后设置</value></data>
@@ -7317,7 +7320,7 @@
   <data name="Onboarding_V2_TailscaleTrust.Header" xml:space="preserve"><value>信任 Tailscale 身份进行 Gateway 身份验证</value></data>
   <data name="Onboarding_V2_TailscaleTrust.Description" xml:space="preserve"><value>默认关闭。仅在 tailnet ACL 应参与 Gateway 访问控制时启用。</value></data>
   <data name="Onboarding_V2_TailscaleTrustToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>信任 Tailscale 身份</value></data>
-  <data name="Onboarding_V2_WindowTitle.Text" xml:space="preserve"><value>OpenClaw 设置</value></data>
+  <data name="Onboarding_V2_WindowTitle.Text" xml:space="preserve"><value>Smart-Agent 设置</value></data>
   <data name="Onboarding_V2_NetworkConsentRecorded" xml:space="preserve"><value>已记录 WSL 网络同意</value></data>
   <data name="Onboarding_V2_ReviewNetworking" xml:space="preserve"><value>检查 WSL 网络更改</value></data>
   <data name="Onboarding_V2_TailscaleChecking" xml:space="preserve"><value>正在检查 Windows Tailscale...</value></data>
@@ -7485,13 +7488,13 @@
   <data name="Onboarding_Copy_GatewayExistingTitle.Text" xml:space="preserve"><value>连接到现有 Gateway</value></data>
   <data name="Onboarding_Copy_GatewayExistingDescription.Text" xml:space="preserve"><value>无需在此电脑上安装 Gateway 或本地 AI 即可连接。</value></data>
   <data name="Onboarding_StartupWarning_Title" xml:space="preserve"><value>Windows 启动</value></data>
-  <data name="Onboarding_StartupWarning_Message" xml:space="preserve"><value>设置已完成，但 Windows 启动首选项未能完全应用。OpenClaw 将完成重启。您可以在 Companion Settings 中重试此首选项。</value></data>
+  <data name="Onboarding_StartupWarning_Message" xml:space="preserve"><value>设置已完成，但 Windows 启动首选项未能完全应用。Smart-Agent 将完成重启。您可以在 Companion Settings 中重试此首选项。</value></data>
   <data name="Onboarding_RegistryRecovery_Title" xml:space="preserve"><value>Gateway 恢复需要处理</value></data>
-  <data name="Onboarding_RegistryRecovery_Message" xml:space="preserve"><value>设置无法协调已保存的 Gateway 更改。未保存的编辑未被提交。请关闭并重新打开 OpenClaw，重新加载已保存的 Gateway 后再重试。</value></data>
-  <data name="Onboarding_RestartRecovery_Title" xml:space="preserve"><value>完成打开 OpenClaw</value></data>
-  <data name="Onboarding_RestartRecovery_Waiting" xml:space="preserve"><value>另一个 OpenClaw 实例仍在完成设置。重试会等待它释放控制权。所选页面已保留。取消后可关闭另一个实例并重新打开 OpenClaw 以继续。</value></data>
-  <data name="Onboarding_RestartRecovery_Storage" xml:space="preserve"><value>OpenClaw 无法安全保留所选设置页面。请重试。取消会停止此次启动；您可能需要重新打开设置并再次选择。</value></data>
-  <data name="Onboarding_RestartRecovery_Invalid" xml:space="preserve"><value>无法读取保存的设置启动信息。OpenClaw 将正常打开。请重新打开设置以选择目标页面。</value></data>
+  <data name="Onboarding_RegistryRecovery_Message" xml:space="preserve"><value>设置无法协调已保存的 Gateway 更改。未保存的编辑未被提交。请关闭并重新打开 Smart-Agent，重新加载已保存的 Gateway 后再重试。</value></data>
+  <data name="Onboarding_RestartRecovery_Title" xml:space="preserve"><value>完成打开 Smart-Agent</value></data>
+  <data name="Onboarding_RestartRecovery_Waiting" xml:space="preserve"><value>另一个 Smart-Agent 实例仍在完成设置。重试会等待它释放控制权。所选页面已保留。取消后可关闭另一个实例并重新打开 Smart-Agent 以继续。</value></data>
+  <data name="Onboarding_RestartRecovery_Storage" xml:space="preserve"><value>Smart-Agent 无法安全保留所选设置页面。请重试。取消会停止此次启动；您可能需要重新打开设置并再次选择。</value></data>
+  <data name="Onboarding_RestartRecovery_Invalid" xml:space="preserve"><value>无法读取保存的设置启动信息。Smart-Agent 将正常打开。请重新打开设置以选择目标页面。</value></data>
   <data name="PermissionsPage_ExecRuleScope_Main" xml:space="preserve">
     <value>此代理</value>
   </data>
@@ -7800,7 +7803,7 @@
   <data name="WorkspaceShell_Sandbox" xml:space="preserve"><value>Sandbox</value></data>
   <data name="WorkspaceShell_Debug" xml:space="preserve"><value>Diagnostics</value></data>
   <data name="WorkspaceShell_Settings" xml:space="preserve"><value>Settings</value></data>
-  <data name="WorkspaceShell_About" xml:space="preserve"><value>About OpenClaw</value></data>
+  <data name="WorkspaceShell_About" xml:space="preserve"><value>关于 Smart-Agent</value></data>
   <data name="WorkspaceShell_AgentsDescription" xml:space="preserve"><value>Your gateway agents and their recent conversations.</value></data>
   <data name="WorkspaceShell_AgentDetailDescription" xml:space="preserve"><value>Agent workspace and recent work.</value></data>
   <data name="WorkspaceShell_WriterDetailDescription" xml:space="preserve"><value>Agent workspace and recent work.</value></data>
@@ -7886,7 +7889,7 @@
   <data name="WorkspaceShell_NoNativeWorkflow" xml:space="preserve"><value>The current gateway client does not expose this workflow. Check your gateway dashboard for supported extensions.</value></data>
   <data name="WorkspaceShell_NoActivity" xml:space="preserve"><value>No recent activity</value></data>
   <data name="WorkspaceShell_ActivityEmpty" xml:space="preserve"><value>Agent events will appear here as the connected gateway sends them.</value></data>
-  <data name="WorkspaceShell_CompanionApp" xml:space="preserve"><value>OpenClaw Windows companion</value></data>
+  <data name="WorkspaceShell_CompanionApp" xml:space="preserve"><value>Smart-Agent Windows 助手</value></data>
   <data name="WorkspaceShell_OpenChat" xml:space="preserve"><value>Open chat</value></data>
   <data name="WorkspaceShell_Details" xml:space="preserve"><value>View details</value></data>
   <data name="WorkspaceShell_AgentSettings" xml:space="preserve"><value>Agent settings</value></data>
@@ -7951,4 +7954,13 @@
   <data name="ChatPage_SetupCheckAgain.Content" xml:space="preserve">
     <value>再次检查</value>
   </data>
+  <data name="VoiceSettingsPage_SttProviderCombo.Header" xml:space="preserve"><value>语音识别</value></data>
+  <data name="VoiceSettingsPage_SttProviderLocal.Content" xml:space="preserve"><value>本地 Whisper（私密、离线）</value></data>
+  <data name="VoiceSettingsPage_SttProviderOpenAi.Content" xml:space="preserve"><value>OpenAI（在线、更高准确度）</value></data>
+  <data name="VoiceSettingsPage_OpenAiApiKeyBox.Header" xml:space="preserve"><value>OpenAI API 密钥</value></data>
+  <data name="VoiceSettingsPage_OpenAiModelText.Text" xml:space="preserve"><value>模型：gpt-transcribe。仅在选择此提供商时，录音才会发送到 OpenAI。API 密钥使用 Windows DPAPI 保护。</value></data>
+  <data name="VoiceSettingsPage_OpenAiFallbackText.Text" xml:space="preserve"><value>如果在线请求失败，将自动使用已下载的本地 Whisper 模型。</value></data>
+  <data name="VoiceSettingsPage_OpenAiReady" xml:space="preserve"><value>OpenAI 在线语音识别已就绪。</value></data>
+  <data name="VoiceSettingsPage_OpenAiKeyRequired" xml:space="preserve"><value>请输入 OpenAI API 密钥以启用在线语音识别。</value></data>
+  <data name="VoiceSettingsPage_LocalRequirement" xml:space="preserve"><value>至少下载一个语音模型后才能使用语音输入。</value></data>
 </root>

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using OpenClaw.Shared;
+using OpenClaw.Shared.Audio;
 using OpenClaw.Shared.Capabilities;
 
 namespace OpenClawTray.Services;
@@ -128,6 +129,8 @@ public class SettingsManager
     public bool NodeSttEnabled { get => _data.NodeSttEnabled; set => _data = _data with { NodeSttEnabled = value }; }
     /// <summary>STT language: "auto" for Whisper auto-detect, or a BCP-47 tag like "en-US".</summary>
     public string SttLanguage { get => string.IsNullOrWhiteSpace(_data.SttLanguage) ? "auto" : _data.SttLanguage; set => _data = _data with { SttLanguage = value }; }
+    public string SttProvider { get => string.Equals(_data.SttProvider, OpenAiSpeechToTextService.ProviderName, StringComparison.OrdinalIgnoreCase) ? OpenAiSpeechToTextService.ProviderName : "local"; set => _data = _data with { SttProvider = value }; }
+    public string SttOpenAiApiKey { get => _data.SttOpenAiApiKey ?? ""; set => _data = _data with { SttOpenAiApiKey = value }; }
     /// <summary>Whisper model size: "tiny", "base", or "small".</summary>
     public string SttModelName { get => string.IsNullOrWhiteSpace(_data.SttModelName) ? "base" : _data.SttModelName; set => _data = _data with { SttModelName = value }; }
     /// <summary>Seconds of silence before auto-submit in voice chat mode.</summary>
@@ -304,6 +307,8 @@ public class SettingsManager
         NodeSystemRunEnabled = true,
         NodeSttEnabled = false,
         SttLanguage = "auto",
+        SttProvider = "local",
+        SttOpenAiApiKey = "",
         SttModelName = "base",
         SttSilenceTimeout = 1.5f,
         VoiceTtsEnabled = false,
@@ -353,6 +358,8 @@ public class SettingsManager
             SshTunnelLocalPort = loaded.SshTunnelLocalPort <= 0 ? defaults.SshTunnelLocalPort : loaded.SshTunnelLocalPort,
             NotificationSound = loaded.NotificationSound ?? defaults.NotificationSound,
             SttLanguage = string.IsNullOrWhiteSpace(loaded.SttLanguage) ? defaults.SttLanguage : loaded.SttLanguage,
+            SttProvider = string.Equals(loaded.SttProvider, OpenAiSpeechToTextService.ProviderName, StringComparison.OrdinalIgnoreCase) ? OpenAiSpeechToTextService.ProviderName : defaults.SttProvider,
+            SttOpenAiApiKey = UnprotectSettingSecret(loaded.SttOpenAiApiKey) ?? defaults.SttOpenAiApiKey,
             SttModelName = string.IsNullOrWhiteSpace(loaded.SttModelName) ? defaults.SttModelName : loaded.SttModelName,
             SttSilenceTimeout = loaded.SttSilenceTimeout > 0 ? loaded.SttSilenceTimeout : defaults.SttSilenceTimeout,
             TtsProvider = string.IsNullOrWhiteSpace(loaded.TtsProvider) ? defaults.TtsProvider : loaded.TtsProvider,
@@ -447,6 +454,8 @@ public class SettingsManager
         SshTunnelLocalPort = SshTunnelLocalPort,
         NotificationSound = NotificationSound,
         SttLanguage = SttLanguage,
+        SttProvider = SttProvider,
+        SttOpenAiApiKey = SttOpenAiApiKey,
         SttModelName = SttModelName,
         SttSilenceTimeout = SttSilenceTimeout,
         TtsProvider = TtsProvider,
@@ -553,6 +562,7 @@ public class SettingsManager
             // Apply DPAPI protection to the API key for on-disk storage only
             data.TtsElevenLabsApiKey = ProtectSettingSecret(data.TtsElevenLabsApiKey);
             data.TtsMiniMaxApiKey = ProtectSettingSecret(data.TtsMiniMaxApiKey);
+            data.SttOpenAiApiKey = ProtectSettingSecret(data.SttOpenAiApiKey);
 
             var json = data.ToJson();
             if (current is not null)

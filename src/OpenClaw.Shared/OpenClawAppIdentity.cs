@@ -11,8 +11,31 @@ public static class OpenClawAppIdentity
     public const string IdentityEnvironmentVariable = "OPENCLAW_APP_IDENTITY";
     public const string DataDirectoryOverrideEnvironmentVariable = "OPENCLAW_TRAY_DATA_DIR";
     public const string AppDataRootEnvironmentVariable = "OPENCLAW_TRAY_APPDATA_DIR";
-    public const string ReleaseDataDirectoryName = "OpenClawTray";
-    public const string DevDataDirectoryName = "OpenClawTray-Dev";
+    public const string ReleaseDataDirectoryName = "SmartAgent";
+    public const string DevDataDirectoryName = "SmartAgent-Dev";
+    public const string ReleaseDisplayName = "Smart-Agent";
+    public const string DevDisplayName = "Smart-Agent (Dev)";
+    public const string ReleaseAppUserModelId = "SmartAgent.Companion";
+    public const string DevAppUserModelId = "SmartAgent.Companion.Dev";
+    public const string ReleaseProtocolScheme = "smartagent";
+    public const string DevProtocolScheme = "smartagent-dev";
+    public const string ReleaseDistroName = "SmartAgentGateway";
+    public const string DevDistroName = "SmartAgentGateway-Dev";
+    public const int ReleaseGatewayPort = 18889;
+    public const string ReleaseGatewayUrl = "ws://127.0.0.1:18889";
+    public const string ReleaseAutoStartName = "SmartAgent";
+    public const string DevAutoStartName = "SmartAgent-Dev";
+    public const string ReleaseStartupTaskName = "Smart-Agent";
+    public const string DevStartupTaskName = "Smart-Agent (Dev)";
+    public const string ReleasePackageStartupTaskId = "SmartAgentStartup";
+    public const string DevPackageStartupTaskId = "SmartAgentStartupDev";
+    public const string ReleaseMutexBaseName = "SmartAgent";
+    public const string DevMutexBaseName = "SmartAgent-Dev";
+    public const string DefaultRemoteGatewayUrl = "wss://agent.smartaryn.com";
+    public const string UpdateRepositoryOwner = "aryanbarak";
+    public const string UpdateRepositoryName = "smart-agent-windows-releases";
+    public const string UpdateRepositoryUrl =
+        "https://github.com/aryanbarak/smart-agent-windows-releases";
 
     public static string NormalizeIdentity(string? identity)
     {

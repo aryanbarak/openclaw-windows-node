@@ -16,12 +16,12 @@ public sealed class AppUserModelIdIdentityTests
             "OpenClaw.Tray.WinUI",
             "OpenClaw.Tray.WinUI.csproj"));
 
-        Assert.Contains("<AssemblyTitle>OpenClaw Companion</AssemblyTitle>", project);
-        Assert.Contains("<FileDescription>OpenClaw Companion</FileDescription>", project);
-        Assert.Contains("<Product>OpenClaw Companion</Product>", project);
-        Assert.Contains("<AssemblyTitle>OpenClaw Companion (Dev)</AssemblyTitle>", project);
-        Assert.Contains("<FileDescription>OpenClaw Companion (Dev)</FileDescription>", project);
-        Assert.Contains("<Product>OpenClaw Companion (Dev)</Product>", project);
+        Assert.Contains("<AssemblyTitle>Smart-Agent</AssemblyTitle>", project);
+        Assert.Contains("<FileDescription>Smart-Agent</FileDescription>", project);
+        Assert.Contains("<Product>Smart-Agent</Product>", project);
+        Assert.Contains("<AssemblyTitle>Smart-Agent (Dev)</AssemblyTitle>", project);
+        Assert.Contains("<FileDescription>Smart-Agent (Dev)</FileDescription>", project);
+        Assert.Contains("<Product>Smart-Agent (Dev)</Product>", project);
         Assert.DoesNotContain("<AssemblyTitle>OpenClaw.Tray.WinUI</AssemblyTitle>", project);
     }
 
@@ -44,8 +44,15 @@ public sealed class AppUserModelIdIdentityTests
     [Fact]
     public void AppUserModelId_UsesCompanionIdentity()
     {
-        Assert.StartsWith("OpenClaw.Companion", AppIdentity.AppUserModelId);
+        Assert.StartsWith("SmartAgent.Companion", AppIdentity.AppUserModelId);
         Assert.DoesNotContain("OpenClaw.Tray.WinUI", AppIdentity.AppUserModelId);
+    }
+
+    [Fact]
+    public void ManagedWslGateway_UsesSmartAgentOwnedReleasePort()
+    {
+        Assert.Equal(18889, AppIdentity.SetupGatewayPort);
+        Assert.Equal("ws://127.0.0.1:18889", AppIdentity.SetupGatewayUrl);
     }
 
     [Fact]
@@ -75,7 +82,7 @@ public sealed class AppUserModelIdIdentityTests
             "installer.iss"));
 
         Assert.Contains($@"#define MyAppAumid ""{AppIdentity.AppUserModelId}""", iss);
-        Assert.Contains(@"#define MyAppAumid ""OpenClaw.Companion.Dev""", iss);
+        Assert.Contains(@"#define MyAppAumid ""SmartAgent.Companion.Dev""", iss);
     }
 
     [Fact]
@@ -87,7 +94,7 @@ public sealed class AppUserModelIdIdentityTests
             "OpenClaw.Tray.WinUI",
             "app.manifest"));
 
-        Assert.Contains(@"<assemblyIdentity version=""1.0.0.0"" name=""OpenClaw.Companion""/>", manifest);
+        Assert.Contains(@"<assemblyIdentity version=""1.0.0.0"" name=""SmartAgent.Companion""/>", manifest);
         Assert.DoesNotContain(@"name=""OpenClaw.Tray.WinUI""", manifest);
     }
 

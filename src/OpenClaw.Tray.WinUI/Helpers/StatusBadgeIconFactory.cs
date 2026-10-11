@@ -28,7 +28,7 @@ namespace OpenClawTray.Helpers;
 internal static class StatusBadgeIconFactory
 {
     private static readonly string AssetsPath = Path.Combine(AppContext.BaseDirectory, "Assets");
-    private static readonly string OutputDir = Path.Combine(Path.GetTempPath(), "OpenClawTray", "StatusIcons");
+    private static readonly string OutputDir = Path.Combine(Path.GetTempPath(), "SmartAgent", "StatusIcons");
     private static readonly object Gate = new();
     private static readonly ConcurrentDictionary<ConnectionStatusAccent, string> Cache = new();
 
@@ -84,7 +84,7 @@ internal static class StatusBadgeIconFactory
 
     private static (string Path, bool IsFallback) Build(ConnectionStatusAccent accent)
     {
-        var fallback = Path.Combine(AssetsPath, "openclaw.ico");
+        var fallback = Path.Combine(AssetsPath, "smart-agent.ico");
         try
         {
             Directory.CreateDirectory(OutputDir);

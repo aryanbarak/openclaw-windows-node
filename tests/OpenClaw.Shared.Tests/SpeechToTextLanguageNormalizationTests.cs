@@ -19,6 +19,7 @@ public class SpeechToTextLanguageNormalizationTests
     [InlineData("en", "en")]
     [InlineData("EN", "en")]
     [InlineData("en-US", "en")]
+    [InlineData("fa", "fa")]
     [InlineData("en-us", "en")]
     [InlineData("zh-Hans-CN", "zh")]
     [InlineData("fr-FR", "fr")]

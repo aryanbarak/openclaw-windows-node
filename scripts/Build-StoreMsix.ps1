@@ -229,7 +229,7 @@ try {
         )
     }
 
-    $msixName = "OpenClaw-$Architecture.msix"
+    $msixName = "SmartAgent-$Architecture.msix"
     $msixPath = Join-Path $OutputDirectory $msixName
     Copy-Item -LiteralPath $builtPackages[0].FullName -Destination $msixPath -Force
 
@@ -345,7 +345,7 @@ try {
         Get-FileHash -LiteralPath $msixPath -Algorithm SHA256
     ).Hash.ToLowerInvariant()
     [ordered]@{
-        repository = 'https://github.com/openclaw/openclaw-windows-node'
+        repository = 'https://github.com/aryanbarak/openclaw-windows-node'
         sourceCommit = $sourceCommit.ToLowerInvariant()
         sourceTreeDirty = $sourceTreeDirty
         architecture = $Architecture

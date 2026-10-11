@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <MigrationStoreProductId Condition="'$(MigrationStoreProductId)' == ''">9NFPR3BGDRR5</MigrationStoreProductId>
+    <MigrationStoreProductId Condition="'$(MigrationStoreProductId)' == ''">9PJK1RFSRJKL</MigrationStoreProductId>
     <!-- Selected first coordinated Inno/Store release. Verify its artifacts before
          enabling migration; never derive this floor from the current Version. -->
     <MigrationMinimumSourceVersion Condition="'$(MigrationMinimumSourceVersion)' == ''">2026.9.5.0</MigrationMinimumSourceVersion>

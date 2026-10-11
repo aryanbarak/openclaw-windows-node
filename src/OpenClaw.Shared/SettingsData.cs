@@ -90,6 +90,13 @@ public record class SettingsData
     public bool NodeSttEnabled { get; set; } = false;
     /// <summary>STT language: "auto" for Whisper auto-detect, or a BCP-47 tag like "en-US".</summary>
     public string SttLanguage { get; set; } = "auto";
+    /// <summary>Speech recognition provider: "local" or "openai".</summary>
+    public string SttProvider { get; set; } = "local";
+    /// <summary>
+    /// OpenAI API key storage slot. When persisted by the Windows tray's
+    /// SettingsManager this is an opaque dpapi:-prefixed blob, not plaintext.
+    /// </summary>
+    public string? SttOpenAiApiKey { get; set; }
     /// <summary>Whisper model name: "tiny", "base", or "small".</summary>
     public string SttModelName { get; set; } = "base";
     /// <summary>Seconds of silence before auto-submit in voice chat mode.</summary>

@@ -13,7 +13,7 @@
                        AutomationProperties.AutomationId="VoiceSettingsPageMarker"
                        Style="{StaticResource TitleTextBlockStyle}"/>
             <TextBlock x:Uid="VoiceSettingsPage_PageDescription" x:Name="PageDescriptionText"
-                       Text="Configure speech-to-text and voice interaction settings. All speech processing runs locally on your device."
+                       Text="Configure speech-to-text and voice interaction settings. Choose local processing or OpenAI online transcription."
                        Style="{StaticResource CaptionTextBlockStyle}"
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        TextWrapping="Wrap" Margin="0,0,0,8"/>
@@ -58,6 +58,27 @@
                                Style="{StaticResource CaptionTextBlockStyle}"
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                TextWrapping="Wrap"/>
+
+                    <ComboBox x:Uid="VoiceSettingsPage_SttProviderCombo" x:Name="SttProviderCombo" Header="Speech recognition"
+                              SelectionChanged="OnSttProviderChanged" Width="320">
+                        <ComboBoxItem x:Uid="VoiceSettingsPage_SttProviderLocal" Content="Local Whisper (private, offline)" Tag="local"/>
+                        <ComboBoxItem x:Uid="VoiceSettingsPage_SttProviderOpenAi" Content="OpenAI (online, higher accuracy)" Tag="openai"/>
+                    </ComboBox>
+
+                    <StackPanel x:Name="OpenAiSttPanel" Spacing="8" Visibility="Collapsed">
+                        <PasswordBox x:Uid="VoiceSettingsPage_OpenAiApiKeyBox" x:Name="OpenAiApiKeyBox" Header="OpenAI API key"
+                                     PasswordChanged="OnOpenAiApiKeyChanged" Width="420" HorizontalAlignment="Left"/>
+                        <TextBlock x:Uid="VoiceSettingsPage_OpenAiModelText"
+                                   Text="Model: gpt-transcribe. Recorded speech is sent to OpenAI only while this provider is selected. The API key is protected with Windows DPAPI."
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock x:Uid="VoiceSettingsPage_OpenAiFallbackText"
+                                   Text="If the online request fails, a downloaded local Whisper model is used automatically."
+                                   Style="{StaticResource CaptionTextBlockStyle}"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
 
                     <ComboBox x:Uid="VoiceSettingsPage_ModelCombo" x:Name="ModelCombo" Header="Model Size"
                               SelectionChanged="OnModelChanged" Width="320">
@@ -143,6 +164,7 @@
                     <ComboBox x:Uid="VoiceSettingsPage_LanguageCombo" x:Name="LanguageCombo"
                               SelectionChanged="OnLanguageChanged" Width="200">
                         <ComboBoxItem x:Uid="VoiceSettingsPage_LangAuto" Content="Auto-detect" Tag="auto"/>
+                        <ComboBoxItem x:Uid="VoiceSettingsPage_LangFa"   Content="Persian"      Tag="fa"/>
                         <ComboBoxItem x:Uid="VoiceSettingsPage_LangEn"   Content="English"     Tag="en"/>
                         <ComboBoxItem x:Uid="VoiceSettingsPage_LangEs"   Content="Spanish"     Tag="es"/>
                         <ComboBoxItem x:Uid="VoiceSettingsPage_LangFr"   Content="French"      Tag="fr"/>

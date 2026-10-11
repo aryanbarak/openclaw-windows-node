@@ -795,6 +795,35 @@ public sealed class OnboardingWindowsFlowTests(UIThreadFixture ui, ITestOutputHe
         }, new FailingNativeHost());
     }
 
+    [Fact]
+    public async Task NativeEditor_ShowsSuggestedRemoteGatewayWithoutConfiguringIt()
+    {
+        var host = new FailingNativeHost();
+        await WithWindowAsync(async (window, frame, _) =>
+        {
+            var security = await MountedPageAsync<SecurityNoticePage>(window, frame);
+            Assert.Equal("Smart-Agent Setup", window.Title);
+            Assert.Equal("Welcome to Smart-Agent", Find<TextBlock>(security, "WelcomeTitle").Text);
+            Assert.Equal("Smart-Agent is your AI assistant for getting things done on your PC.",
+                Find<TextBlock>(security, "WelcomeDescription").Text);
+            var brandMark = Find<Image>(Assert.IsType<Grid>(window.Content), "TitleBarBrandMark");
+            Assert.Equal(24, brandMark.Width);
+            Assert.NotNull(brandMark.Source);
+
+            typeof(SetupWindow).GetMethod("NavigateToNativeConnection",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                .Invoke(window, [SetupGatewayRoute.Existing]);
+            var editor = await MountedPageAsync<SetupNativeConnectionPage>(window, frame);
+
+            Assert.Equal("wss://agent.smartaryn.com", Find<TextBox>(editor, "AddressInput").Text);
+            Assert.Null(window.AccessDraft.Config.GatewayUrl);
+            Assert.False(window.AccessDraft.GatewayAvailable);
+            Assert.Empty(host.Checks);
+            await SavePageProofAsync(window, editor, "smart-agent-suggested-gateway");
+        }, host: host, configGatewayUrl: null,
+            suggestedRemoteGatewayUrl: "wss://agent.smartaryn.com");
+    }
+
     [Theory]
     [InlineData(SetupGatewayRoute.Existing, 0)]
     [InlineData(SetupGatewayRoute.Remote, 1)]
@@ -887,7 +916,8 @@ public sealed class OnboardingWindowsFlowTests(UIThreadFixture ui, ITestOutputHe
 
     private async Task WithWindowAsync(
         Func<SetupWindow, Frame, string, Task> assertion, ISetupNativeConnectionHost? host = null, bool recovery = false,
-        bool nativeProof = false, ElementTheme theme = ElementTheme.Light)
+        bool nativeProof = false, ElementTheme theme = ElementTheme.Light,
+        string? configGatewayUrl = "wss://mounted-flow.invalid", string? suggestedRemoteGatewayUrl = null)
     {
         var repo = Environment.GetEnvironmentVariable("OPENCLAW_REPO_ROOT")
             ?? throw new InvalidOperationException("Set OPENCLAW_REPO_ROOT for mounted onboarding tests.");
@@ -904,7 +934,7 @@ public sealed class OnboardingWindowsFlowTests(UIThreadFixture ui, ITestOutputHe
         File.WriteAllText(configPath, JsonSerializer.Serialize(new SetupConfig
         {
             DistroName = "MountedFlow-NoRealDistro",
-            GatewayUrl = "wss://mounted-flow.invalid",
+            GatewayUrl = configGatewayUrl,
             Settings = new() { EnableNodeMode = true, EnableMcpServer = false, NodeOllamaInferenceEnabled = false },
         }));
         try
@@ -923,6 +953,7 @@ public sealed class OnboardingWindowsFlowTests(UIThreadFixture ui, ITestOutputHe
                     window = OnboardingNativeProof.CreateWindow(() => new SetupWindow(configPath: configPath, dataDir: data,
                         localDataDir: Path.Combine(directory, "local-data"), commandLineArgs: [],
                         distroNameOverride: "MountedFlow-NoRealDistro", nativeConnectionHost: host,
+                        suggestedRemoteGatewayUrl: suggestedRemoteGatewayUrl,
                         startAtLocalAiRecoveryReview: recovery, localAiRecoveryModelId: recovery ? "mounted-pinned-model" : null));
                     var root = Assert.IsType<Grid>(window.Content);
                     frame = Find<Frame>(root, "RootFrame");

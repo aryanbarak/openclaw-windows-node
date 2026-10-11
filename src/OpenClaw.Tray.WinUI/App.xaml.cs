@@ -43,9 +43,16 @@ namespace OpenClawTray;
 
 public partial class App : Application, OpenClawTray.Services.IAppCommands, IPermissionsPageRuntimeHost
 {
-    internal static readonly UpdatumManager AppUpdater = new("openclaw", "openclaw-windows-node")
+    internal static readonly UpdatumManager AppUpdater = new(
+        OpenClawAppIdentity.UpdateRepositoryOwner,
+        OpenClawAppIdentity.UpdateRepositoryName)
     {
         FetchOnlyLatestRelease = true,
+        AssetRegexPattern = RuntimeInformation.ProcessArchitecture == Architecture.Arm64
+            ? "^SmartAgent-Setup-arm64\\.exe$"
+            : "^SmartAgent-Setup-x64\\.exe$",
+        AssetExtensionFilter = "exe",
+        InstallUpdateWindowsExeType = UpdatumWindowsExeType.Installer,
         InstallUpdateSingleFileExecutableName = "OpenClaw.Tray.WinUI",
     };
 
@@ -3832,7 +3839,7 @@ public partial class App : Application, OpenClawTray.Services.IAppCommands, IPer
         if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
         {
             if (nativeCompletion is not null) throw new InvalidOperationException("The tray executable is unavailable.");
-            await ShowSetupRestartErrorAsync("OpenClaw setup finished, but the tray executable could not be found for restart.");
+            await ShowSetupRestartErrorAsync("Smart-Agent setup finished, but the tray executable could not be found for restart.");
             return;
         }
 
@@ -3890,11 +3897,11 @@ public partial class App : Application, OpenClawTray.Services.IAppCommands, IPer
         {
             if (nativeCompletion is not null) throw;
             Logger.Error($"Failed to restart tray after setup: {ex}");
-            await ShowSetupRestartErrorAsync("OpenClaw setup finished, but restarting the tray failed. The current tray will keep running; please exit and reopen OpenClaw.");
+            await ShowSetupRestartErrorAsync("Smart-Agent setup finished, but restarting the tray failed. The current tray will keep running; please exit and reopen Smart-Agent.");
         }
     }
 
-    private async Task ShowSetupRestartErrorAsync(string message, string title = "Restart OpenClaw")
+    private async Task ShowSetupRestartErrorAsync(string message, string title = "Restart Smart-Agent")
     {
         var xamlRoot = _windowManager?.SetupXamlRoot;
         if (xamlRoot is null)

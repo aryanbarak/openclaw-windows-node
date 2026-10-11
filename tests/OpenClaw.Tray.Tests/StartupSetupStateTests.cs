@@ -93,7 +93,7 @@ public class StartupSetupStateTests
         // so first-run setup should still be offered.
         using var temp = TempSettings.Create();
         StoreDeviceToken(temp.Path);
-        var settings = new SettingsManager(temp.Path) { GatewayUrl = "ws://localhost:18789" };
+        var settings = new SettingsManager(temp.Path) { GatewayUrl = "ws://localhost:18889" };
 
         Assert.True(StartupSetupState.RequiresSetup(settings, temp.Path));
     }
@@ -446,11 +446,11 @@ public class StartupSetupStateTests
         registry.AddOrUpdate(new GatewayRecord
         {
             Id = "local-gateway",
-            Url = "ws://localhost:18789",
+            Url = "ws://localhost:18889",
             IsLocal = true,
             SharedGatewayToken = "shared-token"
         });
-        var wsl = new FakeWslCommandRunner([new WslDistroInfo("OpenClawGateway", "Stopped", 2)]);
+        var wsl = new FakeWslCommandRunner([new WslDistroInfo("SmartAgentGateway", "Stopped", 2)]);
 
         var kind = await SetupExistingGatewayClassifier.ClassifyAsync(
             registry,
@@ -473,9 +473,9 @@ public class StartupSetupStateTests
             Id = "tailscale-gateway",
             Url = "wss://openclaw.tailnet.ts.net",
             IsLocal = true,
-            SetupManagedDistroName = "OpenClawGateway",
+            SetupManagedDistroName = "SmartAgentGateway",
         });
-        var wsl = new FakeWslCommandRunner([new WslDistroInfo("OpenClawGateway", "Stopped", 2)]);
+        var wsl = new FakeWslCommandRunner([new WslDistroInfo("SmartAgentGateway", "Stopped", 2)]);
 
         var kind = await SetupExistingGatewayClassifier.ClassifyAsync(
             registry, settings, temp.Path, wsl, localDataPath: temp.Path);
@@ -533,7 +533,7 @@ public class StartupSetupStateTests
         Directory.CreateDirectory(localDataPath);
         File.WriteAllText(
             Path.Combine(localDataPath, "setup-state.json"),
-            """{"DistroName":"OpenClawGateway","Phase":"Complete"}""");
+            """{"DistroName":"SmartAgentGateway","Phase":"Complete"}""");
         var settings = new SettingsManager(temp.Path);
         var registry = new GatewayRegistry(temp.Path);
         var wsl = new ThrowingWslCommandRunner();
@@ -556,7 +556,7 @@ public class StartupSetupStateTests
         Directory.CreateDirectory(localDataPath);
         File.WriteAllText(
             Path.Combine(localDataPath, "setup-state.json"),
-            """{"DistroName":"OpenClawGateway","Phase":13,"Status":7}""");
+            """{"DistroName":"SmartAgentGateway","Phase":13,"Status":7}""");
         var settings = new SettingsManager(temp.Path);
         var registry = new GatewayRegistry(temp.Path);
         var wsl = new ThrowingWslCommandRunner();

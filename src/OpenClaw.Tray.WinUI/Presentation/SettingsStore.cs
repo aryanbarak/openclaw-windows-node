@@ -165,6 +165,7 @@ internal sealed class SettingsStore : ISettingsStore
         NodeOllamaInferenceEnabled = _settings.NodeOllamaInferenceEnabled,
         EnableManagedLocalGatewayAutoRepair = _settings.EnableManagedLocalGatewayAutoRepair,
         SttModelName = _settings.SttModelName,
+        SttProvider = _settings.SttProvider,
         TtsProvider = _settings.TtsProvider,
         TtsPiperVoiceId = _settings.TtsPiperVoiceId,
         TtsElevenLabsApiKey = _settings.TtsElevenLabsApiKey,

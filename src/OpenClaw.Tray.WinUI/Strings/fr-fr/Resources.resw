@@ -276,25 +276,25 @@
     <value>Fermer</value>
   </data>
   <data name="WindowTitle_Settings" xml:space="preserve">
-    <value>Paramètres: OpenClaw Tray</value>
+    <value>Paramètres: Smart-Agent</value>
   </data>
   <data name="WindowTitle_Status" xml:space="preserve">
-    <value>État: OpenClaw Tray</value>
+    <value>État: Smart-Agent</value>
   </data>
   <data name="WindowTitle_ActivityStream" xml:space="preserve">
-    <value>Flux d'activités: OpenClaw Tray</value>
+    <value>Flux d'activités: Smart-Agent</value>
   </data>
   <data name="WindowTitle_NotificationHistory" xml:space="preserve">
-    <value>Historique de notifications: OpenClaw Tray</value>
+    <value>Historique de notifications: Smart-Agent</value>
   </data>
   <data name="WindowTitle_WebChat" xml:space="preserve">
-    <value>Discussion OpenClaw</value>
+    <value>Discussion Smart-Agent</value>
   </data>
   <data name="WindowTitle_Welcome" xml:space="preserve">
-    <value>Bienvenue sur OpenClaw</value>
+    <value>Bienvenue sur Smart-Agent</value>
   </data>
   <data name="WindowTitle_Update" xml:space="preserve">
-    <value>Mettre à jour OpenClaw</value>
+    <value>Mettre à jour Smart-Agent</value>
   </data>
   <data name="Status_Testing" xml:space="preserve">
     <value>Test en cours...</value>
@@ -306,10 +306,10 @@
     <value>❌ Problème de connexion</value>
   </data>
   <data name="Welcome_Title" xml:space="preserve">
-    <value>Bienvenue sur OpenClaw!</value>
+    <value>Bienvenue sur Smart-Agent!</value>
   </data>
   <data name="Welcome_Description" xml:space="preserve">
-    <value>OpenClaw Tray est votre compagnon Windows pour OpenClaw, l'assistant personnel propulsé par l'IA.</value>
+    <value>Smart-Agent est votre assistant personnel propulsé par l'IA pour Windows.</value>
   </data>
   <data name="Welcome_GettingStarted" xml:space="preserve">
     <value>Pour débuter, il vous faut :</value>
@@ -2437,22 +2437,22 @@ Utilisez l'une de ces options :
     <value>Fichiers de l’espace de travail</value>
   </data>
   <data name="ChatWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Chat</value>
+    <value>Smart-Agent Chat</value>
   </data>
   <data name="SearchBox.PlaceholderText" xml:space="preserve">
     <value>Tapez une commande...</value>
   </data>
   <data name="HubWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>Paramètres OpenClaw</value>
+    <value>Paramètres Smart-Agent</value>
   </data>
   <data name="TitleSearchBox.PlaceholderText" xml:space="preserve">
     <value>Rechercher… (Ctrl+E)</value>
   </data>
   <data name="CanvasWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Canvas</value>
+    <value>Smart-Agent Canvas</value>
   </data>
   <data name="CanvasWindow_TextBlock_31.Text" xml:space="preserve">
-    <value>OpenClaw Canvas</value>
+    <value>Smart-Agent Canvas</value>
   </data>
   <data name="CanvasWindowReloadToolTip.Content" xml:space="preserve">
     <value>Recharger</value>
@@ -2461,7 +2461,7 @@ Utilisez l'une de ces options :
     <value>Recharger le canvas</value>
   </data>
   <data name="TrayMenuWindow_winexWindowEx_2.Title" xml:space="preserve">
-    <value>OpenClaw Menu</value>
+    <value>Smart-Agent Menu</value>
   </data>
   <data name="UsagePage_TextBlock_10.Text" xml:space="preserve">
     <value>Utilisation et coût</value>
@@ -2494,7 +2494,7 @@ Utilisez l'une de ces options :
     <value>Voix et audio</value>
   </data>
   <data name="VoiceSettingsPage_PageDescription.Text" xml:space="preserve">
-    <value>Configurez la reconnaissance vocale et les paramètres d'interaction vocale. Tout le traitement vocal s'exécute localement sur votre appareil.</value>
+    <value>Configurez la reconnaissance vocale et choisissez le traitement local ou la transcription OpenAI en ligne.</value>
   </data>
   <data name="VoiceSettingsPage_SttHeader.Text" xml:space="preserve">
     <value>Reconnaissance vocale</value>
@@ -2531,6 +2531,9 @@ Utilisez l'une de ces options :
   </data>
   <data name="VoiceSettingsPage_LangAuto.Content" xml:space="preserve">
     <value>Détection automatique</value>
+  </data>
+  <data name="VoiceSettingsPage_LangFa.Content" xml:space="preserve">
+    <value>Persan</value>
   </data>
   <data name="VoiceSettingsPage_LangEn.Content" xml:space="preserve">
     <value>Anglais</value>
@@ -2896,7 +2899,7 @@ Utilisez l'une de ces options :
     <value>Forcer l'interface de discussion du compagnon</value>
   </data>
   <data name="Chat_ZeroState_WelcomeTitle" xml:space="preserve">
-    <value>Bienvenue dans OpenClaw</value>
+    <value>Bienvenue dans Smart-Agent</value>
   </data>
   <data name="Chat_ZeroState_WelcomeSubtitle" xml:space="preserve">
     <value>Comment puis-je vous aider aujourd'hui ?</value>
@@ -7140,17 +7143,17 @@ Le binaire wxc-exec est introuvable. {1} S'il s'agit d'une build développeur, c
   <data name="Chat_Composer_Effort_Faster" xml:space="preserve"><value>Plus rapide</value></data>
   <data name="Chat_Composer_Effort_Smarter" xml:space="preserve"><value>Plus approfondi</value></data>
   <data name="Onboarding_Flow_Position" xml:space="preserve"><value>Étape {0} sur {1}</value></data>
-  <data name="Onboarding_Flow_CompletionUnavailable" xml:space="preserve"><value>La configuration n'a pas pu ouvrir Chat. Fermez la configuration et rouvrez OpenClaw.</value></data>
+  <data name="Onboarding_Flow_CompletionUnavailable" xml:space="preserve"><value>La configuration n'a pas pu ouvrir Chat. Fermez la configuration et rouvrez Smart-Agent.</value></data>
   <data name="Onboarding_Flow_AiNavigationFailed" xml:space="preserve"><value>La passerelle est installée, mais la configuration de l'IA n'a pas pu s'ouvrir. Rouvrez la configuration pour continuer sans réinstaller.</value></data>
   <data name="Onboarding_Flow_AccessTitle" xml:space="preserve"><value>Votre PC, vos autorisations</value></data>
   <data name="Onboarding_Flow_InstallAction" xml:space="preserve"><value>Installer et configurer</value></data>
   <data name="Onboarding_Flow_Permissions.Header" xml:space="preserve"><value>Autorisations Windows</value></data>
   <data name="Onboarding_Flow_InstallReview.Text" xml:space="preserve"><value>Ce qui sera installé</value></data>
-  <data name="Onboarding_Flow_AutoStart.Text" xml:space="preserve"><value>Lancer OpenClaw à l'ouverture de session</value></data>
-  <data name="Onboarding_Flow_AutoStartToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Lancer OpenClaw à l'ouverture de session</value></data>
+  <data name="Onboarding_Flow_AutoStart.Text" xml:space="preserve"><value>Lancer Smart-Agent à l'ouverture de session</value></data>
+  <data name="Onboarding_Flow_AutoStartToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Lancer Smart-Agent à l'ouverture de session</value></data>
   <data name="ChatDashboardButton.Content" xml:space="preserve"><value>Dashboard</value></data>
   <data name="ChatDashboardHint.Text" xml:space="preserve"><value>Canaux, intégrations et paramètres de la passerelle</value></data>
-  <data name="Onboarding_Flow_WelcomeDescription.Text" xml:space="preserve"><value>OpenClaw est votre assistant IA pour accomplir vos tâches sur votre PC.</value></data>
+  <data name="Onboarding_Flow_WelcomeDescription.Text" xml:space="preserve"><value>Smart-Agent est votre assistant IA pour accomplir vos tâches sur votre PC.</value></data>
   <data name="Onboarding_AiSetup_Title.Text" xml:space="preserve"><value>Connectez votre IA</value></data>
   <data name="Onboarding_AiSetup_CatalogOptIn" xml:space="preserve"><value>Découvrir les conversations existantes des fournisseurs (facultatif)</value></data>
   <data name="Onboarding_AiSetup_Starting" xml:space="preserve"><value>Démarrage de la configuration du fournisseur…</value></data>
@@ -7282,12 +7285,12 @@ Le binaire wxc-exec est introuvable. {1} S'il s'agit d'une build développeur, c
   <data name="Onboarding_V2_LocalAiReview.Header" xml:space="preserve"><value>Local AI</value></data>
   <data name="Onboarding_V2_TailscaleReview.Header" xml:space="preserve"><value>Tailscale Serve</value></data>
   <data name="Onboarding_V2_ReplacementCard.Header" xml:space="preserve"><value>Vérifier le remplacement WSL</value></data>
-  <data name="Onboarding_V2_StartupCard.Header" xml:space="preserve"><value>Lancer OpenClaw à l'ouverture de session</value></data>
+  <data name="Onboarding_V2_StartupCard.Header" xml:space="preserve"><value>Lancer Smart-Agent à l'ouverture de session</value></data>
   <data name="Onboarding_V2_ExactCommands.Header" xml:space="preserve"><value>Commandes et fichiers exacts</value></data>
   <data name="Onboarding_V2_ReviewRequired.Title" xml:space="preserve"><value>Vérifiez les choix requis</value></data>
   <data name="Onboarding_V2_ReviewRequired.Message" xml:space="preserve"><value>Vérifiez les prérequis Local AI et Tailscale sélectionnés et confirmez tout remplacement WSL avant l'installation.</value></data>
   <data name="Onboarding_V2_Install.Content" xml:space="preserve"><value>Installer</value></data>
-  <data name="Onboarding_V2_WelcomeTitle.Text" xml:space="preserve"><value>Bienvenue dans OpenClaw</value></data>
+  <data name="Onboarding_V2_WelcomeTitle.Text" xml:space="preserve"><value>Bienvenue dans Smart-Agent</value></data>
   <data name="Onboarding_V2_WelcomeChat.Header" xml:space="preserve"><value>Discutez avec votre IA</value></data>
   <data name="Onboarding_V2_WelcomeChat.Description" xml:space="preserve"><value>Utilisez Chat natif avec le fournisseur d'IA de votre choix.</value></data>
   <data name="Onboarding_V2_WelcomePc.Header" xml:space="preserve"><value>Laissez les agents vous aider sur ce PC</value></data>
@@ -7295,7 +7298,7 @@ Le binaire wxc-exec est introuvable. {1} S'il s'agit d'une build développeur, c
   <data name="Onboarding_V2_WelcomeGateway.Header" xml:space="preserve"><value>Gardez le contrôle de votre Gateway</value></data>
   <data name="Onboarding_V2_WelcomeGateway.Description" xml:space="preserve"><value>Exécutez ici un Gateway WSL privé ou connectez-vous à un Gateway existant.</value></data>
   <data name="Onboarding_V2_WelcomeTrust.Title" xml:space="preserve"><value>Avant de commencer</value></data>
-  <data name="Onboarding_V2_WelcomeTrust.Message" xml:space="preserve"><value>Les agents IA sont puissants et leur donner accès à votre PC comporte des risques. Ils peuvent commettre des erreurs, modifier ou supprimer des fichiers, ou exposer des informations privées.&#x0a;&#x0a;Vous pouvez contrôler et limiter l’accès d’OpenClaw à votre PC.</value></data>
+  <data name="Onboarding_V2_WelcomeTrust.Message" xml:space="preserve"><value>Les agents IA sont puissants et leur donner accès à votre PC comporte des risques. Ils peuvent commettre des erreurs, modifier ou supprimer des fichiers, ou exposer des informations privées.&#x0a;&#x0a;Vous pouvez contrôler et limiter l’accès de Smart-Agent à votre PC.</value></data>
   <data name="Onboarding_V2_Continue.Content" xml:space="preserve"><value>Continuer</value></data>
   <data name="Onboarding_V2_Retry.Content" xml:space="preserve"><value>Réessayer</value></data>
   <data name="Onboarding_V2_AlternativeRoutes.Content" xml:space="preserve"><value>Distant, MCP local ou configuration ultérieure</value></data>
@@ -7317,7 +7320,7 @@ Le binaire wxc-exec est introuvable. {1} S'il s'agit d'une build développeur, c
   <data name="Onboarding_V2_TailscaleTrust.Header" xml:space="preserve"><value>Faire confiance aux identités Tailscale pour l'authentification Gateway</value></data>
   <data name="Onboarding_V2_TailscaleTrust.Description" xml:space="preserve"><value>Désactivé par défaut. Activez uniquement si les ACL du tailnet doivent participer au contrôle d'accès du Gateway.</value></data>
   <data name="Onboarding_V2_TailscaleTrustToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve"><value>Faire confiance aux identités Tailscale</value></data>
-  <data name="Onboarding_V2_WindowTitle.Text" xml:space="preserve"><value>Configuration OpenClaw</value></data>
+  <data name="Onboarding_V2_WindowTitle.Text" xml:space="preserve"><value>Configuration Smart-Agent</value></data>
   <data name="Onboarding_V2_NetworkConsentRecorded" xml:space="preserve"><value>Consentement réseau WSL enregistré</value></data>
   <data name="Onboarding_V2_ReviewNetworking" xml:space="preserve"><value>Vérifier les modifications du réseau WSL</value></data>
   <data name="Onboarding_V2_TailscaleChecking" xml:space="preserve"><value>Vérification de Tailscale Windows...</value></data>
@@ -7485,13 +7488,13 @@ Le binaire wxc-exec est introuvable. {1} S'il s'agit d'une build développeur, c
   <data name="Onboarding_Copy_GatewayExistingTitle.Text" xml:space="preserve"><value>Se connecter à un Gateway existant</value></data>
   <data name="Onboarding_Copy_GatewayExistingDescription.Text" xml:space="preserve"><value>Se connecter sans installer de Gateway ni d’IA locale sur ce PC.</value></data>
   <data name="Onboarding_StartupWarning_Title" xml:space="preserve"><value>Démarrage de Windows</value></data>
-  <data name="Onboarding_StartupWarning_Message" xml:space="preserve"><value>La configuration est terminée, mais la préférence de démarrage de Windows n'a pas pu être entièrement appliquée. OpenClaw va terminer son redémarrage. Vous pouvez réessayer dans Companion Settings.</value></data>
+  <data name="Onboarding_StartupWarning_Message" xml:space="preserve"><value>La configuration est terminée, mais la préférence de démarrage de Windows n'a pas pu être entièrement appliquée. Smart-Agent va terminer son redémarrage. Vous pouvez réessayer dans Companion Settings.</value></data>
   <data name="Onboarding_RegistryRecovery_Title" xml:space="preserve"><value>La récupération du Gateway nécessite votre attention</value></data>
-  <data name="Onboarding_RegistryRecovery_Message" xml:space="preserve"><value>La configuration n'a pas pu réconcilier les modifications enregistrées du Gateway. Les modifications non enregistrées n'ont pas été validées. Fermez puis rouvrez OpenClaw pour recharger les Gateways enregistrés avant de réessayer.</value></data>
-  <data name="Onboarding_RestartRecovery_Title" xml:space="preserve"><value>Terminer l'ouverture d'OpenClaw</value></data>
-  <data name="Onboarding_RestartRecovery_Waiting" xml:space="preserve"><value>Une autre instance d'OpenClaw termine la configuration. Réessayer attend qu'elle libère le contrôle. La page choisie est conservée. Annuler permet de fermer l'autre instance puis de rouvrir OpenClaw pour reprendre.</value></data>
-  <data name="Onboarding_RestartRecovery_Storage" xml:space="preserve"><value>OpenClaw n'a pas pu conserver la page choisie en toute sécurité. Réessayez. Annuler arrête ce lancement ; vous devrez peut-être rouvrir la configuration et choisir à nouveau.</value></data>
-  <data name="Onboarding_RestartRecovery_Invalid" xml:space="preserve"><value>Le lancement enregistré n'a pas pu être lu. OpenClaw s'ouvrira normalement. Rouvrez la configuration pour choisir une destination.</value></data>
+  <data name="Onboarding_RegistryRecovery_Message" xml:space="preserve"><value>La configuration n'a pas pu réconcilier les modifications enregistrées du Gateway. Les modifications non enregistrées n'ont pas été validées. Fermez puis rouvrez Smart-Agent pour recharger les Gateways enregistrés avant de réessayer.</value></data>
+  <data name="Onboarding_RestartRecovery_Title" xml:space="preserve"><value>Terminer l'ouverture de Smart-Agent</value></data>
+  <data name="Onboarding_RestartRecovery_Waiting" xml:space="preserve"><value>Une autre instance de Smart-Agent termine la configuration. Réessayer attend qu'elle libère le contrôle. La page choisie est conservée. Annuler permet de fermer l'autre instance puis de rouvrir Smart-Agent pour reprendre.</value></data>
+  <data name="Onboarding_RestartRecovery_Storage" xml:space="preserve"><value>Smart-Agent n'a pas pu conserver la page choisie en toute sécurité. Réessayez. Annuler arrête ce lancement ; vous devrez peut-être rouvrir la configuration et choisir à nouveau.</value></data>
+  <data name="Onboarding_RestartRecovery_Invalid" xml:space="preserve"><value>Le lancement enregistré n'a pas pu être lu. Smart-Agent s'ouvrira normalement. Rouvrez la configuration pour choisir une destination.</value></data>
   <data name="PermissionsPage_ExecRuleScope_Main" xml:space="preserve">
     <value>cet agent</value>
   </data>
@@ -7800,7 +7803,7 @@ Vos paramètres, votre passerelle, vos fichiers et vos modèles restent en place
   <data name="WorkspaceShell_Sandbox" xml:space="preserve"><value>Sandbox</value></data>
   <data name="WorkspaceShell_Debug" xml:space="preserve"><value>Diagnostics</value></data>
   <data name="WorkspaceShell_Settings" xml:space="preserve"><value>Settings</value></data>
-  <data name="WorkspaceShell_About" xml:space="preserve"><value>About OpenClaw</value></data>
+  <data name="WorkspaceShell_About" xml:space="preserve"><value>À propos de Smart-Agent</value></data>
   <data name="WorkspaceShell_AgentsDescription" xml:space="preserve"><value>Your gateway agents and their recent conversations.</value></data>
   <data name="WorkspaceShell_AgentDetailDescription" xml:space="preserve"><value>Agent workspace and recent work.</value></data>
   <data name="WorkspaceShell_WriterDetailDescription" xml:space="preserve"><value>Agent workspace and recent work.</value></data>
@@ -7886,7 +7889,7 @@ Vos paramètres, votre passerelle, vos fichiers et vos modèles restent en place
   <data name="WorkspaceShell_NoNativeWorkflow" xml:space="preserve"><value>The current gateway client does not expose this workflow. Check your gateway dashboard for supported extensions.</value></data>
   <data name="WorkspaceShell_NoActivity" xml:space="preserve"><value>No recent activity</value></data>
   <data name="WorkspaceShell_ActivityEmpty" xml:space="preserve"><value>Agent events will appear here as the connected gateway sends them.</value></data>
-  <data name="WorkspaceShell_CompanionApp" xml:space="preserve"><value>OpenClaw Windows companion</value></data>
+  <data name="WorkspaceShell_CompanionApp" xml:space="preserve"><value>Compagnon Windows Smart-Agent</value></data>
   <data name="WorkspaceShell_OpenChat" xml:space="preserve"><value>Open chat</value></data>
   <data name="WorkspaceShell_Details" xml:space="preserve"><value>View details</value></data>
   <data name="WorkspaceShell_AgentSettings" xml:space="preserve"><value>Agent settings</value></data>
@@ -7951,4 +7954,13 @@ Vos paramètres, votre passerelle, vos fichiers et vos modèles restent en place
   <data name="ChatPage_SetupCheckAgain.Content" xml:space="preserve">
     <value>Vérifier à nouveau</value>
   </data>
+  <data name="VoiceSettingsPage_SttProviderCombo.Header" xml:space="preserve"><value>Reconnaissance vocale</value></data>
+  <data name="VoiceSettingsPage_SttProviderLocal.Content" xml:space="preserve"><value>Whisper local (privé, hors ligne)</value></data>
+  <data name="VoiceSettingsPage_SttProviderOpenAi.Content" xml:space="preserve"><value>OpenAI (en ligne, meilleure précision)</value></data>
+  <data name="VoiceSettingsPage_OpenAiApiKeyBox.Header" xml:space="preserve"><value>Clé API OpenAI</value></data>
+  <data name="VoiceSettingsPage_OpenAiModelText.Text" xml:space="preserve"><value>Modèle : gpt-transcribe. La voix enregistrée est envoyée à OpenAI uniquement quand ce fournisseur est sélectionné. La clé API est protégée avec Windows DPAPI.</value></data>
+  <data name="VoiceSettingsPage_OpenAiFallbackText.Text" xml:space="preserve"><value>Si la requête en ligne échoue, un modèle Whisper local téléchargé est utilisé automatiquement.</value></data>
+  <data name="VoiceSettingsPage_OpenAiReady" xml:space="preserve"><value>La reconnaissance vocale OpenAI en ligne est prête.</value></data>
+  <data name="VoiceSettingsPage_OpenAiKeyRequired" xml:space="preserve"><value>Saisissez une clé API OpenAI pour activer la reconnaissance vocale en ligne.</value></data>
+  <data name="VoiceSettingsPage_LocalRequirement" xml:space="preserve"><value>L’entrée vocale nécessite le téléchargement d’au moins un modèle vocal.</value></data>
 </root>

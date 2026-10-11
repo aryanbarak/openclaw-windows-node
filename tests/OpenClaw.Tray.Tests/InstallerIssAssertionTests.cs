@@ -18,12 +18,12 @@ public sealed class InstallerIssAssertionTests
     public void Installer_HasAppMutexMatchingTraySingleInstance()
     {
         var iss = File.ReadAllText(Path.Combine(TestRepositoryPaths.GetRepositoryRoot(), "installer.iss"));
-        // Release build uses "OpenClawTray" mutex; dev build uses "OpenClawTray-Dev".
+        // Release and dev builds use distinct Smart-Agent mutexes.
         // The installer default (non-DevBuild) must match the release mutex.
         Assert.Contains("AppMutex={#MyMutex}", iss);
-        Assert.Contains(@"#define MyMutex ""OpenClawTray""", iss);
+        Assert.Contains(@"#define MyMutex ""SmartAgent""", iss);
         Assert.Contains("Inno requires \"{{\" to emit a literal opening brace in AppId.", iss);
-        Assert.Contains(@"#define MyAppId ""{{M0LTB0T-TRAY-4PP1-D3N7}""", iss);
+        Assert.Contains(@"#define MyAppId ""{{011A8C2B-1CC9-4F76-9B27-CA1DA1933DBA}""", iss);
 
         // The matching tray-side mutex name must be present in App.xaml.cs via AppIdentity.
         var appXamlCs = File.ReadAllText(Path.Combine(
@@ -47,17 +47,17 @@ public sealed class InstallerIssAssertionTests
     {
         var iss = File.ReadAllText(Path.Combine(TestRepositoryPaths.GetRepositoryRoot(), "installer.iss"));
 
-        Assert.Contains(@"#define MyAppName ""OpenClaw Companion""", iss);
-        Assert.Contains(@"#define MyAppAumid ""OpenClaw.Companion""", iss);
+        Assert.Contains(@"#define MyAppName ""Smart-Agent""", iss);
+        Assert.Contains(@"#define MyAppAumid ""SmartAgent.Companion""", iss);
         Assert.Contains(@"#define MyCompression ""lzma""", iss);
         Assert.Contains(@"#define MySolidCompression ""yes""", iss);
-        Assert.Contains("OutputBaseFilename=OpenClawCompanion{#MyOutputSuffix}-Setup-{#MyAppArch}", iss);
+        Assert.Contains("OutputBaseFilename=SmartAgent{#MyOutputSuffix}-Setup-{#MyAppArch}", iss);
         foreach (var iconEntry in new[]
         {
             @"Name: ""{group}\{#MyAppName}""; Filename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
-            @"Name: ""{group}\OpenClaw Gateway Setup""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://setup""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
-            @"Name: ""{group}\OpenClaw Companion Settings""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://commandcenter""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
-            @"Name: ""{group}\OpenClaw Chat""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://chat""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
+            @"Name: ""{group}\Smart-Agent Gateway Setup""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://setup""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
+            @"Name: ""{group}\Smart-Agent Settings""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://commandcenter""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
+            @"Name: ""{group}\Smart-Agent Chat""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://chat""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
             @"Name: ""{group}\Check for Updates""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""{#MyProtocol}://check-updates""; IconFilename: ""{app}\{#MyAppExeName}""; AppUserModelID: ""{#MyAppAumid}""",
             @"Name: ""{autodesktop}\{#MyAppName}""; Filename: ""{app}\{#MyAppExeName}""; Tasks: desktopicon; AppUserModelID: ""{#MyAppAumid}""",
             @"Name: ""{userstartup}\{#MyAppName}""; Filename: ""{app}\{#MyAppExeName}""; Parameters: ""--background""; Tasks: startupicon; AppUserModelID: ""{#MyAppAumid}"""
@@ -142,7 +142,7 @@ public sealed class InstallerIssAssertionTests
     }
 
     [Fact]
-    public void Installer_RegistersOpenClawProtocol()
+    public void Installer_RegistersSmartAgentProtocol()
     {
         var iss = File.ReadAllText(Path.Combine(TestRepositoryPaths.GetRepositoryRoot(), "installer.iss"));
 
@@ -152,8 +152,8 @@ public sealed class InstallerIssAssertionTests
         Assert.Contains(@"Subkey: ""Software\Classes\{#MyProtocol}\shell\open\command""", iss);
         Assert.Contains(@"{app}\{#MyAppExeName}", iss);
         Assert.Contains(@"""%1""", iss);
-        // Ensure release default protocol is "openclaw"
-        Assert.Contains(@"#define MyProtocol ""openclaw""", iss);
+        // Ensure release default protocol is isolated from official OpenClaw.
+        Assert.Contains(@"#define MyProtocol ""smartagent""", iss);
     }
 
     [Fact]
@@ -161,13 +161,13 @@ public sealed class InstallerIssAssertionTests
     {
         var iss = File.ReadAllText(Path.Combine(TestRepositoryPaths.GetRepositoryRoot(), "installer.iss"));
 
-        Assert.Contains(@"#define MyAppName ""OpenClaw Companion (Dev)""", iss);
-        Assert.Contains(@"#define MyAppAumid ""OpenClaw.Companion.Dev""", iss);
-        Assert.Contains(@"#define MyInstallDir ""OpenClawTray-Dev""", iss);
-        Assert.Contains(@"#define MyMutex ""OpenClawTray-Dev""", iss);
-        Assert.Contains(@"#define MyProtocol ""openclaw-dev""", iss);
-        Assert.Contains(@"#define MyDistroName ""OpenClawGateway-Dev""", iss);
-        Assert.Contains(@"#define MyAppPublisher ""OpenClaw Foundation""", iss);
+        Assert.Contains(@"#define MyAppName ""Smart-Agent (Dev)""", iss);
+        Assert.Contains(@"#define MyAppAumid ""SmartAgent.Companion.Dev""", iss);
+        Assert.Contains(@"#define MyInstallDir ""SmartAgent-Dev""", iss);
+        Assert.Contains(@"#define MyMutex ""SmartAgent-Dev""", iss);
+        Assert.Contains(@"#define MyProtocol ""smartagent-dev""", iss);
+        Assert.Contains(@"#define MyDistroName ""SmartAgentGateway-Dev""", iss);
+        Assert.Contains(@"#define MyAppPublisher ""Smart-Agent""", iss);
         Assert.Contains("-DataDirectoryName ' + AddQuotes('{#MyInstallDir}')", iss);
         Assert.Contains("-AutoStartName ' + AddQuotes('{#MyAutoStartName}')", iss);
         Assert.Contains("-StartupTaskName ' + AddQuotes('{#MyStartupTaskName}')", iss);
@@ -379,8 +379,10 @@ public sealed class InstallerIssAssertionTests
         Assert.Contains(@"<AppxManifest Remove=""@(AppxManifest)"" />", project);
         Assert.DoesNotContain("PatchDevAppxManifestIdentity", project);
         Assert.Contains("Version=\"0.0.0.0\"", manifest);
-        Assert.Contains("Name=\"OpenClawFoundation.OpenClaw\"", manifest);
-        Assert.Contains("<uap:Protocol Name=\"openclaw\">", manifest);
+        Assert.Contains("Name=\"AryanBarakzai.Smart-Agent\"", manifest);
+        Assert.Contains("Publisher=\"CN=C364B4A9-3399-4961-B2B4-36D29AC552C3\"", manifest);
+        Assert.Contains("<PublisherDisplayName>Aryan Barakzai</PublisherDisplayName>", manifest);
+        Assert.Contains("<uap:Protocol Name=\"smartagent\">", manifest);
         Assert.DoesNotContain("OpenClawFoundation.OpenClaw.Dev", manifest);
     }
 

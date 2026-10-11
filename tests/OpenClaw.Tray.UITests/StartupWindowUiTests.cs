@@ -124,7 +124,7 @@ public sealed class StartupWindowUiTests(ITestOutputHelper output)
             new PropertyCondition(AutomationElement.AutomationIdProperty, "WorkspaceNavigation")) is not null;
 
     private static bool IsSetup(AutomationElement window) =>
-        window.Current.Name.Contains("OpenClaw Setup", StringComparison.Ordinal);
+        window.Current.Name.Contains("Smart-Agent Setup", StringComparison.Ordinal);
 
     private static bool HasExpectedWindow(int processId, bool configured) =>
         Windows(processId).Any(window => configured ? IsWorkspace(window) : IsSetup(window));
@@ -135,12 +135,12 @@ public sealed class StartupWindowUiTests(ITestOutputHelper output)
         Assert.Equal(configured ? 1 : 0, windows.Count(IsWorkspace));
         Assert.Equal(configured ? 0 : 1, windows.Count(IsSetup));
         Assert.DoesNotContain(windows, window =>
-            window.Current.Name.Contains("OpenClaw Settings", StringComparison.Ordinal));
+            window.Current.Name.Contains("Smart-Agent Settings", StringComparison.Ordinal));
         if (!configured)
         {
             Assert.Contains(windows, window => IsSetup(window) &&
                 window.FindFirst(TreeScope.Descendants,
-                    new PropertyCondition(AutomationElement.NameProperty, "Welcome to OpenClaw")) is not null);
+                    new PropertyCondition(AutomationElement.NameProperty, "Welcome to Smart-Agent")) is not null);
         }
         output.WriteLine($"{phase}: setup={windows.Count(IsSetup)}, workspace={windows.Count(IsWorkspace)}");
     }
