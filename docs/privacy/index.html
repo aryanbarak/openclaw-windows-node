@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="Privacy Policy for the Smart-Agent Windows application.">
+  <title>Smart-Agent Privacy Policy</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: #f7f3fb;
+      background: #18151d;
+      line-height: 1.65;
+    }
+    body { margin: 0; }
+    main { width: min(860px, calc(100% - 40px)); margin: 0 auto; padding: 64px 0 96px; }
+    header { padding-bottom: 28px; border-bottom: 1px solid #4a414f; }
+    h1 { margin: 0 0 8px; font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.1; }
+    h2 { margin-top: 42px; font-size: 1.4rem; }
+    h3 { margin-top: 28px; font-size: 1.1rem; }
+    p, li { color: #ddd5e2; }
+    a { color: #86d9f4; }
+    .meta { color: #bcb2c3; }
+    .summary { margin-top: 28px; padding: 20px 24px; background: #2d2533; border-radius: 14px; }
+    .summary strong { color: #fff; }
+    .fa { direction: rtl; text-align: right; }
+    code { color: #f5d36b; }
+    footer { margin-top: 56px; padding-top: 24px; border-top: 1px solid #4a414f; color: #bcb2c3; }
+    @media (prefers-color-scheme: light) {
+      :root { color: #201924; background: #fbf8fc; }
+      p, li { color: #423a47; }
+      .meta, footer { color: #675d6c; }
+      .summary { background: #f0e8f3; }
+      .summary strong { color: #201924; }
+      a { color: #006783; }
+      code { color: #6d5100; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Smart-Agent Privacy Policy</h1>
+    <div class="meta">Effective date: October 11, 2026</div>
+    <p>This policy explains how the Smart-Agent Windows application handles information. Smart-Agent is published by Aryan Barakzai.</p>
+  </header>
+
+  <section class="summary">
+    <strong>Summary:</strong> Smart-Agent stores its settings and downloaded speech assets on your device. It connects to the Gateway and AI services that you configure. Sensitive capabilities such as microphone, camera, screen capture, location, browser control, and command execution require your configuration and applicable Windows permissions. Smart-Agent does not sell personal information or use it for advertising.
+  </section>
+
+  <h2>1. Information Smart-Agent handles</h2>
+  <p>Depending on the features you enable, Smart-Agent may handle:</p>
+  <ul>
+    <li>chat messages, prompts, AI responses, attachments, and conversation metadata;</li>
+    <li>Gateway addresses, connection state, device identity, and authentication tokens;</li>
+    <li>app preferences, permission choices, execution approvals, and locally downloaded model files;</li>
+    <li>microphone audio and transcriptions when you use speech input;</li>
+    <li>camera images, screen captures, location, browser content, files, command input, and command output only when you enable and invoke the relevant capability; and</li>
+    <li>operational diagnostics such as component names, outcomes, durations, counts, protocol choices, and coarse error categories if you explicitly configure diagnostic telemetry.</li>
+  </ul>
+
+  <h2>2. How information is used</h2>
+  <p>Smart-Agent uses information to provide the features you request, connect the Windows app to your selected Gateway and AI provider, maintain your settings and sessions, enforce permission and execution-approval choices, and diagnose technical failures.</p>
+
+  <h2>3. Local processing and storage</h2>
+  <p>App configuration, connection records, device identity, logs, downloaded speech models, and other runtime data may be stored under your Windows user profile. Local speech recognition uses a downloaded Whisper model on your device. Local text-to-speech assets are also stored and processed on your device.</p>
+  <p>Authentication material is treated as a local user secret. You can remove local Smart-Agent data by using the app's uninstall or cleanup options, subject to the choices presented by those tools.</p>
+
+  <h2>4. Gateway and AI services</h2>
+  <p>Smart-Agent is a client for a Gateway and AI services. When you connect to a Gateway or use an AI provider, the information needed for your request may be transmitted to and processed by that service. This may include prompts, conversation content, attachments, tool requests, and tool results. Those services have their own terms, privacy policies, security controls, and retention practices.</p>
+  <p>If you enable cloud speech transcription, recorded audio may be sent to the transcription provider you configured. When local speech recognition is selected, speech audio is processed locally instead.</p>
+
+  <h2>5. Device capabilities and permissions</h2>
+  <p>Smart-Agent can expose optional Windows-node capabilities to an authorized Gateway. These may include microphone, camera, screen capture, location, browser control, canvas, device information, file access, and command execution. Smart-Agent does not silently enable privacy-sensitive capabilities. Availability depends on your app settings, Gateway policy, execution approvals, and Windows permissions.</p>
+  <p>AI agents can make mistakes. Review permission and approval prompts carefully, especially before allowing access to private information, files, accounts, or system commands.</p>
+
+  <h2>6. Diagnostics and telemetry</h2>
+  <p>Diagnostic telemetry export is disabled by default. It begins only if you configure an OpenTelemetry endpoint, and data is sent only to that endpoint. Exported diagnostics are designed to exclude prompts, chat content, screenshots, camera frames, audio, clipboard contents, file contents, credentials, tokens, and raw command input or output.</p>
+  <p>Local logs and support information remain on the device unless you choose to copy or share them.</p>
+
+  <h2>7. Sharing, sale, and advertising</h2>
+  <p>Smart-Agent does not sell personal information and does not use personal information for targeted advertising. Information is shared only as needed with the Gateway, AI provider, transcription provider, or other service that you choose to use, or when required by law.</p>
+
+  <h2>8. Retention and your choices</h2>
+  <p>Local information remains until it is removed through the app, its cleanup tools, or Windows. Information sent to a Gateway or third-party service is retained according to that service's configuration and privacy policy. You may disable capabilities, disconnect Gateways, remove downloaded speech models, clear local app data, or uninstall Smart-Agent.</p>
+
+  <h2>9. Children</h2>
+  <p>Smart-Agent is a general-purpose productivity tool and is not directed to children. Do not use it to provide a child with access to services or content that the child is not permitted to use.</p>
+
+  <h2>10. Security</h2>
+  <p>Smart-Agent uses permission controls, connection authentication, redaction, integrity checks for downloaded speech assets, and user-visible execution approvals. No system is completely secure, so users should protect their Windows account, Gateway, provider accounts, and credentials.</p>
+
+  <h2>11. Changes to this policy</h2>
+  <p>This policy may be updated when Smart-Agent features or legal requirements change. The effective date at the top of this page identifies the current version.</p>
+
+  <h2>12. Contact</h2>
+  <p>For privacy questions, open a privacy-support request in the <a href="https://github.com/aryanbarak/openclaw-windows-node/issues">Smart-Agent public issue tracker</a>. Do not include passwords, API keys, authentication tokens, private files, or other sensitive content in a public issue.</p>
+
+  <section class="summary fa" lang="fa">
+    <h2>خلاصهٔ فارسی</h2>
+    <p>Smart-Agent تنظیمات و مدل‌های گفتار دانلودشده را روی کامپیوتر شما نگهداری می‌کند و به Gateway و ارائه‌دهندهٔ هوش مصنوعی که خودتان تنظیم می‌کنید متصل می‌شود. قابلیت‌های حساس مانند میکروفون، دوربین، ثبت صفحه، موقعیت مکانی، کنترل مرورگر و اجرای فرمان تنها با تنظیمات و مجوزهای مربوط قابل استفاده‌اند. پردازش گفتار می‌تواند به‌صورت محلی انجام شود؛ اگر رونویسی ابری را فعال کنید، صدا ممکن است برای ارائه‌دهندهٔ انتخابی ارسال شود. Smart-Agent اطلاعات شخصی را نمی‌فروشد و برای تبلیغات هدفمند استفاده نمی‌کند.</p>
+  </section>
+
+  <footer>
+    Smart-Agent for Windows · Publisher: Aryan Barakzai
+  </footer>
+</main>
+</body>
+</html>
